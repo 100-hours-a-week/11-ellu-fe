@@ -1,6 +1,6 @@
 ---
 name: "🐛 Fix"
-description: 버그 수정, 성능 병목 해결, 핫픽스 적용 시 사용합니다.
+about: 버그 수정, 성능 병목 해결, 핫픽스 적용 시 사용합니다.
 title: "🐛 Fix: "
 labels: [fix]
 assignees: ''

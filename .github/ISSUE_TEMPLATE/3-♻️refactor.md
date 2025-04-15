@@ -1,6 +1,6 @@
 ---
 name: "♻️ Refactor"
-description: 코드 구조 개선, 스타일 정리, 성능 최적화를 위한 작업입니다.
+about: 코드 구조 개선, 스타일 정리, 성능 최적화를 위한 작업입니다.
 title: "♻️ Refactor: "
 labels: [refactor]
 assignees: ''

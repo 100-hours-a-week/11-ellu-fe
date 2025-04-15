@@ -1,6 +1,6 @@
 ---
 name: "🛠 Maintenance / Release"
-description: 설정 변경, 릴리즈 노트, 문서 편집 작업 등을 위한 템플릿입니다.
+about: 설정 변경, 릴리즈 노트, 문서 편집 작업 등을 위한 템플릿입니다.
 title: "🛠 Maintenance: "
 labels: [chore]
 assignees: ''
