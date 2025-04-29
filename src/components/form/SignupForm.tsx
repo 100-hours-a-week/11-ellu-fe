@@ -1,0 +1,56 @@
+'use client';
+
+import { useState, ChangeEvent, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { TextField, Button, Box } from '@mui/material';
+
+export default function SignupForm() {
+  const router = useRouter();
+  const [nickname, setNickname] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+
+  const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,10}$/;
+
+  const validateNickname = (value: string): string | null => {
+    if (!nicknameRegex.test(value)) {
+      return '닉네임은 1~10자의 한글, 영문 또는 숫자만 사용할 수 있습니다.';
+    }
+    return null;
+  };
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNickname(value);
+    setError(validateNickname(value));
+  };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const validationMessage = validateNickname(nickname);
+
+    if (validationMessage) {
+      setError(validationMessage);
+      return;
+    }
+
+    console.log('닉네임 제출:', nickname);
+    router.replace('/projects');
+  };
+
+  return (
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 530 }}>
+      <TextField
+        label="닉네임"
+        value={nickname}
+        onChange={handleChange}
+        error={!!error}
+        helperText={error ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
+        required
+      />
+      <Button type="submit" variant="contained" disabled={!!error || nickname.length === 0} sx={{ marginTop: 3, height: 50 }}>
+        회원가입 완료
+      </Button>
+    </Box>
+  );
+}
