@@ -1,5 +1,6 @@
 module.exports = {
     extends: ['@commitlint/config-conventional'],
+    ignores: [(commit) => commit.includes('[skip ci]')],
     rules: {
         'subject-case': [
             2,
@@ -36,5 +37,9 @@ module.exports = {
         'scope-empty': [2, 'always'],
         'body-leading-blank': [1, 'always'],
         'footer-leading-blank': [1, 'always'],
+
+        // 🔽 이 두 줄을 추가해서 릴리즈 커밋은 예외로 허용
+        'footer-max-line-length': [0], 
+        'scope-empty': [0],
     },
 };
