@@ -65,20 +65,3 @@
   color: var(--color-gray);
   font-size: 18px;
 }
-
-.footer {
-  padding: 20px 0;
-  width: 100%;
-  background-color: var(--color-gray);
-  font-size: 18px;
-}
-.footer h1 {
-  color: gray;
-  font-family: var(--logo-font);
-  font-weight: 800;
-  font-size: 40px;
-}
-.footer p {
-  margin-top: 10px;
-  color: gray;
-}
