@@ -1,0 +1,39 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# 이 부분을 추가하여 토큰에 필요한 권한 부여
+permissions:
+  contents: write      # 저장소 내용 쓰기 권한
+  issues: write        # 이슈 생성 권한
+  pull-requests: write # PR 생성 권한
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
