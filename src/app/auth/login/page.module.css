@@ -7,7 +7,8 @@
 }
 
 .topBox {
-  padding: 100px 0;
+  position: relative;
+  padding: 100px 0 0 0;
   width: 100%;
   background-color: var(--color-background);
 }
@@ -29,7 +30,12 @@
   margin-top: 55px;
   font-size: 18px;
   line-height: 25px;
-  padding-bottom: 50px;
+}
+
+.fastimg {
+  position: absolute;
+  bottom: 190;
+  width: 100%;
 }
 
 .middleBox {

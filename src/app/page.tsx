@@ -14,10 +14,19 @@ export default function Home() {
           장기 목표를 루틴으로 만들어주는 스마트 일정 관리 서비스입니다.
         </p>
         <Link href={"/auth/login"}>
-          <Button variant="contained">로그인</Button>
+          <Button
+            sx={{
+              width: "170px",
+              fontSize: "25px",
+              padding: "10px",
+            }}
+            variant="contained"
+          >
+            로그인
+          </Button>
         </Link>
       </div>
-      <div>
+      <div className={style.middleBox}>
         <Image
           src={"/images/onboarding1.svg"}
           width={600}
@@ -31,19 +40,23 @@ export default function Home() {
           세분화해 드립니다.
         </p>
       </div>
-      <div>
+      <div className={style.endBox}>
         <Image
           src={"/images/onboarding2.svg"}
-          width={30}
-          height={47}
+          width={500}
+          height={500}
           alt={"소개이미지"}
         />
-        <p>시각화부터 알림까지, 완성도 높은 루틴 관리</p>
+        <h1>시각화부터 알림까지, 완성도 높은 루틴 관리</h1>
         <p>
-          일정 시각화, 리마인드 알림, 공유 기능까지 - 루틴 관리의 새로운 기준을
+          일정 시각화, 리마인드 알림, 공유 기능까지, 루틴 관리의 새로운 기준을
           제시합니다.
         </p>
       </div>
+      <footer className={style.footer}>
+        <h1>Looper</h1>
+        <p>Ellu's Project</p>
+      </footer>
     </div>
   );
 }

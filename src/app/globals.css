@@ -136,7 +136,7 @@ table {
 :root {
   --logo-font: "Oswald", sans-serif;
   --color-primary: #528ad3;
-  --color-gray: #938f93;
-  --color-background: #ffffff;
+  --color-gray: #bbbbbb;
+  --color-background: #f3f8ff;
   --color-text: #333333;
 }
