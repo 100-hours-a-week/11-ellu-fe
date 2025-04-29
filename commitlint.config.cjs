@@ -25,7 +25,8 @@ module.exports = {
                 'chore',
                 'hotfix',
                 'perf',
-                'ci'
+                'ci',
+                'release'
             ],
         ],
         'type-case': [2, 'always', 'lower-case'],
