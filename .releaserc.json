@@ -1,5 +1,5 @@
 {
-  "branches": ["main", "develop"],
+  "branches": ["main"],
   "plugins": [
     [
       "@semantic-release/commit-analyzer",
@@ -28,56 +28,16 @@
         "preset": "conventionalcommits",
         "presetConfig": {
           "types": [
-            {
-              "type": "feat",
-              "section": "✨ 새로운 기능",
-              "hidden": false
-            },
-            {
-              "type": "fix",
-              "section": "🐛 버그 수정",
-              "hidden": false
-            },
-            {
-              "type": "docs",
-              "section": "📚 문서 변경",
-              "hidden": false
-            },
-            {
-              "type": "style",
-              "section": "💎 코드 스타일 변경",
-              "hidden": false
-            },
-            {
-              "type": "refactor",
-              "section": "♻️ 코드 리팩토링",
-              "hidden": false
-            },
-            {
-              "type": "perf",
-              "section": "⚡ 성능 개선",
-              "hidden": false
-            },
-            {
-              "type": "test",
-              "section": "✅ 테스트",
-              "hidden": true
-            },
-            {
-              "type": "chore",
-              "section": "🔧 설정 변경",
-              "hidden": true
-            },
-            {
-              "type": "ci",
-              "section": "⚙️ CI/CD 설정",
-              "hidden": true
-            },
-            {
-              "type": "hotfix",
-              "section": "🚑 긴급 수정",
-              "hidden": false
-            }
+            { "type": "feat", "section": "✨ 새로운 기능", "hidden": false },
+            { "type": "fix", "section": "🐛 버그 수정", "hidden": false },
+            { "type": "docs", "section": "📚 문서 변경", "hidden": false },
+            { "type": "style", "section": "💎 코드 스타일 변경", "hidden": false },
+            { "type": "refactor", "section": "♻️ 코드 리팩토링", "hidden": false },
+            { "type": "perf", "section": "⚡ 성능 개선", "hidden": false },
+            { "type": "test", "section": "✅ 테스트", "hidden": true },
+            { "type": "chore", "section": "🔧 설정 변경", "hidden": true },
+            { "type": "ci", "section": "⚙️ CI/CD 설정", "hidden": true },
+            { "type": "hotfix", "section": "🚑 긴급 수정", "hidden": false }
           ]
         },
         "parserOpts": {
@@ -103,7 +63,17 @@
         "tarballDir": "dist"
       }
     ],
-    "@semantic-release/github",
+    [
+      "@semantic-release/github",
+      {
+        "assets": null,
+        "labels": ["semantic-release"],
+        "successComment": false,
+        "failComment": false,
+        "addReleases": "bottom",
+        "publishRelease": true
+      }
+    ],
     [
       "@semantic-release/git",
       {
