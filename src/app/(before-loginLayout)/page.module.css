@@ -1,16 +1,15 @@
 .container {
-  padding-top: 100px;
   width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
 .topBox {
-  padding: 20px 0;
-  text-align: center;
+  padding: 100px 0;
   width: 100%;
-  border: 1px solid red;
+  background-color: var(--color-background);
 }
 
 .topBox h1 {
@@ -21,16 +20,15 @@
 }
 
 .topBox h2 {
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 30px;
 }
 
 .topBox p {
+  color: var(--color-gray);
   margin-top: 55px;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 25px;
-<<<<<<< HEAD:src/app/page.module.css
-=======
   padding-bottom: 50px;
 }
 
@@ -66,5 +64,4 @@
   margin-top: 15px;
   color: var(--color-gray);
   font-size: 18px;
->>>>>>> 9e8d35e (feat: 회원가입 페이지 퍼블리싱 완료):src/app/(before-loginLayout)/page.module.css
 }

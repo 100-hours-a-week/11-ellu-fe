@@ -1,6 +1,5 @@
-import Image from 'next/image';
-import style from './page.module.css';
-import SignupForm from '@/components/form/SignupForm';
+import style from "./page.module.css";
+import SignupForm from "@/components/form/SignupForm";
 
 export default function Page() {
   return (

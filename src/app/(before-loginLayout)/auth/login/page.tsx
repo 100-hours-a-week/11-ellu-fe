@@ -1,7 +1,3 @@
-<<<<<<< HEAD:src/app/auth/login/page.tsx
-export default function Page() {
-  return <div>로그인 페이지</div>;
-=======
 import Image from 'next/image';
 import style from './page.module.css';
 
@@ -37,5 +33,4 @@ export default function Page() {
       </div>
     </div>
   );
->>>>>>> 9e8d35e (feat: 회원가입 페이지 퍼블리싱 완료):src/app/(before-loginLayout)/auth/login/page.tsx
 }
