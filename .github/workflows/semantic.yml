@@ -37,14 +37,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }} 
           HUSKY: 0
         run: npx semantic-release
-
-      - name: Sync main -> develop
-        if: success()
-        run: |
-          git config user.name "semantic-release[bot]"
-          git config user.email "release@users.noreply.github.com"
-
-          git fetch origin develop
-          git checkout develop
-          git merge --no-ff origin/main -m "chore: semantic 릴리즈 후 develop 브랜치와 병합"
-          git push origin develop
