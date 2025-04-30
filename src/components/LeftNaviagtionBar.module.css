@@ -1,0 +1,43 @@
+.container {
+  width: 150px;
+  height: 100%;
+  border-right: 1px solid black;
+}
+
+.container ul {
+  width: 100%;
+  list-style: none;
+}
+
+.container li {
+  padding-left: 13px;
+  height: 70px;
+  line-height: 70px;
+  border-radius: 5px;
+}
+
+.container li a {
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}
+
+.container .active {
+  font-weight: bold;
+  color: white;
+  background-color: var(--color-primary);
+}
+
+.container .active a {
+  font-weight: bold;
+  color: white;
+}
+
+.icon {
+  margin-bottom: -4px;
+  margin-right: 13px;
+}
+
+.active .icon {
+  filter: brightness(0) invert(1); /* 흑백 SVG를 흰색으로 */
+}

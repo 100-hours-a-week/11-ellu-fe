@@ -1,10 +1,10 @@
 @font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/Oswald-VariableFont_wght.ttf") format("woff2");
+  font-family: 'Pretendard';
+  src: url('/fonts/Oswald-VariableFont_wght.ttf') format('woff2');
 }
 @font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/OpenSans-VariableFont_wdth,wght.ttf") format("woff2");
+  font-family: 'Pretendard';
+  src: url('/fonts/OpenSans-VariableFont_wdth,wght.ttf') format('woff2');
 }
 
 html,
@@ -110,7 +110,7 @@ section {
   display: block;
 }
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: 'Open Sans', sans-serif;
   line-height: 1;
   overflow-x: hidden;
 }
@@ -126,7 +126,7 @@ blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-  content: "";
+  content: '';
   content: none;
 }
 table {
@@ -134,9 +134,9 @@ table {
   border-spacing: 0;
 }
 :root {
-  --logo-font: "Oswald", sans-serif;
+  --logo-font: 'Oswald', sans-serif;
   --color-primary: #528ad3;
   --color-gray: #bbbbbb;
-  --color-background: #f3f8ff;
+  --color-background: #e8f9ff;
   --color-text: #333333;
 }
