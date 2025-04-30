@@ -9,7 +9,7 @@ import { userStore } from "@/stores/userStore";
 export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const setAuth = userStore((s) => s.setAuth);
+  const setAuth = userStore((s) => s.setAccessToken);
 
   useEffect(() => {
     const code = searchParams.get("code");
@@ -23,12 +23,15 @@ export default function Page() {
     }
 
     (async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/auth/token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // refreshToken 쿠키
-        body: JSON.stringify({ code }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_SERVER_URL}/auth/token`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include", // refreshToken 쿠키
+          body: JSON.stringify({ code }),
+        }
+      );
 
       if (!res.ok) {
         alert("카카오 로그인에 실패했습니다.");
@@ -36,18 +39,13 @@ export default function Page() {
         return;
       }
 
-      let response = res.json();
-
-      console.log('!!!!!!!!', response);
-
-    //   const { accessToken, user, isNewUser } = await res.json();
-    //   setAuth(accessToken, user);
-
-    //   if (isNewUser) {
-    //     router.replace("/auth/signup"); // 신규 유저는 닉네임 입력 등 회원가입 절차로
-    //   } else {
-    //     router.replace("/projects"); // 기존 유저는 메인으로
-    //   }
+      const { accessToken, isNewUser } = await res.json();
+      setAuth(accessToken);
+      if (isNewUser) {
+        router.replace("/auth/signup");
+      } else {
+        router.replace("/projects");
+      }
     })();
   }, []);
 

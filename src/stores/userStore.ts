@@ -1,5 +1,4 @@
 import { create } from "zustand";
-
 interface User {
   id: string;
   nickname: string;
@@ -9,13 +8,20 @@ interface User {
 interface AuthState {
   accessToken: string | null;
   user: User | null;
-  setAuth: (accessToken: string, user: User) => void;
+  setAccessToken: (token: string) => void;
+  setUser: (user: User) => void;
   clearAuth: () => void;
 }
 
 export const userStore = create<AuthState>((set) => ({
   accessToken: null,
   user: null,
-  setAuth: (accessToken, user) => set({ accessToken, user }), // 로그인
-  clearAuth: () => set({ accessToken: null, user: null }), // 로그아웃
+  isNewUser: null,
+
+  // 로그인 시 accessToken 저장
+  setAccessToken: (token) => set({ accessToken: token }),
+  //  user 정보 저장
+  setUser: (user) => set({ user }),
+  // 로그아웃 시 전부 초기화
+  clearAuth: () => set({ accessToken: null, user: null }),
 }));
