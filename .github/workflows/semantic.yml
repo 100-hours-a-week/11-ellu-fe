@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main  # 릴리즈는 main 브랜치에만!
-  pull_request:
-    branches:
-      - main  # PR도 main만 대상으로
 
 permissions:
   contents: write
@@ -33,5 +30,5 @@ jobs:
 
       - name: Semantic Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: npx semantic-release
