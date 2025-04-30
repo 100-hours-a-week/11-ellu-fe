@@ -2,6 +2,10 @@ import Image from 'next/image';
 import style from './page.module.css';
 
 export default function Page() {
+  const KAKAO_REST_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_KEY;
+  const REDIRECT_URI = 'http://localhost:3000/auth/kakao/callback';
+  const KAKAO_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
   return (
     <div className={style.container}>
       <div className={style.topBox}>
@@ -15,7 +19,7 @@ export default function Page() {
         <div className={style.fastimg}>
           <img src="/images/loginFast.png" alt="회원가입" />
         </div>
-        <a href="https://www.example.com">
+        <a href={KAKAO_URL}>
           <Image src={'/images/KakaoLogin.svg'} width={300} height={300} alt={'카카오로그인'} />
         </a>
       </div>

@@ -23,7 +23,7 @@ export default function Page() {
     }
 
     (async () => {
-      const res = await fetch("/api/auth/kakao", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/auth/token`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // refreshToken 쿠키
@@ -38,16 +38,16 @@ export default function Page() {
 
       let response = res.json();
 
-      console.log("!!!!!!!!", response);
+      console.log('!!!!!!!!', response);
 
-      //   const { accessToken, user, isNewUser } = await res.json();
-      //   setAuth(accessToken, user);
+    //   const { accessToken, user, isNewUser } = await res.json();
+    //   setAuth(accessToken, user);
 
-      //   if (isNewUser) {
-      //     router.replace("/auth/signup"); // 신규 유저는 닉네임 입력 등 회원가입 절차로
-      //   } else {
-      //     router.replace("/projects"); // 기존 유저는 메인으로
-      //   }
+    //   if (isNewUser) {
+    //     router.replace("/auth/signup"); // 신규 유저는 닉네임 입력 등 회원가입 절차로
+    //   } else {
+    //     router.replace("/projects"); // 기존 유저는 메인으로
+    //   }
     })();
   }, []);
 
