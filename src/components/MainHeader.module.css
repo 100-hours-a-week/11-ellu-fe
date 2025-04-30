@@ -21,9 +21,12 @@
 
 .logo {
   display: flex;
-  justify-content: space-between;
-  width: 140px;
   height: 50px;
   line-height: 50px;
   text-decoration: none;
+}
+
+.logo p {
+  margin-top: 2px;
+  margin-left: 13px;
 }

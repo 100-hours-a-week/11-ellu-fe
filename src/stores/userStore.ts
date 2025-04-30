@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface User {
   id: string;
@@ -13,7 +13,7 @@ interface AuthState {
   clearAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const userStore = create<AuthState>((set) => ({
   accessToken: null,
   user: null,
   setAuth: (accessToken, user) => set({ accessToken, user }), // 로그인
