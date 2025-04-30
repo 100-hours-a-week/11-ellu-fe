@@ -32,6 +32,7 @@ export default function Home() {
           width={600}
           height={600}
           alt={"소개이미지"}
+          priority
         />
         <h1>회의록도 프로젝트도, 자동 분석으로 루틴 완성</h1>
         <p>
@@ -46,6 +47,7 @@ export default function Home() {
           width={500}
           height={500}
           alt={"소개이미지"}
+          priority
         />
         <h1>시각화부터 알림까지, 완성도 높은 루틴 관리</h1>
         <p>
