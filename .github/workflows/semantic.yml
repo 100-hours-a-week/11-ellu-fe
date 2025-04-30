@@ -3,10 +3,7 @@ name: Semantic Release
 on:
   push:
     branches:
-      - main  # 릴리즈는 main 브랜치에만!
-  pull_request:
-    branches:
-      - main  # PR도 main만 대상으로
+      - main 
 
 permissions:
   contents: write
@@ -21,6 +18,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}  
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -31,7 +29,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Disable Husky (skip install)
+        run: npm pkg set scripts.prepare="echo skipping husky install"
+
       - name: Semantic Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }} 
+          HUSKY: 0
         run: npx semantic-release
+
+      - name: Sync main -> develop
+        if: success()
+        run: |
+          git config user.name "semantic-release[bot]"
+          git config user.email "release@users.noreply.github.com"
+
+          git fetch origin develop
+          git checkout develop
+          git merge --no-ff origin/main -m "chore: semantic 릴리즈 후 develop 브랜치와 병합"
+          git push origin develop
