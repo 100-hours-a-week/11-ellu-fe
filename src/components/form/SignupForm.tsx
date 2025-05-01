@@ -50,11 +50,8 @@ export default function SignupForm() {
       onSuccess: () => {
         router.replace("/projects");
       },
-      onError: (err: any) => {
-        if (
-          err.response?.status === 409 &&
-          err.response.data.message === "nickname_already_exists"
-        ) {
+      onError: (err) => {
+        if (err.response?.status === 409) {
           setError("이미 사용 중인 닉네임입니다.");
         } else {
           alert("회원가입 처리 중 문제가 발생했습니다.");

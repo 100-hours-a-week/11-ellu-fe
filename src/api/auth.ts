@@ -5,7 +5,7 @@ export const postKakaoLogin = async (
   code: string
 ): Promise<KakaoLoginResponse> => {
   const res = await api.post("/auth/token", { code });
-  return res.data;
+  return res.data.data;
 };
 
 export const logout = () => api.post("/auth/logout");
