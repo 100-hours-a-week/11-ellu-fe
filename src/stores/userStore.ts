@@ -1,6 +1,8 @@
-import { create } from "zustand";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
 interface User {
-  id: string;
+  id: number;
   nickname: string;
   profileImageUrl: string;
 }
@@ -13,15 +15,18 @@ interface AuthState {
   clearAuth: () => void;
 }
 
-export const userStore = create<AuthState>((set) => ({
-  accessToken: null,
-  user: null,
-  isNewUser: null,
-
-  // 로그인 시 accessToken 저장
-  setAccessToken: (token) => set({ accessToken: token }),
-  //  user 정보 저장
-  setUser: (user) => set({ user }),
-  // 로그아웃 시 전부 초기화
-  clearAuth: () => set({ accessToken: null, user: null }),
-}));
+export const userStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      accessToken: null, // accessToken은 메모리에 저장
+      user: null,
+      setAccessToken: (token) => set({ accessToken: token }),
+      setUser: (user) => set({ user }),
+      clearAuth: () => set({ accessToken: null, user: null }),
+    }),
+    {
+      name: 'user-store',
+      partialize: (state) => ({ user: state.user }), // user정보만 로컬스토리지에 저장
+    }
+  )
+);
