@@ -1,10 +1,11 @@
 .container {
   width: 150px;
-  height: 100%;
-  border-right: 1px solid black;
+  max-width: 150px;
+  height: calc(100vh - 80px);
 }
 
 .container ul {
+  padding-top: 30px;
   width: 100%;
   list-style: none;
 }
@@ -13,7 +14,8 @@
   padding-left: 13px;
   height: 70px;
   line-height: 70px;
-  border-radius: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .container li a {

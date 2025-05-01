@@ -6,7 +6,7 @@ import { userStore } from "@/stores/userStore";
 import { useKakaoLogin } from "@/hooks/api/useKakaoLogin";
 import CircularProgress from "@mui/material/CircularProgress";
 
-export default function Loading() {
+export default function KakaoLoading() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = userStore((s) => s.setAccessToken);
