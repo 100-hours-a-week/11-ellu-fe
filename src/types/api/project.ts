@@ -5,6 +5,6 @@ export interface ProjectMember {
 
 export interface Project {
   title: string;
-  // color: string;
+  color: string;
   members: ProjectMember[];
 }

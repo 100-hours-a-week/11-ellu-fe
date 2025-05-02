@@ -1,10 +1,11 @@
-import { redirect } from 'next/navigation';
-import style from './page.module.css';
-import { cookies } from 'next/headers';
-import { getAccessToken } from '@/api/auth';
-import { getProjects } from '@/api/project';
-import Link from 'next/link';
-import Image from 'next/image';
+import { redirect } from "next/navigation";
+import style from "./page.module.css";
+import { cookies } from "next/headers";
+import { getAccessToken } from "@/api/auth";
+import { getProjects } from "@/api/project";
+import Link from "next/link";
+import Image from "next/image";
+import ProjectsList from "@/components/projects/ProjectsList";
 
 export default async function Page() {
   // const cookieStore = await cookies();
@@ -22,17 +23,30 @@ export default async function Page() {
   // const projects = await getProjects(accessToken);
 
   const projects: any[] = [
-    // {
-    //   title: '프로젝트 1',
-    //   members: [
-    //     { nickname: '홍길동', profile_image_url: 'https://example.com/profile1.jpg' },
-    //     { nickname: '오쌤', profile_image_url: 'https://example.com/profile2.jpg' },
-    //   ],
-    // },
-    // {
-    //   title: '프로젝트 2',
-    //   members: [{ nickname: '홍길동', profile_image_url: 'https://example.com/profile1.jpg' }],
-    // },
+    {
+      title: "프로젝트 1",
+      color: "blue",
+      members: [
+        {
+          nickname: "홍길동",
+          profile_image_url: "/images/createproject.svg",
+        },
+        {
+          nickname: "오쌤",
+          profile_image_url: "/images/createproject.svg",
+        },
+      ],
+    },
+    {
+      title: "프로젝트 2",
+      color: "blue",
+      members: [
+        {
+          nickname: "홍길동",
+          profile_image_url: "/images/createproject.svg",
+        },
+      ],
+    },
   ];
 
   return (
@@ -40,14 +54,15 @@ export default async function Page() {
       <h1>나의 프로젝트</h1>
       <div className={style.projectList}>
         {projects.length > 0 ? (
-          <ul>
-            {projects.map((p) => (
-              <li key={p.title}>{p.title}</li>
-            ))}
-          </ul>
+          <ProjectsList projects={projects} />
         ) : (
           <Link href="/projects/create" className={style.noProject}>
-            <Image src="/images/createproject.svg" alt="프로젝트 없음" width={300} height={300} />
+            <Image
+              src="/images/createproject.svg"
+              alt="프로젝트 없음"
+              width={270}
+              height={270}
+            />
             <div>
               프로젝트를 추가하여 <br /> Looper를 시작해보세요!
             </div>
