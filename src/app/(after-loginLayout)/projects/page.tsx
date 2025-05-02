@@ -6,6 +6,7 @@ import { getProjects } from "@/api/project";
 import Link from "next/link";
 import Image from "next/image";
 import ProjectsList from "@/components/projects/ProjectsList";
+import { Project } from "@/types/api/project";
 
 export default async function Page() {
   // const cookieStore = await cookies();
@@ -22,7 +23,7 @@ export default async function Page() {
 
   // const projects = await getProjects(accessToken);
 
-  const projects: any[] = [
+  const projects: Project[] = [
     {
       title: "프로젝트 1",
       color: "blue",
