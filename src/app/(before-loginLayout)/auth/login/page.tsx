@@ -16,20 +16,13 @@ export default function Page() {
           장기 목표를 루틴으로 만들어주는 스마트 일정 관리 서비스입니다.
         </p>
         <p>하루를 더 똑똑하게, 루퍼와 함께 시작하세요</p>
-        <div className={style.fastimg}>
-          <Image
-            src="/images/loginFast.png"
-            width={200}
-            height={50}
-            alt="회원가입"
-          />
-        </div>
         <a href={KAKAO_URL}>
           <Image
-            src={"/images/KakaoLogin.svg"}
-            width={300}
-            height={300}
+            src={"/images/KakaoLogin.png"}
+            width={250}
+            height={120}
             alt={"카카오로그인"}
+            style={{ marginTop: "50px" }}
           />
         </a>
       </div>
