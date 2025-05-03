@@ -1,0 +1,16 @@
+.noProject {
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.5;
+  display: block;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.noProject {
+  margin-top: 100px;
+}
+
+.noProject div {
+  margin-top: 20px;
+}

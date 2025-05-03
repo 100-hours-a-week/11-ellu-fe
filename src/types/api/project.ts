@@ -1,6 +1,7 @@
 export interface ProjectMember {
+  id: number;
   nickname: string;
-  profile_image_url: string;
+  profileImageUrl: string;
 }
 
 export interface Project {

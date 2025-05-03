@@ -1,19 +1,13 @@
 import { Project } from '@/types/api/project';
+import api from '@/lib/axios';
 
-export async function getProjects(accessToken: string): Promise<Project[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/projects`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-store',
-  });
+// 프로젝트 조회(클라이언트)
+export const getProjects = async (): Promise<Project[]> => {
+  const res = await api.get('/projects');
+  return res.data.data;
+};
 
-  if (!res.ok) {
-    throw new Error('프로젝트 목록 불러오기 실패');
-  }
-
-  const json = await res.json();
-  return json.data.data;
-}
+// 프로젝트 삭제(클라이언트)
+export const deleteProject = async (id: number): Promise<void> => {
+  await api.delete(`/projects/${id}`);
+};
