@@ -1,9 +1,26 @@
-import { ReactNode } from "react";
-import style from "./layout.module.css";
-import LeftNavigationBar from "@/components/LeftNavigationBar";
-import AfterLoginHeader from "@/components/AfterLoginHeader";
+import { ReactNode } from 'react';
+import style from './layout.module.css';
+import LeftNavigationBar from '@/components/LeftNavigationBar';
+import AfterLoginHeader from '@/components/AfterLoginHeader';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { getAccessToken } from '@/api/auth';
+import { getProjects } from '@/api/project';
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default async function Layout({ children }: { children: ReactNode }) {
+  // const cookieStore = await cookies();
+  // const refreshToken = cookieStore.get('refreshToken')?.value;
+
+  // if (!refreshToken) {
+  //   redirect('/auth/login');
+  // }
+
+  // const accessToken = await getAccessToken(refreshToken);
+
+  // if (!accessToken) {
+  //   redirect('/auth/login');
+  // }
+
   return (
     <div className={style.container}>
       <AfterLoginHeader />

@@ -4,6 +4,7 @@ export interface ProjectMember {
 }
 
 export interface Project {
+  id: number;
   title: string;
   color: string;
   members: ProjectMember[];
