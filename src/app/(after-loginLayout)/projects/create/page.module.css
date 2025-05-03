@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 60px;
+  margin-bottom: 50px;
 }
 
 .container h1 {
@@ -20,6 +20,6 @@
 }
 
 .form {
-  margin-left: 30px;
+  margin-left: 60px;
   width: 80%;
 }
