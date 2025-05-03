@@ -10,11 +10,34 @@ const positions = [
   { value: 'AI', label: 'AI 개발자' },
 ];
 
-export default function CreateProjectForm() {
-  const [formData, setFormData] = useState({
-    title: '',
-    wiki: '',
-    position: '',
+const mockProjectData = {
+  '1': {
+    title: 'Looper 프로젝트',
+    wiki: 'Looper는 AI 기반 프로젝트 일정 관리 서비스입니다. 사용자가 프로젝트의 개요를 입력하면 AI가 자동으로 일정을 계획하고 관리해줍니다. 주요 기능으로는 프로젝트 일정 자동 생성, 일정 조정, 팀원 관리 등이 있습니다.',
+    position: 'FE',
+  },
+  '2': {
+    title: '쇼핑몰 프로젝트',
+    wiki: '온라인 쇼핑몰 프로젝트입니다. 사용자 인증, 상품 관리, 장바구니, 결제 시스템 등을 구현합니다. React와 Node.js를 사용하여 개발하며, MongoDB를 데이터베이스로 사용합니다.',
+    position: 'BE',
+  },
+};
+
+interface ProjectInfoFormProps {
+  id?: string;
+}
+
+export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
+  console;
+  const [formData, setFormData] = useState(() => {
+    if (id && mockProjectData[id as keyof typeof mockProjectData]) {
+      return mockProjectData[id as keyof typeof mockProjectData];
+    }
+    return {
+      title: '',
+      wiki: '',
+      position: '',
+    };
   });
 
   const [errors, setErrors] = useState({
@@ -153,7 +176,7 @@ export default function CreateProjectForm() {
       </TextField>
 
       <Button type="submit" variant="contained" color="primary" sx={{ mt: 1, height: '50px' }} disabled={!isFormValid()}>
-        프로젝트 생성
+        {id ? '프로젝트 수정' : '프로젝트 생성'}
       </Button>
     </Box>
   );

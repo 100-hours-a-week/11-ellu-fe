@@ -62,7 +62,7 @@ export default function ProjectTable() {
 
   const projects: Project[] = [
     {
-      id: 3,
+      id: 1,
       title: 'My Project',
       color: 'blue',
       members: [

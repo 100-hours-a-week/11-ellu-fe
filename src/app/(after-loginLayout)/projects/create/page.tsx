@@ -2,8 +2,9 @@ import style from './page.module.css';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Link from 'next/link';
-import CreateProjectForm from '@/components/form/CreateProjectForm';
-export default function CreateProject() {
+import ProjectInfoForm from '@/components/form/ProjectInfoForm';
+
+export default function Page() {
   return (
     <div className={style.container}>
       <div className={style.header}>
@@ -23,7 +24,7 @@ export default function CreateProject() {
         <h1>새로운 프로젝트 생성하기</h1>
       </div>
       <div className={style.form}>
-        <CreateProjectForm />
+        <ProjectInfoForm />
       </div>
     </div>
   );
