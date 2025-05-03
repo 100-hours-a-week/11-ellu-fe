@@ -87,8 +87,8 @@ export default function ProjectTable() {
   }
 
   return (
-    <>
-      <TableContainer component={Paper} sx={{ height: '85%', maxHeight: '85%' }}>
+    <div className={style.container}>
+      <TableContainer component={Paper} sx={{ height: '100%', maxHeight: '100%' }}>
         <Table aria-label="project table">
           <TableHead sx={{ backgroundColor: '#528ad3' }}>
             <TableRow>
@@ -157,7 +157,13 @@ export default function ProjectTable() {
         </Table>
       </TableContainer>
 
-      <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        TransitionProps={{ timeout: 0 }}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
         <DialogTitle id="alert-dialog-title">프로젝트 삭제</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
@@ -166,11 +172,9 @@ export default function ProjectTable() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>취소</Button>
-          <Button onClick={handleDelete} autoFocus>
-            삭제
-          </Button>
+          <Button onClick={handleDelete}>삭제</Button>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   );
 }
