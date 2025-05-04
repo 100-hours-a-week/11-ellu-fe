@@ -10,7 +10,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   return (
     <div className={style.container}>
       <div className={style.calendar}>
-        <Calendar />
+        <Calendar projectId={id} />
       </div>
     </div>
   );

@@ -19,4 +19,13 @@ export interface CalendarModalProps {
   selectedEvent: SelectedTime | null;
   eventData: EventData;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  projectId?: string;
+}
+
+export interface EditScheduleModalProps {
+  open: boolean;
+  onClose: () => void;
+  eventData: EventData | null;
+  onDelete?: () => void;
+  projectId?: string;
 }

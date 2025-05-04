@@ -9,7 +9,16 @@ import React, { useState, useEffect } from 'react';
 import { ko } from 'date-fns/locale/ko';
 import { EventData, SelectedTime, CalendarModalProps } from '../types/calendar';
 
-export default function CalendarModal({ open, onClose, onCancel, onSave, selectedEvent, eventData, onInputChange }: CalendarModalProps) {
+export default function CreateScheduleModal({
+  open,
+  onClose,
+  onCancel,
+  onSave,
+  selectedEvent,
+  eventData,
+  onInputChange,
+  projectId,
+}: CalendarModalProps) {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -18,6 +27,7 @@ export default function CalendarModal({ open, onClose, onCancel, onSave, selecte
   const [descriptionError, setDescriptionError] = useState<string>('');
 
   useEffect(() => {
+    console.log(projectId);
     if (selectedEvent) {
       setStartDate(selectedEvent.start);
       setStartTime(selectedEvent.start);

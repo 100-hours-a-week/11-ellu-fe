@@ -1,16 +1,21 @@
 'use client';
 
+import React, { useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import koLocale from '@fullcalendar/core/locales/ko';
-import React, { useRef, useState } from 'react';
 import styles from './Calendar.module.css';
 import { DateSelectArg, EventDropArg } from '@fullcalendar/core';
 import { EventResizeDoneArg } from '@fullcalendar/interaction';
-import CalendarModal from './CalendarModal';
+import CreateScheduleModal from './CreateScheduleModal';
+import ScheduleDetailModal from './ScheduleDetailModal';
 import { EventData, SelectedTime } from '../types/calendar';
+
+interface CalendarProps {
+  projectId?: string;
+}
 
 const CALENDAR_VIEWS = {
   dayGridYear: {
@@ -37,10 +42,12 @@ const HEADER_TOOLBAR = {
   right: 'timeGridDay,timeGridWeek,dayGridMonth,dayGridYear',
 };
 
-export default function Calendar() {
+export default function Calendar({ projectId }: CalendarProps) {
   const calendarRef = useRef<FullCalendar>(null);
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<SelectedTime | null>(null);
+  const [selectedEventData, setSelectedEventData] = useState<EventData | null>(null);
   const [events, setEvents] = useState<EventData[]>([]);
   const [eventData, setEventData] = useState<EventData>({
     title: '',
@@ -113,10 +120,35 @@ export default function Calendar() {
       return updatedEvents;
     });
   };
+  // 일정 클릭 이벤트 처리
+  const handleEventClick = (info: any) => {
+    const eventData = {
+      id: info.event.id,
+      title: info.event.title,
+      start: info.event.start,
+      end: info.event.end,
+      description: info.event.extendedProps.description,
+    };
+    setSelectedEventData(eventData);
+    setEditOpen(true);
+  };
   // 모달 폼 입력처리
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setEventData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditClose = () => {
+    setEditOpen(false);
+    setSelectedEventData(null);
+  };
+
+  const handleDelete = () => {
+    if (selectedEventData) {
+      setEvents((prevEvents) => prevEvents.filter((event) => event.id !== selectedEventData.id));
+      setEditOpen(false);
+      setSelectedEventData(null);
+    }
   };
 
   return (
@@ -134,11 +166,12 @@ export default function Calendar() {
         droppable={true}
         eventDrop={handleEventDrop}
         eventResize={handleEventResize}
+        eventClick={handleEventClick}
         views={CALENDAR_VIEWS}
         events={events}
       />
 
-      <CalendarModal
+      <CreateScheduleModal
         open={open}
         onClose={handleClose}
         onCancel={handleCancel}
@@ -146,7 +179,10 @@ export default function Calendar() {
         selectedEvent={selectedEvent}
         eventData={eventData}
         onInputChange={handleInputChange}
+        projectId={projectId}
       />
+
+      <ScheduleDetailModal open={editOpen} onClose={handleEditClose} eventData={selectedEventData} onDelete={handleDelete} projectId={projectId} />
     </div>
   );
 }
