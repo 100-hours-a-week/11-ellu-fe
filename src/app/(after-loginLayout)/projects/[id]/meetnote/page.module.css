@@ -1,0 +1,25 @@
+.container {
+  background-color: whitesmoke;
+  border-radius: 10px;
+  width: 30%;
+  height: 100%;
+  padding: 15px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.container h1 {
+  font-size: 1.7rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.meetnote {
+  width: 100%;
+  height: calc(100% - 100px);
+}
