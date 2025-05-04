@@ -64,11 +64,28 @@ export default function CreateMeetnote() {
             margin="normal"
             variant="outlined"
             multiline
-            rows={16}
+            rows={15}
             placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
             required
             helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
             error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  border: 'none',
+                },
+                '&:hover fieldset': {
+                  border: 'none',
+                },
+                '&.Mui-focused fieldset': {
+                  border: 'none',
+                },
+              },
+              backgroundColor: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              mb: 5,
+            }}
           />
 
           <div className={style.secondbutton}>

@@ -175,7 +175,7 @@ export default function RecommendSchedule() {
         }));
     });
     setIsSubmitted(true);
-    console.log('캘린더에 추가할 태스크:', selectedTasks);
+    alert(`${selectedTasks.length}개의 일정이 캘린더에 추가되었습니다.`);
   };
 
   const isGroupFullySelected = (groupIndex: number) => {
@@ -192,8 +192,8 @@ export default function RecommendSchedule() {
     return (
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" mt={8}>
         <Image src={'/images/addmeeting2.svg'} width={200} height={200} alt={'로고'} />
-        <CircularProgress size={30} sx={{ mt: 4 }} />
-        <Typography variant="h6" sx={{ mt: 2 }}>
+        <CircularProgress size={30} sx={{ mt: 5 }} />
+        <Typography variant="h6" sx={{ mt: 2, fontSize: '1rem' }}>
           Looper가 프로젝트에 맞는 태스크를 분석하는 중입니다...
         </Typography>
       </Box>
@@ -218,7 +218,7 @@ export default function RecommendSchedule() {
 
   return (
     <Box sx={{ mt: 3 }}>
-      <Typography variant="h5" gutterBottom fontWeight="bold">
+      <Typography variant="h5" gutterBottom fontWeight="bold" sx={{ color: '#528ad3' }}>
         Looper가 추천하는 태스크
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
@@ -369,7 +369,7 @@ export default function RecommendSchedule() {
           onClick={handleAddToCalendar}
           disabled={getSelectedSubtaskCount() === 0 || isSubmitted}
           sx={{
-            mt: 7,
+            mt: 8,
             width: '100%',
             px: 4,
             py: 1.5,
