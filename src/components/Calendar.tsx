@@ -169,6 +169,8 @@ export default function Calendar({ projectId }: CalendarProps) {
         eventClick={handleEventClick}
         views={CALENDAR_VIEWS}
         events={events}
+        nowIndicator={true} // 현재 시간 표시선 활성화
+        slotEventOverlap={false} // 이벤트 겹침 방지 (선택사항)
       />
 
       <CreateScheduleModal
