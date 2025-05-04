@@ -4,6 +4,10 @@ import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import style from './CreateMeetnote.module.css';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { TextField, Button } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import RecommendSchedule from './RecommendSchedule';
 
 export default function CreateMeetnote() {
   const [step, setStep] = useState(0);
@@ -15,7 +19,7 @@ export default function CreateMeetnote() {
       case 1:
         return <SecondState />;
       case 2:
-        return <ThirdState />;
+        return <RecommendSchedule />;
       default:
         return <div>알 수 없는 상태</div>;
     }
@@ -34,11 +38,53 @@ export default function CreateMeetnote() {
   }
 
   function SecondState() {
-    return <div>step 1</div>;
-  }
+    const [meetingNote, setMeetingNote] = useState('');
 
-  function ThirdState() {
-    return <div>step 2</div>;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setMeetingNote(e.target.value);
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      console.log('회의록:', meetingNote);
+      setStep(2);
+    };
+
+    return (
+      <div className={style.secondState}>
+        <h2>오늘의 스크럼 회의록</h2>
+        <p>오늘 진행된 회의 내용을 자유롭게 작성해주세요</p>
+
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="회의록"
+            value={meetingNote}
+            onChange={handleChange}
+            margin="normal"
+            variant="outlined"
+            multiline
+            rows={16}
+            placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
+            required
+            helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
+            error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
+          />
+
+          <div className={style.secondbutton}>
+            <Button
+              variant="contained"
+              type="submit"
+              color="primary"
+              disabled={meetingNote.length < 10 || meetingNote.length > 1000}
+              sx={{ width: '80px' }}
+            >
+              저장
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
   }
 
   return <div className={style.container}>{renderContent()}</div>;
