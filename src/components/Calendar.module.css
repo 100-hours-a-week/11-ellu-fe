@@ -49,12 +49,12 @@
 }
 
 .calendarContainer :global(.fc-timegrid-now-indicator-line) {
-  border-color: red; /* 선 색상 */
-  border-width: 1px; /* 선 두께 */
+  border-color: red;
+  border-width: 1px;
 }
 
 .calendarContainer :global(.fc-timegrid-now-indicator-arrow) {
-  border-color: red; /* 화살표 색상 */
-  border-width: 5px; /* 화살표 크기 */
+  border-color: red;
+  border-width: 5px;
   border-radius: 5px;
 }
