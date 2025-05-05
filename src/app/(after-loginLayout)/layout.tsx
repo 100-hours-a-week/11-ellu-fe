@@ -4,8 +4,7 @@ import LeftNavigationBar from '@/components/LeftNavigationBar';
 import AfterLoginHeader from '@/components/AfterLoginHeader';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { getAccessToken } from '@/api/auth';
-import { getProjects } from '@/api/project';
+import AuthProvider from '@/components/auth/AuthProvider';
 
 export default async function Layout({ children }: { children: ReactNode }) {
   // const cookieStore = await cookies();
@@ -15,19 +14,15 @@ export default async function Layout({ children }: { children: ReactNode }) {
   //   redirect('/auth/login');
   // }
 
-  // const accessToken = await getAccessToken(refreshToken);
-
-  // if (!accessToken) {
-  //   redirect('/auth/login');
-  // }
-
   return (
-    <div className={style.container}>
-      <AfterLoginHeader />
-      <div className={style.box}>
-        <LeftNavigationBar />
-        <div className={style.mainbox}>{children}</div>
+    <AuthProvider>
+      <div className={style.container}>
+        <AfterLoginHeader />
+        <div className={style.box}>
+          <LeftNavigationBar />
+          <div className={style.mainbox}>{children}</div>
+        </div>
       </div>
-    </div>
+    </AuthProvider>
   );
 }

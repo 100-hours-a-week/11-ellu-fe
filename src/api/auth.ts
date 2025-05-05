@@ -1,5 +1,6 @@
 import api from '@/lib/axios';
 import { KakaoLoginResponse } from '@/types/api/auth';
+import { User } from '@/types/api/user';
 
 // 로그인
 export const KakaoLogin = async (code: string): Promise<KakaoLoginResponse> => {
@@ -10,7 +11,13 @@ export const KakaoLogin = async (code: string): Promise<KakaoLoginResponse> => {
 //로그아웃
 export const logout = () => api.delete('/auth/token');
 
-// accessToken 재발급 (서버 컴포넌트)
+// accessToken 재발급 (클라이언트)
+export const refreshAccessToken = async (): Promise<{ accessToken: string; user: User } | null> => {
+  const res = await api.post('/auth/token/refresh');
+  return res.data.data;
+};
+
+// accessToken 재발급 (서버)
 export const getAccessToken = async (refreshToken: string): Promise<string | null> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/auth/token/refresh`, {
     method: 'POST',
