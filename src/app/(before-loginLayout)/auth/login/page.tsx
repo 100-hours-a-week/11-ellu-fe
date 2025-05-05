@@ -3,7 +3,7 @@ import style from './page.module.css';
 
 export default function Page() {
   const KAKAO_REST_KEY = process.env.NEXT_PUBLIC_KAKAO_REST_KEY;
-  const REDIRECT_URI = 'http://localhost:3000/auth/kakao/callback';
+  const REDIRECT_URI = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI || 'http://localhost:3000/auth/kakao/callback';
   const KAKAO_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
   return (
