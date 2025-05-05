@@ -4,6 +4,7 @@ import React, { useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import koLocale from '@fullcalendar/core/locales/ko';
 import styles from './Calendar.module.css';
@@ -18,28 +19,16 @@ interface CalendarProps {
 }
 
 const CALENDAR_VIEWS = {
-  dayGridYear: {
-    type: 'dayGrid',
-    duration: { years: 1 },
-  },
-  timeGridDay: {
-    type: 'timeGrid',
-    duration: { days: 1 },
-  },
-  timeGridWeek: {
-    type: 'timeGrid',
-    duration: { weeks: 1 },
-  },
-  dayGridMonth: {
-    type: 'dayGrid',
-    duration: { months: 1 },
-  },
+  multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
+  timeGridDay: { type: 'timeGrid', duration: { days: 1 } },
+  timeGridWeek: { type: 'timeGrid', duration: { weeks: 1 } },
+  dayGridMonth: { type: 'dayGrid', duration: { months: 1 } },
 };
 
 const HEADER_TOOLBAR = {
   left: 'prev,next today',
   center: 'title',
-  right: 'timeGridDay,timeGridWeek,dayGridMonth,dayGridYear',
+  right: 'timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear',
 };
 
 export default function Calendar({ projectId }: CalendarProps) {
@@ -155,7 +144,7 @@ export default function Calendar({ projectId }: CalendarProps) {
     <div className={styles.calendarContainer}>
       <FullCalendar
         ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
         initialView="timeGridWeek"
         locale={koLocale}
         headerToolbar={HEADER_TOOLBAR}

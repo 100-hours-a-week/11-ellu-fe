@@ -1,3 +1,11 @@
+import style from './page.module.css';
+import MypageForm from '@/components/form/MypageForm';
 export default function Page() {
-  return <div>마이 페이지</div>;
+  return (
+    <div className={style.container}>
+      <div className={style.formContainer}>
+        <MypageForm />
+      </div>
+    </div>
+  );
 }

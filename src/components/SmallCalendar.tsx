@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import multiMonthPlugin from '@fullcalendar/multimonth';
 import koLocale from '@fullcalendar/core/locales/ko';
 import styles from './Calendar.module.css';
 import { EventData } from '../types/calendar';
@@ -11,7 +12,7 @@ import { useParams } from 'next/navigation';
 
 // 상수 정의
 const CALENDAR_VIEWS = {
-  dayGridYear: { type: 'dayGrid', duration: { years: 1 } },
+  multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
   timeGridDay: { type: 'timeGrid', duration: { days: 1 } },
   timeGridWeek: { type: 'timeGrid', duration: { weeks: 1 } },
   dayGridMonth: { type: 'dayGrid', duration: { months: 1 } },
@@ -20,7 +21,7 @@ const CALENDAR_VIEWS = {
 const HEADER_TOOLBAR = {
   left: 'prev,next today',
   center: 'title',
-  right: 'timeGridDay,timeGridWeek,dayGridMonth,dayGridYear',
+  right: 'timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear',
 };
 
 // 초기 이벤트 생성 함수
@@ -95,7 +96,7 @@ export default function SmallCalendar() {
     <div className={styles.calendarContainer}>
       <FullCalendar
         ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin]}
+        plugins={[dayGridPlugin, timeGridPlugin, multiMonthPlugin]}
         initialView="timeGridWeek"
         locale={koLocale}
         headerToolbar={HEADER_TOOLBAR}
