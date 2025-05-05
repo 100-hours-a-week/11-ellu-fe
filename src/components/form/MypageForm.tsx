@@ -1,25 +1,43 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, Avatar, Typography } from '@mui/material';
+import { Box, TextField, Button, Avatar, Typography, Skeleton, Alert } from '@mui/material';
 import style from './MypageForm.module.css';
-
-const user = {
-  nickname: '홍길동',
-  profileImageUrl: 'https://via.placeholder.com/150',
-};
+import { userStore } from '@/stores/userStore';
+import { useEditMyInfo } from '@/hooks/api/user/useEditMyInfo';
 
 export default function MypageForm() {
-  const [nickname, setNickname] = useState<string>(user.nickname);
-  const [error, setError] = useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const user = userStore((state) => state.user);
+  const setUser = userStore((state) => state.setUser);
 
+  const [nickname, setNickname] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+
+  const { mutate: updateNickname, isPending } = useEditMyInfo();
+
+  // 유저 정보 로드 시 닉네임 설정
+  useEffect(() => {
+    if (user?.nickname) {
+      setNickname(user.nickname);
+    }
+  }, [user]);
+
+  // 닉네임 유효성 검사 규칙
   const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,10}$/;
 
   const validateNickname = (value: string): string | null => {
-    if (!nicknameRegex.test(value)) {
-      return '닉네임은 1~10자의 한글, 영문 또는 숫자만 사용할 수 있습니다.';
+    if (!value.trim()) {
+      return '닉네임을 입력해주세요.';
     }
+
+    if (value.length > 10) {
+      return '닉네임은 최대 10자까지 가능합니다.';
+    }
+
+    if (!nicknameRegex.test(value)) {
+      return '닉네임은 한글, 영문 또는 숫자만 사용할 수 있습니다.';
+    }
+
     return null;
   };
 
@@ -29,36 +47,61 @@ export default function MypageForm() {
     setError(validateNickname(value));
   };
 
-  const handleUpdateNickname = async () => {
-    const validationMessage = validateNickname(nickname);
+  const handleUpdateNickname = () => {
+    const validationError = validateNickname(nickname);
 
-    if (validationMessage) {
-      setError(validationMessage);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     if (nickname === user?.nickname) {
-      return; // No need to update if it's the same
+      setError('현재 닉네임과 동일합니다.');
+      return;
     }
 
-    try {
-      setIsUpdating(true);
-    } catch (err) {
-      setError('닉네임 변경 중 오류가 발생했습니다.');
-      console.error('Error updating nickname:', err);
-    } finally {
-      setIsUpdating(false);
-    }
+    updateNickname(nickname, {
+      onSuccess: () => {
+        if (user) {
+          setUser({
+            ...user,
+            nickname: nickname,
+          });
+        }
+        alert('닉네임 변경 성공!');
+        setError(null);
+      },
+      onError: (err) => {
+        console.error('닉네임 변경 오류:', err);
+        alert('닉네임 변경 중 오류가 발생했습니다.');
+      },
+    });
   };
+
+  if (!user) {
+    return (
+      <Box className={style.formContainer}>
+        <Skeleton variant="circular" width={100} height={100} sx={{ mb: 3 }} />
+        <Skeleton variant="rectangular" width="100%" height={56} sx={{ mb: 2 }} />
+        <Skeleton variant="rectangular" width="100%" height={50} />
+      </Box>
+    );
+  }
 
   return (
     <Box className={style.formContainer}>
       <Box className={style.profileImageSection}>
-        {user?.profileImageUrl ? (
-          <Avatar src={user.profileImageUrl} alt="프로필 이미지" sx={{ width: 100, height: 100 }} />
-        ) : (
-          <Avatar sx={{ width: 100, height: 100, bgcolor: 'var(--color-primary)' }}>{user?.nickname?.charAt(0).toUpperCase() || ''}</Avatar>
-        )}
+        <Avatar
+          src={user.profileImageUrl}
+          sx={{
+            width: 100,
+            height: 100,
+            bgcolor: 'var(--color-primary)',
+            fontSize: '2rem',
+          }}
+        >
+          {user.nickname?.charAt(0).toUpperCase() || 'U'}
+        </Avatar>
       </Box>
 
       <Box className={style.nicknameSection}>
@@ -73,16 +116,17 @@ export default function MypageForm() {
           helperText={error ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
           fullWidth
           sx={{ mb: 3 }}
+          disabled={isPending}
         />
 
         <Button
           variant="contained"
           onClick={handleUpdateNickname}
-          disabled={!!error || isUpdating || nickname.length === 0 || nickname === user?.nickname}
+          disabled={!!error || isPending || nickname.length === 0 || nickname === user.nickname}
           fullWidth
           sx={{ height: 50 }}
         >
-          닉네임 변경하기
+          {isPending ? '변경 중...' : '닉네임 변경하기'}
         </Button>
       </Box>
     </Box>

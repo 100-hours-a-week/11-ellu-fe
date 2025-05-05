@@ -1,9 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { signup } from '@/api/user';
+import { editMyInfo } from '@/api/user';
 import { AxiosError } from 'axios';
 
-export const useSignup = () => {
+export const useEditMyInfo = () => {
   return useMutation<void, AxiosError<{ message: string }>, string>({
-    mutationFn: signup,
+    mutationFn: editMyInfo,
+    retry: false,
   });
 };

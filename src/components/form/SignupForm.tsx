@@ -4,7 +4,7 @@ import { useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { TextField, Button, Box } from '@mui/material';
 import { userStore } from '@/stores/userStore';
-import { useSignup } from '@/hooks/api/useSignup';
+import { useSignup } from '@/hooks/api/auth/useSignup';
 import { getMyInfo } from '@/api/user';
 
 export default function SignupForm() {
@@ -14,7 +14,7 @@ export default function SignupForm() {
 
   const setUser = userStore((s) => s.setUser);
 
-  const { mutate: signup } = useSignup();
+  const { mutate: signup, isPending } = useSignup();
 
   const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,10}$/;
 
@@ -38,14 +38,6 @@ export default function SignupForm() {
 
     if (validationMessage) {
       setError(validationMessage);
-      return;
-    }
-
-    const accessToken = userStore.getState().accessToken;
-
-    if (!accessToken) {
-      alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
-      router.replace('/auth/login');
       return;
     }
 
@@ -80,7 +72,7 @@ export default function SignupForm() {
         helperText={error ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
         required
       />
-      <Button type="submit" variant="contained" disabled={!!error || nickname.length === 0} sx={{ marginTop: 3, height: 50 }}>
+      <Button type="submit" variant="contained" disabled={!!error || nickname.length === 0 || isPending} sx={{ marginTop: 3, height: 50 }}>
         회원가입 완료
       </Button>
     </Box>

@@ -17,7 +17,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 응답에서 403이면 자동 refresh → 재시도
+// 403이면 자동 refresh토큰으로 갱신
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
