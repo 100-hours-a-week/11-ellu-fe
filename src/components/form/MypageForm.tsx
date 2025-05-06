@@ -12,10 +12,10 @@ export default function MypageForm() {
 
   const [nickname, setNickname] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const { mutate: updateNickname, isPending } = useEditMyInfo();
 
-  // 유저 정보 로드 시 닉네임 설정
   useEffect(() => {
     if (user?.nickname) {
       setNickname(user.nickname);
@@ -68,12 +68,18 @@ export default function MypageForm() {
             nickname: nickname,
           });
         }
-        alert('닉네임 변경 성공!');
+        setIsSuccess(true);
         setError(null);
+        setTimeout(() => {
+          setIsSuccess(false);
+        }, 3000);
       },
       onError: (err) => {
-        console.error('닉네임 변경 오류:', err);
-        alert('닉네임 변경 중 오류가 발생했습니다.');
+        if (err.response?.status === 409) {
+          setError('이미 사용 중인 닉네임입니다.');
+        } else {
+          alert('닉네임 변경 중 오류가 발생했습니다.');
+        }
       },
     });
   };
@@ -92,7 +98,7 @@ export default function MypageForm() {
     <Box className={style.formContainer}>
       <Box className={style.profileImageSection}>
         <Avatar
-          src={user.profileImageUrl}
+          src={user?.profileImageUrl}
           sx={{
             width: 100,
             height: 100,
@@ -100,7 +106,7 @@ export default function MypageForm() {
             fontSize: '2rem',
           }}
         >
-          {user.nickname?.charAt(0).toUpperCase() || 'U'}
+          {user?.nickname?.charAt(0).toUpperCase() || 'U'}
         </Avatar>
       </Box>
 
@@ -118,11 +124,15 @@ export default function MypageForm() {
           sx={{ mb: 3 }}
           disabled={isPending}
         />
-
+        {isSuccess && (
+          <Alert severity="success" sx={{ width: '93%', mb: 2 }}>
+            닉네임이 성공적으로 변경되었습니다.
+          </Alert>
+        )}
         <Button
           variant="contained"
           onClick={handleUpdateNickname}
-          disabled={!!error || isPending || nickname.length === 0 || nickname === user.nickname}
+          disabled={!!error || isPending || nickname.length === 0 || nickname === user?.nickname}
           fullWidth
           sx={{ height: 50 }}
         >
