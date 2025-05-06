@@ -1,14 +1,12 @@
 'use client';
 
-import { Box, TextField, Button, MenuItem, Typography } from '@mui/material';
-import { useState } from 'react';
-
-const positions = [
-  { value: 'FE', label: 'FE개발자' },
-  { value: 'BE', label: 'BE개발자' },
-  { value: 'CLOUD', label: '클라우드개발자' },
-  { value: 'AI', label: 'AI 개발자' },
-];
+import { Box, TextField, Button, MenuItem, Typography, CircularProgress, Alert } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ProjectFormData } from '@/types/api/project';
+import { useCreateProject } from '@/hooks/api/projects/useCreateProject';
+import { useEditProject } from '@/hooks/api/projects/useEditProject';
+import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 
 const mockProjectData = {
   '1': {
@@ -23,53 +21,77 @@ const mockProjectData = {
   },
 };
 
-interface ProjectInfoFormProps {
-  id?: string;
-}
+const positions = [
+  { value: 'FE', label: 'FE개발자' },
+  { value: 'BE', label: 'BE개발자' },
+  { value: 'CLOUD', label: '클라우드개발자' },
+  { value: 'AI', label: 'AI 개발자' },
+];
 
-export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
-  console;
-  const [formData, setFormData] = useState(() => {
-    if (id && mockProjectData[id as keyof typeof mockProjectData]) {
-      return mockProjectData[id as keyof typeof mockProjectData];
-    }
-    return {
-      title: '',
-      wiki: '',
-      position: '',
-    };
+export default function ProjectInfoForm({ id }: { id?: string }) {
+  const router = useRouter();
+  const isEditMode = !!id; // id가 있으면 수정 모드
+  const projectId = isEditMode ? Number(id) : undefined;
+
+  const { mutate: createProject, isPending: isCreating } = useCreateProject();
+  const { mutate: editProject, isPending: isEditing } = useEditProject();
+  const { data: projectData, isLoading: isLoadingProject, error: fetchError } = useGetProjectById(projectId as number);
+
+  const isLoading = isCreating || isEditing;
+
+  const [formData, setFormData] = useState<ProjectFormData>({
+    title: '',
+    wiki: '',
+    position: '',
   });
-
   const [errors, setErrors] = useState({
     title: '',
     wiki: '',
     position: '',
   });
 
+  // 기존 프로젝트 데이터 불러오기
+  useEffect(() => {
+    if (mockProjectData[id as keyof typeof mockProjectData]) {
+      setFormData(mockProjectData[id as keyof typeof mockProjectData]);
+    }
+    // if (isEditMode && projectData) {
+    //   setFormData({
+    //     title: projectData.title,
+    //     wiki: projectData.wiki || '',
+    //     position: projectData.position || '',
+    //   });
+    // }
+  }, [isEditMode, projectData]);
+
+  // 유효성 검사 함수
   const validateTitle = (value: string) => {
     if (value.length < 1 || value.length > 10) return '최소 1자, 최대 10자이내로 입력해주세요';
     if (!/^[가-힣a-zA-Z0-9\s]+$/.test(value)) return '한글, 영문, 숫자만 입력 가능합니다';
     return '';
   };
-
   const validateWiki = (value: string) => {
     if (value.length < 50) return '최소 50자 이상 입력해주세요';
     if (value.length > 1000) return '최대 1000자까지 입력 가능합니다';
     return '';
   };
-
   const validatePosition = (value: string) => {
     if (!value) return '포지션을 선택해주세요';
     return '';
   };
 
+  // 폼 유효성 검사
+  const isFormValid = () => {
+    return !errors.title && !errors.wiki && !errors.position && formData.title.length >= 1 && formData.wiki.length >= 50 && formData.position !== '';
+  };
+
+  // 입력 변경 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
     if (name === 'title') {
       setErrors((prev) => ({
         ...prev,
@@ -88,14 +110,59 @@ export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
     }
   };
 
-  const isFormValid = () => {
-    return !errors.title && !errors.wiki && !errors.position && formData.title.length >= 1 && formData.wiki.length >= 50 && formData.position !== '';
-  };
-
+  // 폼 제출 핸들러
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
+
+    if (isEditMode) {
+      // 수정 모드
+      editProject(
+        {
+          projectId: Number(id),
+          data: formData,
+        },
+        {
+          onSuccess: () => {
+            alert('프로젝트가 수정되었습니다.');
+            router.push('/projects');
+          },
+          onError: (error) => {
+            alert('프로젝트 수정에 실패했습니다');
+          },
+        }
+      );
+    } else {
+      // 생성 모드
+      createProject(formData, {
+        onSuccess: () => {
+          alert('프로젝트가 생성되었습니다.');
+          router.push('/projects');
+        },
+        onError: (error) => {
+          alert('프로젝트 생성에 실패했습니다');
+        },
+      });
+    }
   };
+
+  // // 프로젝트 정보 불러오기 로딩
+  // if (isEditMode && isLoadingProject) {
+  //   return (
+  //     <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+  //       <CircularProgress />
+  //     </Box>
+  //   );
+  // }
+  // // 프로젝트 정보 불러오기 실패
+  // if (isEditMode && fetchError) {
+  //   return (
+  //     <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" gap={2}>
+  //       <Alert severity="error" sx={{ width: '80%', maxWidth: '600px' }}>
+  //         프로젝트 정보를 불러오는데 실패했습니다:
+  //       </Alert>
+  //     </Box>
+  //   );
+  // }
 
   return (
     <Box
@@ -118,7 +185,7 @@ export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
       }}
     >
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 2 }}>
-        생성할 프로젝트의 이름
+        {isEditMode ? '수정할' : '생성할'} 프로젝트의 이름
       </Typography>
       <TextField
         label="프로젝트 이름"
@@ -129,7 +196,7 @@ export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
         required
         error={!!errors.title}
         helperText={errors.title}
-        inputProps={{ maxLength: 10 }}
+        disabled={isLoading}
         sx={{ width: '50%', minWidth: '300px' }}
       />
 
@@ -150,7 +217,7 @@ export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
         required
         error={!!errors.wiki}
         helperText={errors.wiki}
-        inputProps={{ maxLength: 1000 }}
+        disabled={isLoading}
       />
 
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 2 }}>
@@ -167,6 +234,7 @@ export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
         error={!!errors.position}
         helperText={errors.position}
         sx={{ width: '20%', minWidth: '150px' }}
+        disabled={isLoading}
       >
         {positions.map((option) => (
           <MenuItem key={option.value} value={option.value}>
@@ -175,8 +243,8 @@ export default function ProjectInfoForm({ id }: ProjectInfoFormProps) {
         ))}
       </TextField>
 
-      <Button type="submit" variant="contained" color="primary" sx={{ mt: 1, height: '50px' }} disabled={!isFormValid()}>
-        {id ? '프로젝트 수정' : '프로젝트 생성'}
+      <Button type="submit" variant="contained" color="primary" sx={{ mt: 1, height: '50px' }} disabled={!isFormValid() || isLoading}>
+        {isLoading ? '처리 중...' : isEditMode ? '프로젝트 수정' : '프로젝트 생성'}
       </Button>
     </Box>
   );
