@@ -1,19 +1,20 @@
 import api from '@/lib/axios';
 import { KakaoLoginResponse } from '@/types/api/auth';
 import { User } from '@/types/api/user';
+import { ApiResponse } from '@/types/api/common';
 
 // 로그인
 export const KakaoLogin = async (code: string): Promise<KakaoLoginResponse> => {
-  const res = await api.post('/auth/token', { code });
+  const res = await api.post<ApiResponse<KakaoLoginResponse>>('/auth/token', { code });
   return res.data.data;
 };
 
 //로그아웃
-export const logout = () => api.delete('/auth/token');
+export const logout = () => api.delete<ApiResponse<void>>('/auth/token');
 
 // accessToken 재발급 (클라이언트)
 export const refreshAccessToken = async (): Promise<{ accessToken: string; user: User } | null> => {
-  const res = await api.post('/auth/token/refresh');
+  const res = await api.post<ApiResponse<{ accessToken: string; user: User }>>('/auth/token/refresh');
   return res.data.data;
 };
 
