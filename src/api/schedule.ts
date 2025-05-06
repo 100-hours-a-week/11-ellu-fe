@@ -2,7 +2,9 @@ import api from '@/lib/axios';
 import { ScheduleResponse } from '@/types/api/schedule';
 import { EventData } from '@/types/calendar';
 import { ApiResponse } from '@/types/api/common';
-import { convertToEventData } from '@/utils/scheduleUtils';
+import { convertToEventData, convertToScheduleData } from '@/utils/scheduleUtils';
+
+////////////////////모든일정////////////////////
 
 // 일별 전체 일정조회
 export const getAllDailySchedules = async (date: string): Promise<EventData[]> => {
@@ -28,10 +30,42 @@ export const getAllYearlySchedules = async (year: string): Promise<EventData[]> 
   return convertToEventData(res.data.data);
 };
 
+// 일정 생성
+export const createSchedule = async (
+  eventData: EventData,
+  options: {
+    isProjectSchedule?: boolean;
+    isAiRecommended?: boolean;
+    isCompleted?: boolean;
+  } = {}
+): Promise<void> => {
+  const scheduleData = convertToScheduleData(eventData, options);
+  await api.post<ApiResponse<ScheduleResponse>>('/user/schedules', scheduleData);
+};
+
+// 일정 수정
+export const updateSchedule = async (
+  scheduleId: number,
+  eventData: EventData,
+  options: {
+    isProjectSchedule?: boolean;
+    isAiRecommended?: boolean;
+    isCompleted?: boolean;
+  } = {}
+): Promise<void> => {
+  const scheduleData = convertToScheduleData(eventData, options);
+  await api.patch<ApiResponse<ScheduleResponse>>(`/user/schedules/${scheduleId}`, scheduleData);
+};
+
+// 일정 삭제
+export const deleteSchedule = async (scheduleId: number): Promise<void> => {
+  await api.delete<ApiResponse<void>>(`/user/schedules/${scheduleId}`);
+};
+
 ////////////////////프로젝트////////////////////
 
 // 특정 프로젝트 일별 일정조회
-export const getProjectDailySchedules = async (projectId: string, date: string): Promise<EventData[]> => {
+export const getProjectDailySchedules = async (projectId: number, date: string): Promise<EventData[]> => {
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules/daily`, {
     params: { date },
   });
@@ -39,7 +73,7 @@ export const getProjectDailySchedules = async (projectId: string, date: string):
 };
 
 // 특정 프로젝트 (주,월)별 일정조회
-export const getProjectMonthlySchedules = async (projectId: string, month: string): Promise<EventData[]> => {
+export const getProjectMonthlySchedules = async (projectId: number, month: string): Promise<EventData[]> => {
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules/monthly`, {
     params: { month },
   });
@@ -47,9 +81,43 @@ export const getProjectMonthlySchedules = async (projectId: string, month: strin
 };
 
 // 특정 프로젝트 연별 일정조회
-export const getProjectYearlySchedules = async (projectId: string, year: string): Promise<EventData[]> => {
+export const getProjectYearlySchedules = async (projectId: number, year: string): Promise<EventData[]> => {
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules/yearly`, {
     params: { year },
   });
   return convertToEventData(res.data.data);
+};
+
+// 프로젝트 일정 생성
+export const createProjectSchedules = async (
+  projectId: number,
+  eventDataList: EventData[],
+  options: {
+    isProjectSchedule?: boolean;
+    isAiRecommended?: boolean;
+    isCompleted?: boolean;
+  } = {}
+): Promise<void> => {
+  const scheduleDataList = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
+  await api.post<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules`, scheduleDataList);
+};
+
+// 프로젝트 일정 수정
+export const updateProjectSchedule = async (
+  projectId: number,
+  scheduleId: number,
+  eventData: EventData,
+  options: {
+    isProjectSchedule?: boolean;
+    isAiRecommended?: boolean;
+    isCompleted?: boolean;
+  } = {}
+): Promise<void> => {
+  const scheduleData = convertToScheduleData(eventData, options);
+  await api.patch<ApiResponse<ScheduleResponse>>(`/projects/${projectId}/schedules/${scheduleId}`, scheduleData);
+};
+
+// 프로젝트 일정 삭제
+export const deleteProjectSchedule = async (projectId: number, scheduleId: number): Promise<void> => {
+  await api.delete<ApiResponse<void>>(`/projects/${projectId}/schedules/${scheduleId}`);
 };
