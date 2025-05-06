@@ -20,21 +20,54 @@ import {
   DialogActions,
   CircularProgress,
   Box,
+  Alert,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CalendarIcon from '@mui/icons-material/CalendarMonth';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { Project } from '@/types/api/project';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
-import { useDeleteProject } from '@/hooks/api/useDeleteProject';
-import { useGetProjects } from '@/hooks/api/useGetProjects';
+import { useDeleteProject } from '@/hooks/api/projects/useDeleteProject';
+import { useGetProjects } from '@/hooks/api/projects/useGetProjects';
 import style from './ProjectsList.module.css';
 
-export default function ProjectTable() {
+// 임시 데이터
+const projects: Project[] = [
+  {
+    id: 1,
+    title: 'My Project',
+    color: 'blue',
+    members: [
+      {
+        id: 2,
+        nickname: '강아지2',
+        profileImageUrl: '/images/onboarding1.svg',
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: 'My Project2',
+    color: 'blue',
+    members: [
+      {
+        id: 2,
+        nickname: '강아지2',
+        profileImageUrl: '/images/onboarding1.svg',
+      },
+    ],
+  },
+];
+
+export default function ProjectsList() {
   const [open, setOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // const { data: projects, isLoading, isError, error, refetch } = useGetProjects();
+  const { mutate: deleteProject } = useDeleteProject();
 
   const handleClickOpen = (project: Project) => {
     setSelectedProject(project);
@@ -48,7 +81,15 @@ export default function ProjectTable() {
 
   const handleDelete = () => {
     if (selectedProject) {
-      handleClose();
+      deleteProject(selectedProject.id, {
+        onSuccess: () => {
+          handleClose();
+        },
+        onError: (error) => {
+          alert(`삭제 실패: ${error.response?.data?.message || '알 수 없는 오류가 발생했습니다.'}`);
+          handleClose();
+        },
+      });
     }
   };
 
@@ -60,22 +101,21 @@ export default function ProjectTable() {
   //   );
   // }
 
-  const projects: Project[] = [
-    {
-      id: 1,
-      title: 'My Project',
-      color: 'blue',
-      members: [
-        {
-          id: 2,
-          nickname: '강아지2',
-          profileImageUrl: '/images/onboarding1.svg',
-        },
-      ],
-    },
-  ];
+  // if (isError) {
+  //   return (
+  //     <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="60%" gap={2}>
+  //       <Alert severity="error">
+  //         프로젝트 목록을 불러오는 중 오류가 발생했습니다.
+  //         {error instanceof Error && `: ${error.message}`}
+  //       </Alert>
+  //       <Button variant="outlined" onClick={() => refetch()} startIcon={<RefreshIcon />}>
+  //         다시 시도
+  //       </Button>
+  //     </Box>
+  //   );
+  // }
 
-  if (projects?.length === 0) {
+  if (!projects || projects.length === 0) {
     return (
       <Link href="/projects/create" className={style.noProject}>
         <Image src="/images/createproject.svg" alt="프로젝트 없음" width={270} height={270} />
@@ -107,7 +147,7 @@ export default function ProjectTable() {
                         width: 12,
                         height: 12,
                         borderRadius: '50%',
-                        backgroundColor: project.color,
+                        backgroundColor: `#${project.color}`,
                         border: '1px solid #ccc',
                       }}
                     />
@@ -157,13 +197,7 @@ export default function ProjectTable() {
         </Table>
       </TableContainer>
 
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        TransitionProps={{ timeout: 0 }}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
+      <Dialog open={open} onClose={handleClose} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">프로젝트 삭제</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
