@@ -65,9 +65,9 @@ export const deleteSchedule = async (scheduleId: number): Promise<void> => {
 ////////////////////프로젝트////////////////////
 
 // 특정 프로젝트 일별 일정조회
-export const getProjectDailySchedules = async (projectId: number, date: string): Promise<EventData[]> => {
+export const getProjectDailySchedules = async (projectId: number, day: string): Promise<EventData[]> => {
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules/daily`, {
-    params: { date },
+    params: { day },
   });
   return convertToEventData(res.data.data);
 };

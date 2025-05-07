@@ -1,17 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { getProjectMonthlySchedules } from "@/api/schedule";
-import { EventData } from "@/types/calendar";
-import { AxiosError } from "axios";
+import { useQuery } from '@tanstack/react-query';
+import { getProjectMonthlySchedules } from '@/api/schedule';
+import { EventData } from '@/types/calendar';
+import { AxiosError } from 'axios';
 
-export const useGetProjectMonthlySchedules = (
-  projectId: number,
-  month: string
-) => {
+// enabled 옵션을 boolean 타입으로 받도록 수정
+type QueryOptions = {
+  enabled?: boolean;
+};
+
+export const useGetProjectMonthlySchedules = (projectId: number, month: string, options?: QueryOptions) => {
+  const enabled = options?.enabled !== undefined ? options.enabled : true;
+
   return useQuery<EventData[], AxiosError<{ message: string }>>({
-    queryKey: ["project-monthly-schedules", projectId, month],
+    queryKey: ['project-monthly-schedules', projectId, month],
     queryFn: () => getProjectMonthlySchedules(projectId, month),
     staleTime: 5 * 60 * 1000,
     retry: 0,
-    enabled: !!projectId && !!month,
+    enabled: enabled && !!projectId && !!month,
   });
 };
