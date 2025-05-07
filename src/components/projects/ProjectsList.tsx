@@ -181,7 +181,7 @@ export default function ProjectsList() {
                         width: 12,
                         height: 12,
                         borderRadius: "50%",
-                        backgroundColor: `${project.color}`,
+                        backgroundColor: `#${project.color}`,
                         border: "1px solid #ccc",
                       }}
                     />
