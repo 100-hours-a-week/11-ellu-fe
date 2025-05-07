@@ -1,43 +1,40 @@
-"use client";
+// components/Calendar.tsx
+'use client';
 
-import React, { useRef, useState, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import multiMonthPlugin from "@fullcalendar/multimonth";
-import interactionPlugin from "@fullcalendar/interaction";
-import koLocale from "@fullcalendar/core/locales/ko";
-import styles from "./Calendar.module.css";
-import { DateSelectArg, EventDropArg } from "@fullcalendar/core";
-import { EventResizeDoneArg } from "@fullcalendar/interaction";
-import CreateScheduleModal from "./CreateScheduleModal";
-import ScheduleDetailModal from "./ScheduleDetailModal";
-import { EventData } from "../types/calendar";
-import { useCalendarModals } from "@/hooks/useCalendarModals";
+import React, { useRef, useEffect } from 'react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import multiMonthPlugin from '@fullcalendar/multimonth';
+import interactionPlugin from '@fullcalendar/interaction';
+import koLocale from '@fullcalendar/core/locales/ko';
+import styles from './Calendar.module.css';
+import { DateSelectArg } from '@fullcalendar/core';
+import CreateScheduleModal from './CreateScheduleModal';
+import ScheduleDetailModal from './ScheduleDetailModal';
+import { useCalendarModals } from '@/hooks/useCalendarModals';
+import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
+import { useCalendarView } from '@/hooks/useCalendarView';
+import { EventData } from '@/types/calendar';
 
 // 상수 정의
 const CALENDAR_VIEWS = {
-  multiMonthYear: { type: "multiMonth", duration: { years: 1 } },
-  timeGridDay: { type: "timeGrid", duration: { days: 1 } },
-  timeGridWeek: { type: "timeGrid", duration: { weeks: 1 } },
-  dayGridMonth: { type: "dayGrid", duration: { months: 1 } },
+  multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
+  timeGridDay: { type: 'timeGrid', duration: { days: 1 } },
+  timeGridWeek: { type: 'timeGrid', duration: { weeks: 1 } },
+  dayGridMonth: { type: 'dayGrid', duration: { months: 1 } },
 };
 
 const HEADER_TOOLBAR = {
-  left: "prev,next today",
-  center: "title",
-  right: "timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear",
+  left: 'prev,next today',
+  center: 'title',
+  right: 'timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear',
 };
 
 export default function Calendar({ projectId }: { projectId?: string }) {
   const calendarRef = useRef<FullCalendar>(null);
 
-  // 캘린더 뷰와 날짜 상태
-  const [currentView, setCurrentView] = useState<string>("timeGridWeek");
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [events, setEvents] = useState<EventData[]>([]);
-
-  // 모달 관련 커스텀 훅 사용
+  // 커스텀 훅 사용
   const {
     openCreateModal,
     openDetailModal,
@@ -51,37 +48,21 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     handleInputChange,
   } = useCalendarModals();
 
-  // 캘린더 뷰가 변경될 때 호출되는 핸들러
-  const handleViewChange = (viewInfo: any) => {
-    console.log("View changed to:", viewInfo.view.type);
-    setCurrentView(viewInfo.view.type);
-  };
+  const { events, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers();
 
-  // 날짜 범위가 변경될 때 호출되는 핸들러
-  const handleDatesSet = (dateInfo: any) => {
-    console.log("Date range changed:", {
-      start: dateInfo.start,
-      end: dateInfo.end,
-      view: dateInfo.view.type,
-    });
-    setCurrentDate(dateInfo.start);
-  };
+  const { currentView, currentDate, handleViewChange, handleDatesSet } = useCalendarView();
 
   // 현재 뷰와 날짜 변경 시 필요한 처리를 위한 useEffect
   useEffect(() => {
-    console.log("Current view:", currentView);
-    console.log("Current date:", currentDate);
+    console.log('Current view:', currentView);
+    console.log('Current date:', currentDate);
 
-    // 여기서 뷰 타입에 따라 다른 API 호출 등의 처리를 할 수 있습니다
-    if (currentView === "timeGridDay") {
-      console.log("일별 뷰: 일별 데이터를 가져와야 합니다");
-    } else if (
-      currentView === "timeGridWeek" ||
-      currentView === "dayGridMonth"
-    ) {
-      console.log("주간/월간 뷰: 월별 데이터를 가져와야 합니다");
-    } else if (currentView === "multiMonthYear") {
-      console.log("연간 뷰: 연간 데이터를 가져와야 합니다");
+    if (currentView === 'timeGridDay') {
+      console.log('일별 뷰: 일별 데이터를 가져와야 합니다');
+    } else if (currentView === 'timeGridWeek' || currentView === 'dayGridMonth') {
+      console.log('주간/월간 뷰: 월별 데이터를 가져와야 합니다');
+    } else if (currentView === 'multiMonthYear') {
+      console.log('연간 뷰: 연간 데이터를 가져와야 합니다');
     }
   }, [currentView, currentDate]);
 
@@ -101,52 +82,12 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 저장
   const handleSave = (newEvent: EventData) => {
-    const eventWithId = {
-      ...newEvent,
-      id: Date.now().toString(),
-    };
-    setEvents((prevEvents) => {
-      const updatedEvents = [...prevEvents, eventWithId];
-      console.log("새로운 일정 추가:", updatedEvents);
-      return updatedEvents;
-    });
+    createEvent(newEvent);
     closeCreateModal();
     if (calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
       calendarApi.unselect();
     }
-  };
-
-  // 일정 드래그 앤 드롭 처리
-  const handleEventDrop = (info: EventDropArg) => {
-    const { event } = info;
-    if (!event.start || !event.end) return;
-
-    setEvents((prevEvents) => {
-      const updatedEvents = prevEvents.map((evt) =>
-        evt.id === event.id
-          ? { ...evt, start: event.start!, end: event.end! }
-          : evt
-      );
-      console.log("일정 드래그 후 변경:", updatedEvents);
-      return updatedEvents;
-    });
-  };
-
-  // 이벤트 크기 조정
-  const handleEventResize = (info: EventResizeDoneArg) => {
-    const { event } = info;
-    if (!event.start || !event.end) return;
-
-    setEvents((prevEvents) => {
-      const updatedEvents = prevEvents.map((evt) =>
-        evt.id === event.id
-          ? { ...evt, start: event.start!, end: event.end! }
-          : evt
-      );
-      console.log("일정 크기 조정 후 변경:", updatedEvents);
-      return updatedEvents;
-    });
   };
 
   // 일정 클릭 이벤트 처리
@@ -163,10 +104,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 삭제
   const handleDelete = () => {
-    if (selectedEventData) {
-      setEvents((prevEvents) =>
-        prevEvents.filter((event) => event.id !== selectedEventData.id)
-      );
+    if (selectedEventData?.id) {
+      deleteEvent(selectedEventData.id);
       closeDetailModal();
     }
   };
@@ -175,12 +114,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     <div className={styles.calendarContainer}>
       <FullCalendar
         ref={calendarRef}
-        plugins={[
-          dayGridPlugin,
-          timeGridPlugin,
-          interactionPlugin,
-          multiMonthPlugin,
-        ]}
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
         initialView="timeGridWeek"
         locale={koLocale}
         headerToolbar={HEADER_TOOLBAR}
@@ -189,8 +123,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         unselectAuto={false}
         editable={true}
         droppable={true}
-        eventDrop={handleEventDrop}
-        eventResize={handleEventResize}
+        eventDrop={updateEvent}
+        eventResize={updateEvent}
         eventClick={handleEventClick}
         views={CALENDAR_VIEWS}
         events={events}

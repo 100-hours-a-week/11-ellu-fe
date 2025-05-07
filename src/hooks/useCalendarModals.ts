@@ -1,30 +1,28 @@
 // hooks/useCalendarModals.ts
-import { useState } from "react";
-import { EventData, SelectedTime } from "@/types/calendar";
+import { useState } from 'react';
+import { EventData, SelectedTime } from '@/types/calendar';
 
 export function useCalendarModals() {
   // 모달 상태 관리
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<SelectedTime | null>(null);
-  const [selectedEventData, setSelectedEventData] = useState<EventData | null>(
-    null
-  );
+  const [selectedEventData, setSelectedEventData] = useState<EventData | null>(null);
   const [eventData, setEventData] = useState<EventData>({
-    title: "",
+    title: '',
     start: new Date(),
     end: new Date(),
-    description: "",
+    description: '',
   });
 
   // 일정 생성 모달 관련 함수
   const openCreateScheduleModal = (start: Date, end: Date) => {
     setSelectedEvent({ start, end });
     setEventData({
-      title: "",
+      title: '',
       start,
       end,
-      description: "",
+      description: '',
     });
     setOpenCreateModal(true);
   };
