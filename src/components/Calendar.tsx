@@ -22,11 +22,13 @@ import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGet
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
 import { useGetProjectYearlySchedules } from '@/hooks/api/schedule/project/useGetProjectYearlySchedules';
 import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
+import { useDeleteProjectSchedule } from '@/hooks/api/schedule/project/useDeleteProjectSchedule';
 
 import { useGetAllDailySchedules } from '@/hooks/api/schedule/useGetAllDailySchedules';
 import { useGetAllMonthlySchedules } from '@/hooks/api/schedule/useGetAllMonthlySchedules';
 import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySchedules';
 import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
+import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
 
 // 상수 정의
 const CALENDAR_VIEWS = {
@@ -97,6 +99,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const { mutate: createProjectScheduleMutate } = useCreateProjectSchedules();
   // 일정 수정
   // 일정 삭제
+  const { mutate: deleteProjectScheduleMutate } = useDeleteProjectSchedule();
 
   // 모든일정
   // 일별 일정
@@ -115,6 +118,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const { mutate: createScheduleMutate } = useCreateSchedule();
   // 일정 수정
   // 일정 삭제
+  const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
   useEffect(() => {
     console.log('여기~~~', formattedDate, currentView);
@@ -235,9 +239,47 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 삭제
   const handleDelete = () => {
-    if (selectedEventData?.id) {
-      deleteEvent(selectedEventData.id);
-      closeDetailModal();
+    if (!selectedEventData || !selectedEventData.id) {
+      return;
+    }
+    const scheduleId = parseInt(selectedEventData.id);
+    if (isNaN(scheduleId)) {
+      console.error('유효하지 않은 일정 ID:', selectedEventData.id);
+      return;
+    }
+
+    if (projectIdNumber) {
+      // 프로젝트 일정 삭제
+      deleteProjectScheduleMutate(
+        {
+          projectId: projectIdNumber,
+          scheduleId: scheduleId,
+        },
+        {
+          onSuccess: () => {
+            console.log('프로젝트 일정 삭제 성공:', scheduleId);
+            deleteEvent(selectedEventData.id as string);
+            closeDetailModal();
+          },
+          onError: (error) => {
+            console.error('일정 삭제 실패:', error);
+            alert('일정 삭제에 실패했습니다.');
+          },
+        }
+      );
+    } else {
+      // 일반 일정 삭제
+      deleteScheduleMutate(scheduleId, {
+        onSuccess: () => {
+          console.log('일반 일정 삭제 성공:', scheduleId);
+          deleteEvent(selectedEventData.id as string);
+          closeDetailModal();
+        },
+        onError: (error) => {
+          console.error('일정 삭제 실패:', error);
+          alert('일정 삭제에 실패했습니다.');
+        },
+      });
     }
   };
 
