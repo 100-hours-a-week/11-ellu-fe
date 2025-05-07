@@ -49,13 +49,11 @@ export function useCalendarModals() {
   };
 
   return {
-    // 상태
     openCreateModal,
     openDetailModal,
     selectedEvent,
     selectedEventData,
     eventData,
-    // 함수
     openCreateScheduleModal,
     closeCreateModal,
     openDetailScheduleModal,

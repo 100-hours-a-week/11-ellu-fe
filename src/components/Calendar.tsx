@@ -24,6 +24,8 @@ import { useGetProjectYearlySchedules } from '@/hooks/api/schedule/project/useGe
 import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
 
 import { useGetAllDailySchedules } from '@/hooks/api/schedule/useGetAllDailySchedules';
+import { useGetAllMonthlySchedules } from '@/hooks/api/schedule/useGetAllMonthlySchedules';
+import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySchedules';
 import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
 
 // 상수 정의
@@ -59,78 +61,92 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     handleInputChange,
   } = useCalendarModals();
   const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers();
-  const { currentView, currentDate, viewType, handleViewChange, handleDatesSet } = useCalendarView();
+  const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
   const formattedMonth = format(currentDate, 'yyyy-MM');
   const formattedYear = format(currentDate, 'yyyy');
 
   // tanstack query
-  // 프로젝트 일정
+  // 프로젝트
+  // 일별 일정
   const { data: projectDailyData, isLoading: isLoadingProjectDaily } = useGetProjectDailySchedules(
     projectIdNumber as number,
     formattedDate,
     {
-      enabled: !!projectIdNumber && viewType === 'day',
+      enabled: !!projectIdNumber && currentView === 'day',
     }
   );
+  // 주간/월간 일정
   const { data: projectMonthlyData, isLoading: isLoadingProjectMonthly } = useGetProjectMonthlySchedules(
     projectIdNumber as number,
     formattedMonth,
     {
-      enabled: !!projectIdNumber && (viewType === 'week' || viewType === 'month'),
+      enabled: !!projectIdNumber && (currentView === 'week' || currentView === 'month'),
     }
   );
+  // 연간 일정
   const { data: projectYearlyData, isLoading: isLoadingProjectYearly } = useGetProjectYearlySchedules(
     projectIdNumber as number,
     formattedYear,
     {
-      enabled: !!projectIdNumber && viewType === 'year',
+      enabled: !!projectIdNumber && currentView === 'year',
     }
   );
+  // 일정 생성
   const { mutate: createProjectScheduleMutate } = useCreateProjectSchedules();
+  // 일정 수정
+  // 일정 삭제
 
   // 모든일정
+  // 일별 일정
   const { data: allDailyData, isLoading: isLoadingAllDaily } = useGetAllDailySchedules(formattedDate, {
-    enabled: !projectIdNumber && viewType === 'day',
+    enabled: !projectIdNumber && currentView === 'day',
   });
+  // 주간/월간 일정
+  const { data: allMonthlyData, isLoading: isLoadingAllMonthly } = useGetAllMonthlySchedules(formattedMonth, {
+    enabled: !projectIdNumber && (currentView === 'week' || currentView === 'month'),
+  });
+  // 연간 일정
+  const { data: allYearlyData, isLoading: isLoadingAllYearly } = useGetAllYearlySchedules(formattedYear, {
+    enabled: !projectIdNumber && currentView === 'year',
+  });
+  // 일정 생성
   const { mutate: createScheduleMutate } = useCreateSchedule();
+  // 일정 수정
+  // 일정 삭제
 
   useEffect(() => {
     console.log('여기~~~', formattedDate, currentView);
 
     if (projectIdNumber) {
-      // 프로젝트 일정 (이미 구현한 부분)
-      if (viewType === 'day' && projectDailyData) {
-        console.log('프로젝트 일별 뷰: 일별 데이터를 로드합니다', projectDailyData);
+      // 프로젝트 일정
+      if (currentView === 'day' && projectDailyData) {
         setEvents(projectDailyData);
-      } else if ((viewType === 'week' || viewType === 'month') && projectMonthlyData) {
-        console.log('프로젝트 주간/월간 뷰: 월별 데이터를 로드합니다', projectMonthlyData);
+      } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
         setEvents(projectMonthlyData);
-      } else if (viewType === 'year' && projectYearlyData) {
-        console.log('프로젝트 연간 뷰: 연간 데이터를 로드합니다', projectYearlyData);
+      } else if (currentView === 'year' && projectYearlyData) {
         setEvents(projectYearlyData);
       }
     } else {
       // 전체 일정
-      if (viewType === 'day' && allDailyData) {
-        console.log('전체 일별 뷰: 일별 데이터를 로드합니다', allDailyData);
+      if (currentView === 'day' && allDailyData) {
         setEvents(allDailyData);
-      } else if (viewType === 'week' || viewType === 'month') {
-        console.log('전체 주간/월간 뷰: 월별 데이터를 가져와야 합니다');
-        // 전체 월별 일정 데이터 로드 로직은 아직 구현하지 않음
-      } else if (viewType === 'year') {
-        console.log('전체 연간 뷰: 연간 데이터를 가져와야 합니다');
-        // 전체 연간 일정 데이터 로드 로직은 아직 구현하지 않음
+      } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
+        setEvents(allMonthlyData);
+      } else if (currentView === 'year' && allYearlyData) {
+        setEvents(allYearlyData);
       }
     }
   }, [
-    viewType,
+    currentView,
     currentDate,
     projectDailyData,
     projectMonthlyData,
     projectYearlyData,
     allDailyData,
+    allMonthlyData,
+    allYearlyData,
     projectIdNumber,
     setEvents,
   ]);
@@ -151,7 +167,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 저장
   const handleSave = (newEvent: EventData) => {
-    // 로컬 상태 먼저 업데이트 (UI에 바로 반영)
     const createdEvent = createEvent(newEvent);
     closeCreateModal();
 
@@ -160,9 +175,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       calendarApi.unselect();
     }
 
-    // 프로젝트 ID 유무에 따라 다른 API 호출
     if (projectIdNumber) {
-      // 프로젝트 일정 저장 (이전에 구현한 부분)
+      // 프로젝트 일정 저장
       console.log('프로젝트 일정 생성:', newEvent);
       createProjectScheduleMutate(
         {
@@ -184,7 +198,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         }
       );
     } else {
-      // 일반 일정 저장 (새로 추가하는 부분)
+      // 일반 일정 저장
       console.log('일반 일정 생성:', newEvent);
       createScheduleMutate(
         {
@@ -247,7 +261,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         events={events}
         nowIndicator={true}
         slotEventOverlap={false}
-        viewDidMount={handleViewChange}
         datesSet={handleDatesSet}
       />
 

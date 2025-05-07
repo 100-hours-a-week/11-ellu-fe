@@ -3,7 +3,6 @@ import { getAllDailySchedules } from '@/api/schedule';
 import { EventData } from '@/types/calendar';
 import { AxiosError } from 'axios';
 
-// enabled 옵션을 boolean 타입으로 받도록 수정
 type QueryOptions = {
   enabled?: boolean;
 };
