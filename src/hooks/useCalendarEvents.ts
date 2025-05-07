@@ -1,4 +1,3 @@
-// hooks/useCalendarEvents.ts
 import { useState, useCallback } from 'react';
 import { EventData } from '@/types/calendar';
 import { EventDropArg } from '@fullcalendar/core';

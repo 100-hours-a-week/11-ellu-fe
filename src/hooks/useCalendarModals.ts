@@ -1,4 +1,3 @@
-// hooks/useCalendarModals.ts
 import { useState } from 'react';
 import { EventData, SelectedTime } from '@/types/calendar';
 
