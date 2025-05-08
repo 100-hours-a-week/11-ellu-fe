@@ -1,7 +1,7 @@
-// components/Calendar.tsx
 'use client';
 
 import React, { useRef, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -45,6 +45,7 @@ const HEADER_TOOLBAR = {
 };
 
 export default function Calendar({ projectId }: { projectId?: string }) {
+  const queryClient = useQueryClient();
   const calendarRef = useRef<FullCalendar>(null);
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
@@ -97,7 +98,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   );
   // 일정 생성
   const { mutate: createProjectScheduleMutate } = useCreateProjectSchedules();
-  // 일정 수정
   // 일정 삭제
   const { mutate: deleteProjectScheduleMutate } = useDeleteProjectSchedule();
 
@@ -116,7 +116,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   });
   // 일정 생성
   const { mutate: createScheduleMutate } = useCreateSchedule();
-  // 일정 수정
   // 일정 삭제
   const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
@@ -171,6 +170,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 저장
   const handleSave = (newEvent: EventData) => {
+    console.log('일정 저장:', newEvent);
     const createdEvent = createEvent(newEvent);
     closeCreateModal();
 
@@ -190,6 +190,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
         {
           onSuccess: () => {
+            refreshCalendarData();
             console.log('프로젝트 일정 생성 성공');
           },
           onError: (error) => {
@@ -211,6 +212,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
         {
           onSuccess: () => {
+            refreshCalendarData();
             console.log('일반 일정 생성 성공');
           },
           onError: (error) => {
@@ -239,6 +241,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 삭제
   const handleDelete = () => {
+    console.log('~~~~~~~~', selectedEventData);
     if (!selectedEventData || !selectedEventData.id) {
       return;
     }
@@ -280,6 +283,40 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           alert('일정 삭제에 실패했습니다.');
         },
       });
+    }
+  };
+
+  const refreshCalendarData = () => {
+    if (projectIdNumber) {
+      // 프로젝트 일정 데이터 리로드
+      if (currentView === 'day') {
+        queryClient.invalidateQueries({
+          queryKey: ['project-daily-schedules', projectIdNumber, formattedDate],
+        });
+      } else if (currentView === 'week' || currentView === 'month') {
+        queryClient.invalidateQueries({
+          queryKey: ['project-monthly-schedules', projectIdNumber, formattedMonth],
+        });
+      } else {
+        queryClient.invalidateQueries({
+          queryKey: ['project-yearly-schedules', projectIdNumber, formattedYear],
+        });
+      }
+    } else {
+      // 일반 일정 데이터 리로드
+      if (currentView === 'day') {
+        queryClient.invalidateQueries({
+          queryKey: ['daily-schedules', formattedDate],
+        });
+      } else if (currentView === 'week' || currentView === 'month') {
+        queryClient.invalidateQueries({
+          queryKey: ['monthly-schedules', formattedMonth],
+        });
+      } else {
+        queryClient.invalidateQueries({
+          queryKey: ['yearly-schedules', formattedYear],
+        });
+      }
     }
   };
 
