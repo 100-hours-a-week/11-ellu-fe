@@ -29,8 +29,9 @@ import { useGetAllMonthlySchedules } from '@/hooks/api/schedule/useGetAllMonthly
 import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySchedules';
 import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
 import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
+
 import { useScheduleStore } from '@/stores/scheduleStore';
-// 상수 정의
+
 const CALENDAR_VIEWS = {
   multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
   timeGridDay: { type: 'timeGrid', duration: { days: 1 } },

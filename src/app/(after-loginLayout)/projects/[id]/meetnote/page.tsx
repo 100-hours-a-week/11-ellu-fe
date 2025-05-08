@@ -3,9 +3,11 @@ import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import Link from 'next/link';
 import CreateMeetnote from '@/components/projects/CreateMeetnote';
-import SmallCalendar from '@/components/SmallCalendar';
+import Calendar from '@/components/Calendar';
 
-export default function Page() {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+
   return (
     <div className={style.container}>
       <div className={style.leftcontainer}>
@@ -26,11 +28,11 @@ export default function Page() {
           <h1>회의록 추가하기</h1>
         </div>
         <div className={style.meetnote}>
-          <CreateMeetnote />
+          <CreateMeetnote projectId={id} />
         </div>
       </div>
       <div className={style.rightcontainer}>
-        <SmallCalendar />
+        <Calendar projectId={id} />
       </div>
     </div>
   );

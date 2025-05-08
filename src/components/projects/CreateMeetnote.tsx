@@ -5,11 +5,13 @@ import { useState, useEffect } from 'react';
 import style from './CreateMeetnote.module.css';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { TextField, Button } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useCreateMeetingNote } from '@/hooks/api/projects/useCreateMeetingNote';
 import RecommendSchedule from './RecommendSchedule';
 
-export default function CreateMeetnote() {
+export default function CreateMeetnote({ projectId }: { projectId: string }) {
+  // 회의록 추가 훅
+  const { mutate: createMeetingNote, isPending, isError, error } = useCreateMeetingNote();
+
   const [step, setStep] = useState(0);
 
   const renderContent = () => {
@@ -46,8 +48,21 @@ export default function CreateMeetnote() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      console.log('회의록:', meetingNote);
-      setStep(2);
+      createMeetingNote(
+        {
+          projectId: parseInt(projectId),
+          meetingNote: meetingNote,
+        },
+        {
+          onSuccess: () => {
+            setStep(2);
+          },
+          onError: (err) => {
+            console.error('회의록 저장 실패:', err);
+            alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+          },
+        }
+      );
     };
 
     return (
