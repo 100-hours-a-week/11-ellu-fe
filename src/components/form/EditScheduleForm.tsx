@@ -9,9 +9,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ko } from 'date-fns/locale/ko';
 import { EventData } from '@/types/calendar';
 import { useRouter } from 'next/navigation';
-
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
+import { useScheduleStore } from '@/stores/scheduleStore';
 
 interface EditScheduleFormProps {
   scheduleData: EventData;
@@ -22,17 +22,23 @@ interface EditScheduleFormProps {
 export default function EditScheduleForm({ scheduleData, projectId, onSuccess }: EditScheduleFormProps) {
   const router = useRouter();
 
-  // Hook을 컴포넌트 내부로 이동
+  useEffect(() => {
+    console.log('scheduleData', scheduleData);
+  }, [scheduleData]);
+
+  // React Query Hooks
   const { mutate: updateSchedule, isPending: isUpdatingSchedule } = useUpdateSchedule();
   const { mutate: updateProjectSchedule, isPending: isUpdatingProjectSchedule } = useUpdateProjectSchedule();
   const isPending = isUpdatingSchedule || isUpdatingProjectSchedule;
 
+  // 폼 상태
   const [formData, setFormData] = useState<EventData>(scheduleData);
   const [startDate, setStartDate] = useState<Date>(new Date(scheduleData.start));
   const [startTime, setStartTime] = useState<Date>(new Date(scheduleData.start));
   const [endDate, setEndDate] = useState<Date>(new Date(scheduleData.end));
   const [endTime, setEndTime] = useState<Date>(new Date(scheduleData.end));
 
+  // 유효성 검사 상태
   const [titleError, setTitleError] = useState<string>('');
   const [descriptionError, setDescriptionError] = useState<string>('');
 
@@ -47,7 +53,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   // 할일 유효성 검사 함수
   const validateDescription = (description: string) => {
     if (description.length < 1) return '상세일정을 입력해주세요.';
-    if (description.length > 20) return '상세일정은 20자 이하여야 합니다.'; // "싱세일정" -> "상세일정" 오타 수정
+    if (description.length > 20) return '상세일정은 20자 이하여야 합니다.';
     if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(description)) return '한글, 영문, 숫자만 입력 가능합니다.';
     return '';
   };
@@ -58,6 +64,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
     setDescriptionError(validateDescription(formData.description || ''));
   }, []);
 
+  // 입력 변경 핸들러
   const handleStartDateChange = (newValue: Date | null) => {
     if (!newValue) return;
 
@@ -129,7 +136,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
 
   // 저장 버튼 활성화 체크함수
   const isSaveDisabled = () => {
-    if (!formData.title || titleError || descriptionError || isPending) return true; // isPending 추가
+    if (!formData.title || titleError || descriptionError || isPending) return true;
 
     const startDateTime = new Date(startDate);
     startDateTime.setHours(startTime.getHours());
@@ -142,6 +149,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
     return startDateTime > endDateTime;
   };
 
+  // 저장 버튼 클릭 핸들러
   const handleSave = () => {
     const startDateTime = new Date(startDate);
     startDateTime.setHours(startTime.getHours());
@@ -157,9 +165,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
       end: endDateTime,
     };
 
-    console.log(updatedSchedule);
     const scheduleId = parseInt(updatedSchedule.id || '0');
-
     if (isNaN(scheduleId) || scheduleId === 0) {
       alert('유효하지 않은 일정 ID입니다.');
       return;
@@ -167,9 +173,10 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
 
     if (projectId) {
       // 프로젝트 일정 업데이트
+      const projectIdNumber = parseInt(projectId);
       updateProjectSchedule(
         {
-          projectId: parseInt(projectId),
+          projectId: projectIdNumber,
           scheduleId: scheduleId,
           eventData: updatedSchedule,
           options: { isProjectSchedule: true },
@@ -177,7 +184,8 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
         {
           onSuccess: () => {
             alert('일정이 성공적으로 수정되었습니다.');
-            onSuccess(); // 성공 시 콜백 호출 (리다이렉트)
+            useScheduleStore.getState().setCurrentSchedule(null);
+            onSuccess();
           },
           onError: (error) => {
             alert('일정 수정 중 오류가 발생했습니다.');
@@ -196,7 +204,8 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
         {
           onSuccess: () => {
             alert('일정이 성공적으로 수정되었습니다.');
-            onSuccess(); // 성공 시 콜백 호출 (리다이렉트)
+            useScheduleStore.getState().setCurrentSchedule(null);
+            onSuccess();
           },
           onError: (error) => {
             alert('일정 수정 중 오류가 발생했습니다.');
@@ -207,8 +216,10 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
     }
   };
 
+  // 취소 버튼 클릭 핸들러
   const handleCancel = () => {
     router.back();
+    useScheduleStore.getState().setCurrentSchedule(null);
   };
 
   return (

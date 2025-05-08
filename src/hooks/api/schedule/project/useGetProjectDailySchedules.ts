@@ -15,6 +15,7 @@ export const useGetProjectDailySchedules = (projectId: number, date: string, opt
     queryFn: () => getProjectDailySchedules(projectId, date),
     staleTime: 5 * 60 * 1000,
     retry: false,
+    refetchOnWindowFocus: true,
     enabled: enabled && !!projectId && !!date,
   });
 };

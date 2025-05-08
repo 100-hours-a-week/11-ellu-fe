@@ -29,7 +29,7 @@ import { useGetAllMonthlySchedules } from '@/hooks/api/schedule/useGetAllMonthly
 import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySchedules';
 import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
 import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
-
+import { useScheduleStore } from '@/stores/scheduleStore';
 // 상수 정의
 const CALENDAR_VIEWS = {
   multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
@@ -49,6 +49,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const calendarRef = useRef<FullCalendar>(null);
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
+
+  const { setCurrentSchedule } = useScheduleStore();
 
   // 커스텀 훅 사용
   const {
@@ -234,8 +236,12 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       title: info.event.title,
       start: info.event.start,
       end: info.event.end,
-      description: info.event.extendedProps.description,
+      description: info.event.extendedProps.description || '',
+      isCompleted: info.event.extendedProps.isCompleted || false,
+      isAiRecommended: info.event.extendedProps.isAiRecommended || false,
+      isProjectSchedule: info.event.extendedProps.isProjectSchedule || false,
     };
+    setCurrentSchedule(eventData);
     openDetailScheduleModal(eventData);
   };
 

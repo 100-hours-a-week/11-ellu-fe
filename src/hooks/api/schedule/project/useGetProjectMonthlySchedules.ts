@@ -15,6 +15,7 @@ export const useGetProjectMonthlySchedules = (projectId: number, month: string, 
     queryFn: () => getProjectMonthlySchedules(projectId, month),
     staleTime: 5 * 60 * 1000,
     retry: 0,
+    refetchOnWindowFocus: true,
     enabled: enabled && !!projectId && !!month,
   });
 };

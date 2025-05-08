@@ -15,6 +15,7 @@ export const useGetProjectYearlySchedules = (projectId: number, year: string, op
     queryFn: () => getProjectYearlySchedules(projectId, year),
     staleTime: 5 * 60 * 1000,
     retry: 0,
+    refetchOnWindowFocus: true,
     enabled: enabled && !!projectId && !!year,
   });
 };

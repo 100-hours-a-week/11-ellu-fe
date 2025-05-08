@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { IconButton, Box, CircularProgress } from '@mui/material';
+import { IconButton, Box, Alert } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { EventData } from '@/types/calendar';
 import EditScheduleForm from '@/components/form/EditScheduleForm';
 import style from './page.module.css';
+import { useScheduleStore } from '@/stores/scheduleStore';
 
 export default function Page() {
   const params = useParams();
@@ -15,31 +14,29 @@ export default function Page() {
   const projectId = params.id as string;
   const scheduleId = params.scheduleId as string;
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [scheduleData, setScheduleData] = useState<EventData | null>(null);
+  const { currentSchedule } = useScheduleStore();
 
-  useEffect(() => {
-    // API 호출로 대체
-    const timer = setTimeout(() => {
-      const mockData: EventData = {
-        id: scheduleId,
-        title: '미팅 일정',
-        start: new Date(),
-        end: new Date(new Date().getTime() + 60 * 60 * 1000),
-        description: '프로젝트 진행 상황 논의',
-      };
-
-      setScheduleData(mockData);
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [projectId, scheduleId]);
-
-  if (isLoading) {
+  if (!currentSchedule) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="60%">
-        <CircularProgress />
+      <Box display="flex" justifyContent="center" alignItems="center" height="60%" flexDirection="column" gap={2}>
+        <Alert severity="error">일정 정보를 찾을 수 없습니다. 프로젝트 캘린더에서 일정을 다시 선택해주세요.</Alert>
+        <Link href={`/projects/${projectId}`}>
+          <button>프로젝트 캘린더로 돌아가기</button>
+        </Link>
+      </Box>
+    );
+  }
+
+  // 클릭한 일정 ID와 URL의 ID가 다른 경우 (선택 사항)
+  if (currentSchedule.id !== scheduleId) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="60%" flexDirection="column" gap={2}>
+        <Alert severity="warning">
+          요청한 일정 ID({scheduleId})와 현재 선택된 일정 ID({currentSchedule.id})가 일치하지 않습니다.
+        </Alert>
+        <Link href={`/projects/${projectId}`}>
+          <button>프로젝트 캘린더로 돌아가기</button>
+        </Link>
       </Box>
     );
   }
@@ -63,9 +60,13 @@ export default function Page() {
         <h1>일정 수정하기</h1>
       </div>
       <div className={style.form}>
-        {scheduleData && (
-          <EditScheduleForm scheduleData={scheduleData} projectId={projectId} onSuccess={() => router.push(`/projects/${projectId}`)} />
-        )}
+        <EditScheduleForm
+          scheduleData={currentSchedule}
+          projectId={projectId}
+          onSuccess={() => {
+            router.push(`/projects/${projectId}`);
+          }}
+        />
       </div>
     </div>
   );

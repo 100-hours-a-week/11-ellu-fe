@@ -15,6 +15,7 @@ export const useGetAllMonthlySchedules = (month: string, options?: QueryOptions)
     queryFn: () => getAllMonthlySchedules(month),
     staleTime: 5 * 60 * 1000,
     retry: false,
+    refetchOnWindowFocus: true,
     enabled: enabled && !!month,
   });
 };

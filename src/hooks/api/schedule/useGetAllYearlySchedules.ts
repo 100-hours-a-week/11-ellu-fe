@@ -15,6 +15,7 @@ export const useGetAllYearlySchedules = (year: string, options?: QueryOptions) =
     queryFn: () => getAllYearlySchedules(year),
     staleTime: 5 * 60 * 1000,
     retry: false,
+    refetchOnWindowFocus: true,
     enabled: enabled && !!year,
   });
 };

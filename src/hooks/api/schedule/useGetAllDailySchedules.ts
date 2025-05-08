@@ -15,6 +15,7 @@ export const useGetAllDailySchedules = (date: string, options?: QueryOptions) =>
     queryFn: () => getAllDailySchedules(date),
     staleTime: 5 * 60 * 1000,
     retry: false,
+    refetchOnWindowFocus: true,
     enabled: enabled && !!date,
   });
 };
