@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, Typography } from '@mui/material';
+import { Box, TextField, Button, Typography, CircularProgress } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -9,6 +9,9 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { ko } from 'date-fns/locale/ko';
 import { EventData } from '@/types/calendar';
 import { useRouter } from 'next/navigation';
+
+import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
+import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 
 interface EditScheduleFormProps {
   scheduleData: EventData;
@@ -18,6 +21,11 @@ interface EditScheduleFormProps {
 
 export default function EditScheduleForm({ scheduleData, projectId, onSuccess }: EditScheduleFormProps) {
   const router = useRouter();
+
+  // Hook을 컴포넌트 내부로 이동
+  const { mutate: updateSchedule, isPending: isUpdatingSchedule } = useUpdateSchedule();
+  const { mutate: updateProjectSchedule, isPending: isUpdatingProjectSchedule } = useUpdateProjectSchedule();
+  const isPending = isUpdatingSchedule || isUpdatingProjectSchedule;
 
   const [formData, setFormData] = useState<EventData>(scheduleData);
   const [startDate, setStartDate] = useState<Date>(new Date(scheduleData.start));
@@ -39,7 +47,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   // 할일 유효성 검사 함수
   const validateDescription = (description: string) => {
     if (description.length < 1) return '상세일정을 입력해주세요.';
-    if (description.length > 20) return '싱세일정은 20자 이하여야 합니다.';
+    if (description.length > 20) return '상세일정은 20자 이하여야 합니다.'; // "싱세일정" -> "상세일정" 오타 수정
     if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(description)) return '한글, 영문, 숫자만 입력 가능합니다.';
     return '';
   };
@@ -112,12 +120,16 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   };
 
   const isSameDay = (date1: Date, date2: Date) => {
-    return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
   };
 
   // 저장 버튼 활성화 체크함수
   const isSaveDisabled = () => {
-    if (!formData.title || titleError || descriptionError) return true;
+    if (!formData.title || titleError || descriptionError || isPending) return true; // isPending 추가
 
     const startDateTime = new Date(startDate);
     startDateTime.setHours(startTime.getHours());
@@ -145,11 +157,54 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
       end: endDateTime,
     };
 
-    // API 호출 로직 (실제 프로젝트에 맞게 구현)
-    console.log('Updated schedule:', updatedSchedule);
+    console.log(updatedSchedule);
+    const scheduleId = parseInt(updatedSchedule.id || '0');
 
-    // 성공 시 콜백 호출
-    onSuccess();
+    if (isNaN(scheduleId) || scheduleId === 0) {
+      alert('유효하지 않은 일정 ID입니다.');
+      return;
+    }
+
+    if (projectId) {
+      // 프로젝트 일정 업데이트
+      updateProjectSchedule(
+        {
+          projectId: parseInt(projectId),
+          scheduleId: scheduleId,
+          eventData: updatedSchedule,
+          options: { isProjectSchedule: true },
+        },
+        {
+          onSuccess: () => {
+            alert('일정이 성공적으로 수정되었습니다.');
+            onSuccess(); // 성공 시 콜백 호출 (리다이렉트)
+          },
+          onError: (error) => {
+            alert('일정 수정 중 오류가 발생했습니다.');
+            console.error('수정 실패:', error);
+          },
+        }
+      );
+    } else {
+      // 일반 일정 업데이트
+      updateSchedule(
+        {
+          scheduleId: scheduleId,
+          eventData: updatedSchedule,
+          options: {},
+        },
+        {
+          onSuccess: () => {
+            alert('일정이 성공적으로 수정되었습니다.');
+            onSuccess(); // 성공 시 콜백 호출 (리다이렉트)
+          },
+          onError: (error) => {
+            alert('일정 수정 중 오류가 발생했습니다.');
+            console.error('수정 실패:', error);
+          },
+        }
+      );
+    }
   };
 
   const handleCancel = () => {
@@ -178,8 +233,20 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
             시작 시간
           </Typography>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <DatePicker label="시작 일자" value={startDate} onChange={handleStartDateChange} sx={{ flex: 1 }} />
-            <TimePicker label="시작 시간" value={startTime} onChange={handleStartTimeChange} sx={{ flex: 1 }} />
+            <DatePicker
+              label="시작 일자"
+              value={startDate}
+              onChange={handleStartDateChange}
+              sx={{ flex: 1 }}
+              disabled={isPending}
+            />
+            <TimePicker
+              label="시작 시간"
+              value={startTime}
+              onChange={handleStartTimeChange}
+              sx={{ flex: 1 }}
+              disabled={isPending}
+            />
           </Box>
         </Box>
 
@@ -188,13 +255,21 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
             종료 시간
           </Typography>
           <Box sx={{ display: 'flex', gap: 2 }}>
-            <DatePicker label="종료 일자" value={endDate} onChange={handleEndDateChange} sx={{ flex: 1 }} minDate={startDate} />
+            <DatePicker
+              label="종료 일자"
+              value={endDate}
+              onChange={handleEndDateChange}
+              sx={{ flex: 1 }}
+              minDate={startDate}
+              disabled={isPending}
+            />
             <TimePicker
               label="종료 시간"
               value={endTime}
               onChange={handleEndTimeChange}
               sx={{ flex: 1 }}
               minTime={isSameDay(startDate, endDate) ? startTime : undefined}
+              disabled={isPending}
             />
           </Box>
         </Box>
@@ -214,6 +289,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
           },
         }}
         fullWidth
+        disabled={isPending}
       />
 
       <TextField
@@ -232,14 +308,22 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
           },
         }}
         fullWidth
+        disabled={isPending}
       />
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-        <Button variant="outlined" onClick={handleCancel}>
+        <Button variant="outlined" onClick={handleCancel} disabled={isPending}>
           취소
         </Button>
         <Button variant="contained" onClick={handleSave} disabled={isSaveDisabled()}>
-          수정
+          {isPending ? (
+            <>
+              <CircularProgress size={20} sx={{ mr: 1, color: 'inherit' }} />
+              수정 중...
+            </>
+          ) : (
+            '수정'
+          )}
         </Button>
       </Box>
     </Box>

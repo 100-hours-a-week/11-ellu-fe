@@ -23,7 +23,11 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 403) {
       try {
-        const refreshRes = await axios.post(`${process.env.NEXT_PUBLIC_API_SERVER_URL}/auth/token/refresh`, {}, { withCredentials: true });
+        const refreshRes = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_SERVER_URL}/auth/token/refresh`,
+          {},
+          { withCredentials: true }
+        );
 
         const { accessToken, user } = refreshRes.data.data;
         userStore.getState().setAccessToken(accessToken);
@@ -33,7 +37,7 @@ api.interceptors.response.use(
         return api.request(error.config);
       } catch (err) {
         userStore.getState().clearAuth();
-        window.location.href = '/auth/login';
+        // window.location.href = '/auth/login';
         return Promise.reject(err);
       }
     }

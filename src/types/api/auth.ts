@@ -1,4 +1,4 @@
 export interface KakaoLoginResponse {
   accessToken: string;
-  isNewUser: boolean;
+  new_user: boolean;
 }

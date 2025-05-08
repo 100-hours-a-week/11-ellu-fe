@@ -28,10 +28,11 @@ export default function KakaoLoading() {
     }
 
     kakaoLogin(code, {
-      onSuccess: async ({ accessToken, isNewUser }) => {
+      onSuccess: async ({ accessToken, new_user }) => {
+        console.log(new_user);
         try {
           setAccessToken(accessToken);
-          if (!isNewUser) {
+          if (!new_user) {
             // 이미 가입된 유저
             const user = await getMyInfo();
             setUser(user);
