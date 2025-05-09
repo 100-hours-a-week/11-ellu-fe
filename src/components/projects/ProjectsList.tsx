@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Table,
@@ -21,58 +21,24 @@ import {
   CircularProgress,
   Box,
   Alert,
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CalendarIcon from "@mui/icons-material/CalendarMonth";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import { Project } from "@/types/api/project";
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
-import { useDeleteProject } from "@/hooks/api/projects/useDeleteProject";
-import { useGetProjects } from "@/hooks/api/projects/useGetProjects";
-import style from "./ProjectsList.module.css";
-
-// 임시 데이터
-const projects: Project[] = [
-  {
-    id: 1,
-    title: "My Project",
-    color: "blue",
-    members: [
-      {
-        id: 2,
-        nickname: "강아지2",
-        profileImageUrl: "/images/onboarding1.svg",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "My Project2",
-    color: "blue",
-    members: [
-      {
-        id: 2,
-        nickname: "강아지2",
-        profileImageUrl: "/images/onboarding1.svg",
-      },
-    ],
-  },
-];
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CalendarIcon from '@mui/icons-material/CalendarMonth';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import { Project } from '@/types/api/project';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useState } from 'react';
+import { useDeleteProject } from '@/hooks/api/projects/useDeleteProject';
+import { useGetProjects } from '@/hooks/api/projects/useGetProjects';
+import style from './ProjectsList.module.css';
 
 export default function ProjectsList() {
   const [open, setOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const {
-    data: projects,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useGetProjects();
+  const { data: projects, isLoading, isError, error, refetch } = useGetProjects();
   const { mutate: deleteProject } = useDeleteProject();
 
   const handleClickOpen = (project: Project) => {
@@ -92,9 +58,7 @@ export default function ProjectsList() {
           handleClose();
         },
         onError: (error) => {
-          alert(
-            `삭제 실패: ${error.response?.data?.message || "알 수 없는 오류가 발생했습니다."}`
-          );
+          alert(`삭제 실패: ${error.response?.data?.message || '알 수 없는 오류가 발생했습니다.'}`);
           handleClose();
         },
       });
@@ -103,36 +67,20 @@ export default function ProjectsList() {
 
   if (isLoading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="60%"
-      >
-        <CircularProgress sx={{ scale: "1.5" }} />
+      <Box display="flex" justifyContent="center" alignItems="center" height="60%">
+        <CircularProgress sx={{ scale: '1.5' }} />
       </Box>
     );
   }
 
   if (isError) {
     return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        height="60%"
-        gap={2}
-      >
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="60%" gap={2}>
         <Alert severity="error">
           프로젝트 목록을 불러오는 중 오류가 발생했습니다.
           {error instanceof Error && `: ${error.message}`}
         </Alert>
-        <Button
-          variant="outlined"
-          onClick={() => refetch()}
-          startIcon={<RefreshIcon />}
-        >
+        <Button variant="outlined" onClick={() => refetch()} startIcon={<RefreshIcon />}>
           다시 시도
         </Button>
       </Box>
@@ -142,12 +90,7 @@ export default function ProjectsList() {
   if (!projects || projects.length === 0) {
     return (
       <Link href="/projects/create" className={style.noProject}>
-        <Image
-          src="/images/createproject.svg"
-          alt="프로젝트 없음"
-          width={270}
-          height={270}
-        />
+        <Image src="/images/createproject.svg" alt="프로젝트 없음" width={270} height={270} />
         <div>
           프로젝트를 추가하여 <br /> Looper를 시작해보세요!
         </div>
@@ -157,17 +100,12 @@ export default function ProjectsList() {
 
   return (
     <div className={style.container}>
-      <TableContainer
-        component={Paper}
-        sx={{ height: "100%", maxHeight: "100%" }}
-      >
+      <TableContainer component={Paper} sx={{ height: '100%', maxHeight: '100%' }}>
         <Table aria-label="project table">
-          <TableHead sx={{ backgroundColor: "#528ad3" }}>
+          <TableHead sx={{ backgroundColor: '#528ad3' }}>
             <TableRow>
-              <TableCell sx={{ width: "30%", color: "white" }}>
-                프로젝트명
-              </TableCell>
-              <TableCell sx={{ width: "70%", color: "white" }}>멤버</TableCell>
+              <TableCell sx={{ width: '30%', color: 'white' }}>프로젝트명</TableCell>
+              <TableCell sx={{ width: '70%', color: 'white' }}>멤버</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
@@ -180,9 +118,9 @@ export default function ProjectsList() {
                       style={{
                         width: 12,
                         height: 12,
-                        borderRadius: "50%",
+                        borderRadius: '50%',
                         backgroundColor: `#${project.color}`,
-                        border: "1px solid #ccc",
+                        border: '1px solid #ccc',
                       }}
                     />
                     <Typography variant="body1">{project.title}</Typography>
@@ -208,8 +146,8 @@ export default function ProjectsList() {
                         size="small"
                         sx={{
                           width: 90,
-                          color: "black",
-                          backgroundColor: "#e8f9ff",
+                          color: 'black',
+                          backgroundColor: '#e8f9ff',
                         }}
                       >
                         회의록 추가
@@ -225,11 +163,7 @@ export default function ProjectsList() {
                         <EditIcon fontSize="small" />
                       </IconButton>
                     </Link>
-                    <IconButton
-                      aria-label="삭제하기"
-                      size="small"
-                      onClick={() => handleClickOpen(project)}
-                    >
+                    <IconButton aria-label="삭제하기" size="small" onClick={() => handleClickOpen(project)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Stack>
@@ -249,8 +183,7 @@ export default function ProjectsList() {
         <DialogTitle id="alert-dialog-title">프로젝트 삭제</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            정말로 "{selectedProject?.title}" 프로젝트를 삭제하시겠습니까?{" "}
-            <br />이 작업은 되돌릴 수 없습니다.
+            정말로 "{selectedProject?.title}" 프로젝트를 삭제하시겠습니까? <br />이 작업은 되돌릴 수 없습니다.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
