@@ -19,7 +19,8 @@ export const getAllMonthlySchedules = async (month: string): Promise<EventData[]
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/user/schedules/monthly`, {
     params: { month },
   });
-  return convertToEventData(res.data.data);
+  let data = Object.values(res.data.data).flat();
+  return convertToEventData(data);
 };
 
 // 연별 전체 일정조회
@@ -27,7 +28,8 @@ export const getAllYearlySchedules = async (year: string): Promise<EventData[]> 
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/user/schedules/yearly`, {
     params: { year },
   });
-  return convertToEventData(res.data.data);
+  let data = Object.values(res.data.data).flat();
+  return convertToEventData(data);
 };
 
 // 일정 생성
@@ -77,7 +79,8 @@ export const getProjectMonthlySchedules = async (projectId: number, month: strin
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules/monthly`, {
     params: { month },
   });
-  return convertToEventData(res.data.data);
+  let data = Object.values(res.data.data).flat();
+  return convertToEventData(data);
 };
 
 // 특정 프로젝트 연별 일정조회
@@ -85,7 +88,8 @@ export const getProjectYearlySchedules = async (projectId: number, year: string)
   const res = await api.get<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules/yearly`, {
     params: { year },
   });
-  return convertToEventData(res.data.data);
+  let data = Object.values(res.data.data).flat();
+  return convertToEventData(data);
 };
 
 // 프로젝트 일정 생성
