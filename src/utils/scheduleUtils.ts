@@ -1,5 +1,6 @@
 import { EventData } from '@/types/calendar';
 import { ScheduleResponse } from '@/types/api/schedule';
+import { changeTime } from './changeTime';
 
 // 백엔드 응답 데이터 => FullCalendar형식으로 변환
 export const convertToEventData = (scheduleResponses: ScheduleResponse[]): EventData[] => {
@@ -35,7 +36,7 @@ export const convertToScheduleData = (
     is_completed,
     is_ai_recommended,
     is_project_schedule,
-    start_time: eventData.start.toISOString(),
-    end_time: eventData.end.toISOString(),
+    start_time: changeTime(eventData.start),
+    end_time: changeTime(eventData.end),
   };
 };
