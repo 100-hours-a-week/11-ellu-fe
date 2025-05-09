@@ -36,4 +36,10 @@ export interface EditProjectParams {
 }
 
 // 회의록 기반 AI 추천일정 타입
-export interface RecommendedScheduleData {}
+export interface RecommendedSchedules {
+  recommendedSchedules: RecommendedSchedule[];
+}
+export interface RecommendedSchedule {
+  keyword: string;
+  subtasks: string[];
+}

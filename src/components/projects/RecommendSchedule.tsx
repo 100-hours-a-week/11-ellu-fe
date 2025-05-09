@@ -22,10 +22,12 @@ import { CalendarMonth as CalendarIcon, ExpandMore as ExpandMoreIcon, Check as C
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
 import { addDays, setHours, setMinutes, format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { TaskGroup, RecommendedScheduleData } from '@/types/schedule';
+
+import { useGetRecommendedSchedule } from '@/hooks/api/projects/useGetRecommendedSchedule';
+import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
 
 export default function RecommendSchedule() {
   const router = useRouter();
@@ -38,6 +40,7 @@ export default function RecommendSchedule() {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const queryClient = useQueryClient();
+
   const { mutate: createProjectSchedules, isPending } = useCreateProjectSchedules();
 
   // 목업 데이터 및 로딩 시뮬레이션
@@ -236,6 +239,9 @@ export default function RecommendSchedule() {
         <CircularProgress size={30} sx={{ mt: 5 }} />
         <Typography variant="h6" sx={{ mt: 2, fontSize: '1rem' }}>
           Looper가 프로젝트에 맞는 태스크를 분석하는 중입니다...
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+          AI 분석에는 약 30초~1분 정도 소요될 수 있습니다.
         </Typography>
       </Box>
     );

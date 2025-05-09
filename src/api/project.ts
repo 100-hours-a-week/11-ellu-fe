@@ -1,6 +1,6 @@
 import api from '@/lib/axios';
 import { ApiResponse } from '@/types/api/common';
-import { ProjectFormData, Project, ProjectDetail, RecommendedScheduleData } from '@/types/api/project';
+import { ProjectFormData, Project, ProjectDetail, RecommendedSchedules } from '@/types/api/project';
 
 // 전체 프로젝트 목록 조회
 export const getProjects = async (): Promise<Project[]> => {
@@ -37,7 +37,7 @@ export const createProjectMeetingNote = async (projectId: number, meetingNote: s
 };
 
 // 회의록 기반 AI 추천일정 받아오기
-export const getRecommendedSchedule = async (projectId: number): Promise<RecommendedScheduleData> => {
-  const res = await api.get<ApiResponse<RecommendedScheduleData>>(`/projects/${projectId}/tasks/preview`);
+export const getRecommendedSchedule = async (projectId: number): Promise<RecommendedSchedules> => {
+  const res = await api.get<ApiResponse<RecommendedSchedules>>(`/projects/${projectId}/tasks/preview`);
   return res.data.data;
 };
