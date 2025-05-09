@@ -11,7 +11,6 @@ import {
   Divider,
   Button,
   Alert,
-  IconButton,
   Checkbox,
   FormControlLabel,
   Accordion,
@@ -19,9 +18,7 @@ import {
   AccordionDetails,
   Chip,
 } from '@mui/material';
-import { CalendarMonth as CalendarIcon, ExpandMore as ExpandMoreIcon, Add as AddIcon, Check as CheckIcon } from '@mui/icons-material';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale/ko';
+import { CalendarMonth as CalendarIcon, ExpandMore as ExpandMoreIcon, Check as CheckIcon } from '@mui/icons-material';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 
@@ -43,7 +40,7 @@ interface RecommendedScheduleData {
 
 export default function RecommendSchedule() {
   const params = useParams();
-  const projectId = params.projectId as string;
+  const projectId = params.id as string;
   const [loading, setLoading] = useState(true);
   const [recommendedTasks, setRecommendedTasks] = useState<TaskGroup[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -112,8 +109,6 @@ export default function RecommendSchedule() {
 
   // 단일 서브태스크 체크박스 변경 핸들러
   const handleSubtaskChange = (groupIndex: number, subtaskId: string) => {
-    console.log('체크박스 변경:', groupIndex, subtaskId); // 디버깅용 로그 추가
-
     const newTasks = [...recommendedTasks];
     const subtaskIndex = newTasks[groupIndex].subtasks.findIndex((st) => st.id === subtaskId);
 
@@ -125,27 +120,24 @@ export default function RecommendSchedule() {
 
   // 그룹의 모든 서브태스크 체크박스 변경 핸들러
   const handleGroupChange = (groupIndex: number, isSelected: boolean) => {
-    setRecommendedTasks((prevTasks) => {
-      const newTasks = [...prevTasks];
-      newTasks[groupIndex].subtasks = newTasks[groupIndex].subtasks.map((st) => ({
-        ...st,
-        isSelected,
-      }));
-      return newTasks;
-    });
+    const newTasks = [...recommendedTasks];
+    newTasks[groupIndex].subtasks = newTasks[groupIndex].subtasks.map((st) => ({
+      ...st,
+      isSelected,
+    }));
+    setRecommendedTasks(newTasks);
   };
 
   // 모든 서브태스크 체크박스 변경 핸들러
   const handleSelectAll = (isSelected: boolean) => {
-    setRecommendedTasks((prevTasks) => {
-      return prevTasks.map((group) => ({
-        ...group,
-        subtasks: group.subtasks.map((st) => ({
-          ...st,
-          isSelected,
-        })),
-      }));
-    });
+    const newTasks = recommendedTasks.map((group) => ({
+      ...group,
+      subtasks: group.subtasks.map((st) => ({
+        ...st,
+        isSelected,
+      })),
+    }));
+    setRecommendedTasks(newTasks);
   };
 
   // 선택된 서브태스크 개수 계산
@@ -174,6 +166,7 @@ export default function RecommendSchedule() {
           id: st.id,
         }));
     });
+    console.log(selectedTasks);
     setIsSubmitted(true);
     alert(`${selectedTasks.length}개의 일정이 캘린더에 추가되었습니다.`);
   };
@@ -186,6 +179,10 @@ export default function RecommendSchedule() {
   const isGroupPartiallySelected = (groupIndex: number) => {
     const group = recommendedTasks[groupIndex];
     return group.subtasks.some((st) => st.isSelected) && !group.subtasks.every((st) => st.isSelected);
+  };
+
+  const handleAccordionChange = (groupId: string) => {
+    setExpanded(expanded === groupId ? null : groupId);
   };
 
   if (loading) {
@@ -239,7 +236,13 @@ export default function RecommendSchedule() {
         <Typography>
           <strong>{getSelectedSubtaskCount()}</strong> / {getTotalSubtaskCount()} 개 태스크 선택됨
         </Typography>
-        <Button variant="outlined" color="primary" onClick={() => handleSelectAll(true)} startIcon={<CheckIcon />} disabled={isSubmitted}>
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => handleSelectAll(true)}
+          startIcon={<CheckIcon />}
+          disabled={isSubmitted}
+        >
           전체 선택
         </Button>
       </Box>
@@ -278,8 +281,9 @@ export default function RecommendSchedule() {
             <Accordion
               key={`group-${groupIndex}`}
               expanded={expanded === `group-${groupIndex}`}
-              onChange={() => setExpanded(expanded === `group-${groupIndex}` ? null : `group-${groupIndex}`)}
+              onChange={() => handleAccordionChange(`group-${groupIndex}`)}
               sx={{ boxShadow: 'none' }}
+              disabled={isSubmitted}
             >
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -305,6 +309,7 @@ export default function RecommendSchedule() {
                         handleGroupChange(groupIndex, !isGroupFullySelected(groupIndex));
                       }}
                       onClick={(e) => e.stopPropagation()}
+                      disabled={isSubmitted}
                     />
                     <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
                       {group.keyword}
@@ -327,11 +332,15 @@ export default function RecommendSchedule() {
                           pl: 4,
                           py: 1,
                           transition: 'background-color 0.2s',
-                          '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.03)' },
+                          '&:hover': { bgcolor: isSubmitted ? 'inherit' : 'rgba(0, 0, 0, 0.03)' },
+                          pointerEvents: isSubmitted ? 'none' : 'auto',
+                          opacity: isSubmitted ? 0.7 : 1,
                         }}
                         onClick={(e) => {
-                          e.stopPropagation();
-                          handleSubtaskChange(groupIndex, subtask.id);
+                          if (!isSubmitted) {
+                            e.stopPropagation();
+                            handleSubtaskChange(groupIndex, subtask.id);
+                          }
                         }}
                       >
                         <FormControlLabel
@@ -341,8 +350,11 @@ export default function RecommendSchedule() {
                               onClick={(e) => e.stopPropagation()}
                               onChange={(e) => {
                                 e.stopPropagation();
-                                handleSubtaskChange(groupIndex, subtask.id);
+                                if (!isSubmitted) {
+                                  handleSubtaskChange(groupIndex, subtask.id);
+                                }
                               }}
+                              disabled={isSubmitted}
                             />
                           }
                           label={subtask.name}
@@ -359,7 +371,6 @@ export default function RecommendSchedule() {
         </Box>
       </Paper>
 
-      {/* 완료 버튼 */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
         <Button
           variant="contained"
