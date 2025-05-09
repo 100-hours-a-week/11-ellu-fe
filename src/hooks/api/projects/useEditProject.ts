@@ -10,7 +10,8 @@ export const useEditProject = () => {
     mutationFn: ({ projectId, data }) => editProject(projectId, data),
     retry: false,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] }); // 수정 후 목록 다시 fetch
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['project-detail'] });
     },
   });
 };

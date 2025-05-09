@@ -9,6 +9,7 @@ export interface ProjectMember {
   id: number;
   nickname: string;
   profileImageUrl: string;
+  position: string;
 }
 
 // 프로젝트 상세조회타입
