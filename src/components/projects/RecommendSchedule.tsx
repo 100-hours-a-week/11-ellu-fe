@@ -20,7 +20,11 @@ import {
 } from '@mui/material';
 import { CalendarMonth as CalendarIcon, ExpandMore as ExpandMoreIcon, Check as CheckIcon } from '@mui/icons-material';
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
+import { addDays, setHours, setMinutes, format } from 'date-fns';
+import { useQueryClient } from '@tanstack/react-query';
 
 // 새로운 데이터 타입 정의
 interface Subtask {
@@ -39,13 +43,17 @@ interface RecommendedScheduleData {
 }
 
 export default function RecommendSchedule() {
+  const router = useRouter();
   const params = useParams();
-  const projectId = params.id as string;
+  const projectIdNumber = Number(params.id);
   const [loading, setLoading] = useState(true);
   const [recommendedTasks, setRecommendedTasks] = useState<TaskGroup[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const queryClient = useQueryClient();
+  const { mutate: createProjectSchedules, isPending } = useCreateProjectSchedules();
 
   // 목업 데이터 및 로딩 시뮬레이션
   useEffect(() => {
@@ -105,7 +113,7 @@ export default function RecommendSchedule() {
     };
 
     fetchRecommendedSchedules();
-  }, [projectId]);
+  }, [projectIdNumber]);
 
   // 단일 서브태스크 체크박스 변경 핸들러
   const handleSubtaskChange = (groupIndex: number, subtaskId: string) => {
@@ -156,7 +164,6 @@ export default function RecommendSchedule() {
 
   // 캘린더에 선택된 일정 추가
   const handleAddToCalendar = () => {
-    // 선택된 서브태스크만 필터링
     const selectedTasks = recommendedTasks.flatMap((group) => {
       return group.subtasks
         .filter((st) => st.isSelected)
@@ -166,9 +173,61 @@ export default function RecommendSchedule() {
           id: st.id,
         }));
     });
-    console.log(selectedTasks);
+
+    const startDate = new Date();
+    // 각 태스크를 EventData 형식으로 변환
+    const eventDataList = selectedTasks.map((task, index) => {
+      // 각 태스크는 1일 간격으로 설정
+      const taskStartDate = addDays(startDate, index);
+      // 시작 시간: 오전 9시
+      const taskStartTime = setHours(setMinutes(taskStartDate, 0), 9);
+      // 종료 시간: 오전 10시 (1시간 소요)
+      const taskEndTime = setHours(setMinutes(taskStartDate, 0), 10);
+
+      return {
+        title: task.groupName,
+        description: task.subtaskName,
+        start: taskStartTime,
+        end: taskEndTime,
+      };
+    });
+
+    const today = new Date();
+    const formattedDate = format(today, 'yyyy-MM-dd');
+    const formattedMonth = format(today, 'yyyy-MM');
+    const formattedYear = format(today, 'yyyy');
+
+    createProjectSchedules(
+      {
+        projectId: projectIdNumber,
+        eventDataList: eventDataList,
+        options: {
+          is_project_schedule: true,
+          is_ai_recommended: true,
+        },
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ['project-daily-schedules', projectIdNumber, formattedDate],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['project-monthly-schedules', projectIdNumber, formattedMonth],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['project-yearly-schedules', projectIdNumber, formattedYear],
+          });
+          setIsSubmitted(true);
+          alert(`${selectedTasks.length}개의 일정이 캘린더에 추가되었습니다.`);
+        },
+        onError: (error) => {
+          console.error('일정 추가 실패:', error);
+          alert('일정을 추가하는 중 오류가 발생했습니다.');
+        },
+      }
+    );
+
     setIsSubmitted(true);
-    alert(`${selectedTasks.length}개의 일정이 캘린더에 추가되었습니다.`);
   };
 
   const isGroupFullySelected = (groupIndex: number) => {
