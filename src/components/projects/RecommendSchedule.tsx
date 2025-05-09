@@ -25,22 +25,7 @@ import Image from 'next/image';
 import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
 import { addDays, setHours, setMinutes, format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
-
-// 새로운 데이터 타입 정의
-interface Subtask {
-  id: string;
-  name: string;
-  isSelected: boolean;
-}
-
-interface TaskGroup {
-  keyword: string;
-  subtasks: Subtask[];
-}
-
-interface RecommendedScheduleData {
-  detail: TaskGroup[];
-}
+import { TaskGroup, RecommendedScheduleData } from '@/types/schedule';
 
 export default function RecommendSchedule() {
   const router = useRouter();
