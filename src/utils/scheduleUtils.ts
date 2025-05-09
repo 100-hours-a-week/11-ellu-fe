@@ -4,8 +4,6 @@ import { changeTime } from './changeTime';
 
 // 백엔드 응답 데이터 => FullCalendar형식으로 변환
 export const convertToEventData = (scheduleResponses: ScheduleResponse[]): EventData[] => {
-  console.log('여긴가 제발', new Date(scheduleResponses[0].start_time));
-
   return scheduleResponses.map((schedule) => ({
     id: schedule.id.toString(),
     title: schedule.title,
