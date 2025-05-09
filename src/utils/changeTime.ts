@@ -1,11 +1,8 @@
-export const changeTime = (date: any) => {
-  const inputDate = new Date(date);
+export const changeTime = (input: string | Date): string => {
+  const date = new Date(input);
 
-  const toLocalISOString = (date: any) => {
-    const offsetMs = date.getTimezoneOffset() * 60 * 1000; // 분 단위 오프셋을 ms로
-    const localTime = new Date(date.getTime() - offsetMs);
-    return localTime.toISOString().slice(0, 19);
-  };
+  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+  const localTime = new Date(date.getTime() - offsetMs);
 
-  return toLocalISOString(inputDate);
+  return localTime.toISOString().slice(0, 19);
 };

@@ -211,7 +211,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       createScheduleMutate(
         {
           eventData: newEvent,
-          options: {},
+          options: { is_project_schedule: false },
         },
         {
           onSuccess: () => {

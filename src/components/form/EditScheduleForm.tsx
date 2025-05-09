@@ -199,7 +199,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
         {
           scheduleId: scheduleId,
           eventData: updatedSchedule,
-          options: {},
+          options: { is_project_schedule: false },
         },
         {
           onSuccess: () => {
