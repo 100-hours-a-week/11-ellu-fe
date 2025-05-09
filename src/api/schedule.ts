@@ -34,9 +34,9 @@ export const getAllYearlySchedules = async (year: string): Promise<EventData[]> 
 export const createSchedule = async (
   eventData: EventData,
   options: {
-    isProjectSchedule?: boolean;
-    isAiRecommended?: boolean;
-    isCompleted?: boolean;
+    is_project_schedule?: boolean;
+    is_ai_recommended?: boolean;
+    is_completed?: boolean;
   } = {}
 ): Promise<void> => {
   const scheduleData = convertToScheduleData(eventData, options);
@@ -48,9 +48,9 @@ export const updateSchedule = async (
   scheduleId: number,
   eventData: EventData,
   options: {
-    isProjectSchedule?: boolean;
-    isAiRecommended?: boolean;
-    isCompleted?: boolean;
+    is_project_schedule?: boolean;
+    is_ai_recommended?: boolean;
+    is_completed?: boolean;
   } = {}
 ): Promise<void> => {
   const scheduleData = convertToScheduleData(eventData, options);
@@ -93,9 +93,9 @@ export const createProjectSchedules = async (
   projectId: number,
   eventDataList: EventData[],
   options: {
-    isProjectSchedule?: boolean;
-    isAiRecommended?: boolean;
-    isCompleted?: boolean;
+    is_project_schedule?: boolean;
+    is_ai_recommended?: boolean;
+    is_completed?: boolean;
   } = {}
 ): Promise<void> => {
   const scheduleDataList = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
@@ -108,9 +108,9 @@ export const updateProjectSchedule = async (
   scheduleId: number,
   eventData: EventData,
   options: {
-    isProjectSchedule?: boolean;
-    isAiRecommended?: boolean;
-    isCompleted?: boolean;
+    is_project_schedule?: boolean;
+    is_ai_recommended?: boolean;
+    is_completed?: boolean;
   } = {}
 ): Promise<void> => {
   const scheduleData = convertToScheduleData(eventData, options);

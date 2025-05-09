@@ -189,7 +189,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         {
           projectId: projectIdNumber,
           eventDataList: [newEvent],
-          options: { isProjectSchedule: true },
+          options: { is_project_schedule: true },
         },
         {
           onSuccess: () => {
@@ -238,9 +238,9 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       start: info.event.start,
       end: info.event.end,
       description: info.event.extendedProps.description || '',
-      isCompleted: info.event.extendedProps.isCompleted || false,
-      isAiRecommended: info.event.extendedProps.isAiRecommended || false,
-      isProjectSchedule: info.event.extendedProps.isProjectSchedule || false,
+      is_completed: info.event.extendedProps.is_completed || false,
+      is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
+      is_project_schedule: info.event.extendedProps.is_project_schedule || false,
     };
     setCurrentSchedule(eventData);
     openDetailScheduleModal(eventData);

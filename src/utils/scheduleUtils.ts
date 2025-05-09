@@ -6,13 +6,13 @@ export const convertToEventData = (scheduleResponses: ScheduleResponse[]): Event
   return scheduleResponses.map((schedule) => ({
     id: schedule.id.toString(),
     title: schedule.title,
-    start: new Date(schedule.startTime),
-    end: new Date(schedule.endTime),
+    start: new Date(schedule.start_time),
+    end: new Date(schedule.end_time),
     description: schedule.description || '',
     extendedProps: {
-      isCompleted: schedule.isCompleted,
-      isAiRecommended: schedule.isAiRecommended,
-      isProjectSchedule: schedule.isProjectSchedule,
+      is_completed: schedule.is_completed,
+      is_ai_recommended: schedule.is_ai_recommended,
+      is_project_schedule: schedule.is_project_schedule,
     },
   }));
 };
@@ -21,21 +21,21 @@ export const convertToEventData = (scheduleResponses: ScheduleResponse[]): Event
 export const convertToScheduleData = (
   eventData: EventData,
   options: {
-    isProjectSchedule?: boolean; // 프로젝트 스케줄 확인
-    isAiRecommended?: boolean; // AI 추천 스케줄 확인
-    isCompleted?: boolean; // 완료 스케줄 확인
+    is_project_schedule?: boolean; // 프로젝트 스케줄 확인
+    is_ai_recommended?: boolean; // AI 추천 스케줄 확인
+    is_completed?: boolean; // 완료 스케줄 확인
   } = {}
 ): Omit<ScheduleResponse, 'id'> => {
   // 기본값
-  const { isProjectSchedule = false, isAiRecommended = false, isCompleted = false } = options;
+  const { is_project_schedule = false, is_ai_recommended = false, is_completed = false } = options;
 
   return {
     title: eventData.title,
     description: eventData.description || null,
-    isCompleted,
-    isAiRecommended,
-    isProjectSchedule,
-    startTime: eventData.start.toISOString(),
-    endTime: eventData.end.toISOString(),
+    is_completed,
+    is_ai_recommended,
+    is_project_schedule,
+    start_time: eventData.start.toISOString(),
+    end_time: eventData.end.toISOString(),
   };
 };

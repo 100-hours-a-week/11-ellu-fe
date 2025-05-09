@@ -1,19 +1,19 @@
-import { EventData } from "../calendar";
+import { EventData } from '../calendar';
 export interface ScheduleResponse {
   id: number;
   title: string;
   description: string | null;
-  isCompleted: boolean;
-  isAiRecommended: boolean;
-  isProjectSchedule: boolean;
-  startTime: string;
-  endTime: string;
+  is_completed: boolean;
+  is_ai_recommended: boolean;
+  is_project_schedule: boolean;
+  start_time: string;
+  end_time: string;
 }
 
 export type ScheduleOptions = {
-  isProjectSchedule?: boolean;
-  isAiRecommended?: boolean;
-  isCompleted?: boolean;
+  is_project_schedule?: boolean;
+  is_ai_recommended?: boolean;
+  is_completed?: boolean;
 };
 
 export type CreateScheduleParams = {
