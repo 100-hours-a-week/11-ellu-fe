@@ -34,3 +34,6 @@ export interface EditProjectParams {
   projectId: number;
   data: ProjectFormData;
 }
+
+// 회의록 기반 AI 추천일정 타입
+export interface RecommendedScheduleData {}
