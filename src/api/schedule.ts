@@ -116,7 +116,7 @@ export const updateProjectSchedule = async (
   } = {}
 ): Promise<void> => {
   const scheduleData = convertToScheduleData(eventData, options);
-  await api.patch<ApiResponse<ScheduleResponse>>(`/projects/${projectId}/schedules/${scheduleId}`, scheduleData);
+  await api.patch<ApiResponse<ScheduleResponse>>(`/projects/schedules/${scheduleId}`, scheduleData);
 };
 
 // 프로젝트 일정 삭제

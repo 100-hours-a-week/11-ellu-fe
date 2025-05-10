@@ -171,12 +171,11 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
       return;
     }
 
-    if (projectId) {
+    if (scheduleData.is_project_schedule) {
       // 프로젝트 일정 업데이트
-      const projectIdNumber = parseInt(projectId);
       updateProjectSchedule(
         {
-          projectId: projectIdNumber,
+          projectId: projectId ? Number(projectId) : 0,
           scheduleId: scheduleId,
           eventData: updatedSchedule,
           options: { is_project_schedule: true },
