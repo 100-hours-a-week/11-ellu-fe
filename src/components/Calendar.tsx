@@ -258,11 +258,11 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       return;
     }
 
-    if (projectIdNumber) {
+    if (selectedEventData.is_project_schedule) {
       // 프로젝트 일정 삭제
       deleteProjectScheduleMutate(
         {
-          projectId: projectIdNumber,
+          projectId: projectIdNumber ? projectIdNumber : 0,
           scheduleId: scheduleId,
         },
         {

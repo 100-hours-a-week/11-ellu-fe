@@ -42,6 +42,6 @@ export type UpdateProjectScheduleParams = {
 };
 
 export type DeleteProjectScheduleParams = {
-  projectId: number;
+  projectId?: number;
   scheduleId: number;
 };

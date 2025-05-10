@@ -120,6 +120,6 @@ export const updateProjectSchedule = async (
 };
 
 // 프로젝트 일정 삭제
-export const deleteProjectSchedule = async (projectId: number, scheduleId: number): Promise<void> => {
-  await api.delete<ApiResponse<void>>(`/projects/${projectId}/schedules/${scheduleId}`);
+export const deleteProjectSchedule = async (scheduleId: number): Promise<void> => {
+  await api.delete<ApiResponse<void>>(`/projects/schedules/${scheduleId}`);
 };

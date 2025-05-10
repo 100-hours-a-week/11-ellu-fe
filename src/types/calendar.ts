@@ -4,6 +4,7 @@ export interface EventData {
   start: Date;
   end: Date;
   description?: string;
+  is_project_schedule?: boolean;
 }
 
 export interface SelectedTime {
