@@ -98,7 +98,7 @@ export default function MypageForm() {
     <Box className={style.formContainer}>
       <Box className={style.profileImageSection}>
         <Avatar
-          src={user?.profileImageUrl}
+          src={user?.imageUrl}
           sx={{
             width: 100,
             height: 100,

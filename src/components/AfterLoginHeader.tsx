@@ -69,8 +69,8 @@ export default function AfterLoginHeader() {
         }}
       >
         {user ? (
-          <Avatar src={user.profileImageUrl || undefined} alt={`${user.nickname} 프로필`} sx={{ width: 40, height: 40 }}>
-            {!user.profileImageUrl && user.nickname?.charAt(0).toUpperCase()}
+          <Avatar src={user.imageUrl || undefined} alt={`${user.nickname} 프로필`} sx={{ width: 40, height: 40 }}>
+            {!user.imageUrl && user.nickname?.charAt(0).toUpperCase()}
           </Avatar>
         ) : (
           <Skeleton variant="circular" width={40} height={40} />
