@@ -32,7 +32,7 @@ export const deleteProject = async (id: number): Promise<void> => {
 // 회의록 추가
 export const createProjectMeetingNote = async (projectId: number, meetingNote: string): Promise<void> => {
   await api.post<ApiResponse<void>>(`/projects/${projectId}/notes`, {
-    meeting_note: meetingNote,
+    content: meetingNote,
   });
 };
 
