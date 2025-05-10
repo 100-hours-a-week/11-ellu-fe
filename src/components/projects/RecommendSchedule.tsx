@@ -24,84 +24,38 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { addDays, setHours, setMinutes, format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
-import { TaskGroup, RecommendedScheduleData } from '@/types/schedule';
+import { TaskGroup } from '@/types/schedule';
 
 import { useGetRecommendedSchedule } from '@/hooks/api/projects/useGetRecommendedSchedule';
 import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
 
 export default function RecommendSchedule() {
-  const router = useRouter();
   const params = useParams();
   const projectIdNumber = Number(params.id);
-  const [loading, setLoading] = useState(true);
   const [recommendedTasks, setRecommendedTasks] = useState<TaskGroup[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const queryClient = useQueryClient();
 
+  const { data: scheduleData, isLoading, isError, error } = useGetRecommendedSchedule(projectIdNumber);
+
   const { mutate: createProjectSchedules, isPending } = useCreateProjectSchedules();
 
-  // 목업 데이터 및 로딩 시뮬레이션
   useEffect(() => {
-    const fetchRecommendedSchedules = async () => {
-      setLoading(true);
+    if (scheduleData && scheduleData.recommendedSchedules) {
+      const formattedTasks = scheduleData.recommendedSchedules.map((schedule, groupIndex) => ({
+        keyword: schedule.keyword,
+        subtasks: schedule.subtasks.map((name, subtaskIndex) => ({
+          id: `${groupIndex + 1}-${subtaskIndex + 1}`,
+          name,
+          isSelected: false,
+        })),
+      }));
 
-      try {
-        // 로딩 시뮬레이션 (3초)
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-
-        // 목업 데이터 - 새로운 형식
-        const mockData: RecommendedScheduleData = {
-          detail: [
-            {
-              keyword: 'API 설계하기',
-              subtasks: [
-                { id: '1-1', name: 'API 엔드포인트 설계', isSelected: false },
-                { id: '1-2', name: 'Swagger 문서 작성', isSelected: false },
-                { id: '1-3', name: '예시 응답 추가', isSelected: false },
-              ],
-            },
-            {
-              keyword: '테스트코드 작성하기',
-              subtasks: [
-                { id: '2-1', name: '단위테스트 작성', isSelected: false },
-                { id: '2-2', name: '통합테스트 작성', isSelected: false },
-              ],
-            },
-            {
-              keyword: '프론트엔드 개발',
-              subtasks: [
-                { id: '3-1', name: '컴포넌트 설계', isSelected: false },
-                { id: '3-2', name: '상태 관리 구현', isSelected: false },
-                { id: '3-3', name: 'API 연동', isSelected: false },
-                { id: '3-4', name: '스타일링', isSelected: false },
-              ],
-            },
-            {
-              keyword: '배포 준비',
-              subtasks: [
-                { id: '4-1', name: 'CI/CD 파이프라인 구축', isSelected: false },
-                { id: '4-2', name: '환경 설정', isSelected: false },
-                { id: '4-3', name: '모니터링 도구 세팅', isSelected: false },
-              ],
-            },
-          ],
-        };
-
-        setRecommendedTasks(mockData.detail);
-        setError(null);
-      } catch (err) {
-        console.error('일정 추천을 가져오는 데 실패했습니다:', err);
-        setError('일정 추천을 가져오는 데 문제가 발생했습니다. 다시 시도해주세요.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRecommendedSchedules();
-  }, [projectIdNumber]);
+      setRecommendedTasks(formattedTasks);
+    }
+  }, [scheduleData]);
 
   // 단일 서브태스크 체크박스 변경 핸들러
   const handleSubtaskChange = (groupIndex: number, subtaskId: string) => {
@@ -232,7 +186,7 @@ export default function RecommendSchedule() {
     setExpanded(expanded === groupId ? null : groupId);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" mt={8}>
         <Image src={'/images/addmeeting2.svg'} width={200} height={200} alt={'로고'} />
@@ -247,10 +201,10 @@ export default function RecommendSchedule() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <Alert severity="error" sx={{ mt: 2 }}>
-        {error}
+        태스크 정보를 불러오는 중 오류가 발생했습니다: {error?.message || '알 수 없는 오류'}
       </Alert>
     );
   }
