@@ -9,7 +9,6 @@ export const useGetRecommendedSchedule = (projectId: number) => {
     queryFn: () => getRecommendedSchedule(projectId),
     staleTime: Infinity,
     retry: 1,
-    refetchOnWindowFocus: false,
     enabled: !!projectId,
   });
 };
