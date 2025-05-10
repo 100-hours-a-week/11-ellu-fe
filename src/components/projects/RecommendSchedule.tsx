@@ -20,7 +20,6 @@ import {
 } from '@mui/material';
 import { CalendarMonth as CalendarIcon, ExpandMore as ExpandMoreIcon, Check as CheckIcon } from '@mui/icons-material';
 import { useParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { addDays, setHours, setMinutes, format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
@@ -43,8 +42,8 @@ export default function RecommendSchedule() {
   const { mutate: createProjectSchedules, isPending } = useCreateProjectSchedules();
 
   useEffect(() => {
-    if (scheduleData && scheduleData.recommendedSchedules) {
-      const formattedTasks = scheduleData.recommendedSchedules.map((schedule, groupIndex) => ({
+    if (scheduleData) {
+      const formattedTasks = scheduleData.map((schedule, groupIndex) => ({
         keyword: schedule.keyword,
         subtasks: schedule.subtasks.map((name, subtaskIndex) => ({
           id: `${groupIndex + 1}-${subtaskIndex + 1}`,
