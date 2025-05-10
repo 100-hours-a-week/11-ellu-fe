@@ -69,7 +69,11 @@ export default function AfterLoginHeader() {
         }}
       >
         {user ? (
-          <Avatar src={user.imageUrl || undefined} alt={`${user.nickname} 프로필`} sx={{ width: 40, height: 40 }}>
+          <Avatar
+            src={user.imageUrl || undefined}
+            alt={`${user.nickname} 프로필`}
+            sx={{ width: 40, height: 40, border: '1.5px solid gray' }}
+          >
             {!user.imageUrl && user.nickname?.charAt(0).toUpperCase()}
           </Avatar>
         ) : (

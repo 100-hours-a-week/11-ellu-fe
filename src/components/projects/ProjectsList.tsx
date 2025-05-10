@@ -133,7 +133,7 @@ export default function ProjectsList() {
                         key={member.nickname}
                         alt={member.nickname}
                         src={member.profileImageUrl}
-                        sx={{ width: 32, height: 32 }}
+                        sx={{ width: 32, height: 32, border: '1.5px solid gray' }}
                       />
                     ))}
                   </Stack>

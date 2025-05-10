@@ -102,7 +102,7 @@ export default function MypageForm() {
           sx={{
             width: 100,
             height: 100,
-            bgcolor: 'var(--color-primary)',
+            border: '1.5px solid gray',
             fontSize: '2rem',
           }}
         >
