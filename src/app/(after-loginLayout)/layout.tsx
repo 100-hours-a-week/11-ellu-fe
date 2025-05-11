@@ -7,22 +7,20 @@ import { cookies } from 'next/headers';
 import AuthProvider from '@/components/auth/AuthProvider';
 
 export default async function Layout({ children }: { children: ReactNode }) {
-  // const cookieStore = await cookies();
-  // const refreshToken = cookieStore.get('refreshToken')?.value;
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get('refreshToken')?.value;
 
-  // if (!refreshToken) {
-  //   redirect('/auth/login');
-  // }
+  if (!refreshToken) {
+    redirect('/auth/login');
+  }
 
   return (
-    <AuthProvider>
-      <div className={style.container}>
-        <AfterLoginHeader />
-        <div className={style.box}>
-          <LeftNavigationBar />
-          <div className={style.mainbox}>{children}</div>
-        </div>
+    <div className={style.container}>
+      <AfterLoginHeader />
+      <div className={style.box}>
+        <LeftNavigationBar />
+        <div className={style.mainbox}>{children}</div>
       </div>
-    </AuthProvider>
+    </div>
   );
 }
