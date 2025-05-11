@@ -10,6 +10,9 @@ export const useDeleteProject = () => {
     retry: false,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] }); // 삭제 후 목록 다시 fetch
+      queryClient.invalidateQueries({ queryKey: ['daily-schedules'] });
+      queryClient.invalidateQueries({ queryKey: ['monthly-schedules'] });
+      queryClient.invalidateQueries({ queryKey: ['yearly-schedules'] });
     },
   });
 };
