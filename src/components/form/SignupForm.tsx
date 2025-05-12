@@ -16,7 +16,7 @@ export default function SignupForm() {
 
   const { mutate: signup, isPending } = useSignup();
 
-  const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,10}$/;
+  const nicknameRegex = /^[a-zA-Z0-9가-힣._]{1,10}$/;
 
   const validateNickname = (value: string): string | null => {
     if (!nicknameRegex.test(value)) {
@@ -63,7 +63,12 @@ export default function SignupForm() {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 530 }}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      noValidate
+      sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 530 }}
+    >
       <TextField
         label="닉네임"
         value={nickname}
@@ -72,7 +77,12 @@ export default function SignupForm() {
         helperText={error ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
         required
       />
-      <Button type="submit" variant="contained" disabled={!!error || nickname.length === 0 || isPending} sx={{ marginTop: 3, height: 50 }}>
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={!!error || nickname.length === 0 || isPending}
+        sx={{ marginTop: 3, height: 50 }}
+      >
         회원가입 완료
       </Button>
     </Box>

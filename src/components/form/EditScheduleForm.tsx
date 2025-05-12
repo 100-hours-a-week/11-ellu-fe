@@ -45,7 +45,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   // 제목 유효성 검사 함수
   const validateTitle = (title: string) => {
     if (title.length < 1) return '제목을 입력해주세요.';
-    if (title.length > 10) return '제목은 10자 이하여야 합니다.';
+    if (title.length > 20) return '제목은 20자 이하여야 합니다.';
     if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(title)) return '한글, 영문, 숫자만 입력 가능합니다.';
     return '';
   };
