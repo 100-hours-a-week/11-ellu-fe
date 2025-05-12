@@ -23,21 +23,18 @@ export default function MypageForm() {
   }, [user]);
 
   // 닉네임 유효성 검사 규칙
-  const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,10}$/;
+  const nicknameRegex = /^[a-zA-Z0-9가-힣._]{1,10}$/;
 
   const validateNickname = (value: string): string | null => {
     if (!value.trim()) {
       return '닉네임을 입력해주세요.';
     }
-
     if (value.length > 10) {
       return '닉네임은 최대 10자까지 가능합니다.';
     }
-
     if (!nicknameRegex.test(value)) {
-      return '닉네임은 한글, 영문 또는 숫자만 사용할 수 있습니다.';
+      return '닉네임은 . , _ 를 포함한 한글, 영문 또는 숫자만 사용할 수 있습니다.';
     }
-
     return null;
   };
 
