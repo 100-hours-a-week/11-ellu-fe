@@ -68,7 +68,7 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
     return (
       <div className={style.secondState}>
         <h2>오늘의 스크럼 회의록</h2>
-        <p>오늘 진행된 회의 내용을 자유롭게 작성해주세요</p>
+        <p>데일리스크럼 때 작성하신 표 전체를 복사붙여넣기 해주세요</p>
 
         <form onSubmit={handleSubmit}>
           <TextField
