@@ -196,6 +196,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   // 일정 저장
   const handleSave = (newEvent: EventData) => {
     console.log('일정 저장:', newEvent);
+
     const createdEvent = createEvent(newEvent);
     closeCreateModal();
 
@@ -355,7 +356,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   };
 
   return (
-    <div className={styles.calendarContainer}>
+    <div className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}>
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
@@ -375,6 +376,26 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         nowIndicator={true}
         slotEventOverlap={false}
         datesSet={handleDatesSet}
+        eventContent={(eventInfo) => {
+          const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
+          const backgroundColor = isProjectSchedule ? '#FF9800' : '#4285F4';
+
+          return (
+            <div
+              style={{
+                backgroundColor,
+                color: '#ffffff',
+                padding: '1px',
+                borderRadius: '3px',
+                width: '100%',
+                height: '100%',
+              }}
+            >
+              <b>{eventInfo.timeText}</b>
+              <div>{eventInfo.event.title}</div>
+            </div>
+          );
+        }}
       />
 
       <CreateScheduleModal

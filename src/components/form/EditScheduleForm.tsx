@@ -165,10 +165,17 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
       end: endDateTime,
     };
 
-    const scheduleId = parseInt(updatedSchedule.id || '0');
-    if (isNaN(scheduleId) || scheduleId === 0) {
+    if (!updatedSchedule.id) {
       alert('유효하지 않은 일정 ID입니다.');
       return;
+    }
+
+    let scheduleId;
+    if (updatedSchedule.id && updatedSchedule.id.includes('-')) {
+      const parts = updatedSchedule.id.split('-');
+      scheduleId = parseInt(parts[parts.length - 1]);
+    } else if (updatedSchedule.id) {
+      scheduleId = parseInt(updatedSchedule.id);
     }
 
     if (scheduleData.is_project_schedule) {
@@ -176,7 +183,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
       updateProjectSchedule(
         {
           projectId: projectId ? Number(projectId) : 0,
-          scheduleId: scheduleId,
+          scheduleId: scheduleId as number,
           eventData: updatedSchedule,
           options: { is_project_schedule: true },
         },
@@ -196,7 +203,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
       // 일반 일정 업데이트
       updateSchedule(
         {
-          scheduleId: scheduleId,
+          scheduleId: scheduleId as number,
           eventData: updatedSchedule,
           options: { is_project_schedule: false },
         },
