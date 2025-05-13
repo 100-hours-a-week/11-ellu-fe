@@ -5,6 +5,11 @@ export interface EventData {
   end: Date;
   description?: string;
   is_project_schedule?: boolean;
+  extendedProps?: {
+    is_project_schedule?: boolean;
+    is_ai_recommended?: boolean;
+    is_completed?: boolean;
+  };
 }
 
 export interface SelectedTime {
