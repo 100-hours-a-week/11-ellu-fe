@@ -44,8 +44,13 @@
 }
 
 /* 선택된 영역 스타일 */
-.calendarContainer :global(.fc-highlight) {
-  background-color: #4a90e2 !important;
+.projectCalendar :global(.fc-highlight) {
+  background-color: #ff9800 !important; /* 주황색 */
+}
+
+/* 일반 캘린더용 하이라이트 스타일 */
+.normalCalendar :global(.fc-highlight) {
+  background-color: #4285f4 !important; /* 파란색 */
 }
 
 .calendarContainer :global(.fc-timegrid-now-indicator-line) {
@@ -57,4 +62,16 @@
   border-color: red;
   border-width: 5px;
   border-radius: 5px;
+}
+
+/* FullCalendar의 일정 스타일 재정의 */
+.calendarContainer :global(.fc-event),
+.calendarContainer :global(.fc-event-main),
+.calendarContainer :global(.fc-event-main-frame) {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.calendarContainer :global(.fc-daygrid-event-dot) {
+  display: none !important;
 }
