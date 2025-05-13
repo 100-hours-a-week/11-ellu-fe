@@ -123,25 +123,47 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
   useEffect(() => {
-    console.log('여기~~~', formattedDate, currentView);
-
     if (projectIdNumber) {
       // 프로젝트 일정
       if (currentView === 'day' && projectDailyData) {
-        setEvents(projectDailyData);
+        const formattedData = projectDailyData.map((event) => ({
+          ...event,
+          id: `project-${event.id}`,
+        }));
+        setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
-        setEvents(projectMonthlyData);
+        const formattedData = projectMonthlyData.map((event) => ({
+          ...event,
+          id: `project-${event.id}`,
+        }));
+        setEvents(formattedData);
       } else if (currentView === 'year' && projectYearlyData) {
-        setEvents(projectYearlyData);
+        const formattedData = projectYearlyData.map((event) => ({
+          ...event,
+          id: `project-${event.id}`,
+        }));
+        setEvents(formattedData);
       }
     } else {
       // 전체 일정
       if (currentView === 'day' && allDailyData) {
-        setEvents(allDailyData);
+        const formattedData = allDailyData.map((event) => ({
+          ...event,
+          id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
+        }));
+        setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
-        setEvents(allMonthlyData);
+        const formattedData = allMonthlyData.map((event) => ({
+          ...event,
+          id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
+        }));
+        setEvents(formattedData);
       } else if (currentView === 'year' && allYearlyData) {
-        setEvents(allYearlyData);
+        const formattedData = allYearlyData.map((event) => ({
+          ...event,
+          id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
+        }));
+        setEvents(formattedData);
       }
     }
   }, [
@@ -248,11 +270,18 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 삭제
   const handleDelete = () => {
-    console.log('~~~~~~~~', selectedEventData);
+    console.log('일정삭제:', selectedEventData);
     if (!selectedEventData || !selectedEventData.id) {
       return;
     }
-    const scheduleId = parseInt(selectedEventData.id);
+
+    let scheduleId;
+    if (selectedEventData.id.includes('-')) {
+      const parts = selectedEventData.id.split('-');
+      scheduleId = parseInt(parts[parts.length - 1]);
+    } else {
+      scheduleId = parseInt(selectedEventData.id);
+    }
     if (isNaN(scheduleId)) {
       console.error('유효하지 않은 일정 ID:', selectedEventData.id);
       return;
@@ -267,7 +296,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
         {
           onSuccess: () => {
-            console.log('프로젝트 일정 삭제 성공:', scheduleId);
             deleteEvent(selectedEventData.id as string);
             closeDetailModal();
           },
@@ -281,7 +309,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       // 일반 일정 삭제
       deleteScheduleMutate(scheduleId, {
         onSuccess: () => {
-          console.log('일반 일정 삭제 성공:', scheduleId);
           deleteEvent(selectedEventData.id as string);
           closeDetailModal();
         },
