@@ -48,21 +48,22 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      createMeetingNote(
-        {
-          projectId: parseInt(projectId),
-          meetingNote: meetingNote,
-        },
-        {
-          onSuccess: () => {
-            setStep(2);
-          },
-          onError: (err) => {
-            console.error('회의록 저장 실패:', err);
-            alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
-          },
-        }
-      );
+      // createMeetingNote(
+      //   {
+      //     projectId: parseInt(projectId),
+      //     meetingNote: meetingNote,
+      //   },
+      //   {
+      //     onSuccess: () => {
+      //       setStep(2);
+      //     },
+      //     onError: (err) => {
+      //       console.error('회의록 저장 실패:', err);
+      //       alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+      //     },
+      //   }
+      // );
+      setStep(2);
     };
 
     return (
