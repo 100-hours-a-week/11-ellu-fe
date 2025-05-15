@@ -67,6 +67,7 @@ export function useCalendarEventHandlers() {
               }
             : evt
         );
+        console.log('일정 업데이트 후:', updatedEvents);
         return updatedEvents;
       });
 
@@ -82,7 +83,11 @@ export function useCalendarEventHandlers() {
             options: { is_project_schedule: true },
           },
           {
+            onSuccess: () => {
+              console.log('프로젝트 일정 업데이트 성공');
+            },
             onError: (error) => {
+              console.error('프로젝트 일정 업데이트 실패:', error);
               alert('일정 업데이트 실패');
             },
           }
@@ -96,14 +101,18 @@ export function useCalendarEventHandlers() {
             options: { is_project_schedule: false },
           },
           {
+            onSuccess: () => {
+              console.log('일반 일정 업데이트 성공');
+            },
             onError: (error) => {
+              console.error('일반 일정 업데이트 실패:', error);
               alert('일정 업데이트 실패');
             },
           }
         );
       }
     },
-    [updateScheduleMutate, updateProjectScheduleMutate, events]
+    [updateScheduleMutate, updateProjectScheduleMutate]
   );
 
   // 특정 일정 업데이트
