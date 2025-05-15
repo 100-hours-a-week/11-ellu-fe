@@ -7,7 +7,7 @@ export const useGetRecommendedSchedule = (projectId: number) => {
   return useQuery<RecommendedSchedules, AxiosError>({
     queryKey: ['recommended-schedules', projectId],
     queryFn: () => getRecommendedSchedule(projectId),
-    staleTime: Infinity,
+    staleTime: 0,
     retry: 1,
     enabled: !!projectId,
   });
