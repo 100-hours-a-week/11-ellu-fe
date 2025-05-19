@@ -80,7 +80,7 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
             margin="normal"
             variant="outlined"
             multiline
-            rows={15}
+            rows={13}
             placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
             required
             helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
@@ -100,7 +100,7 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
               backgroundColor: 'white',
               border: 'none',
               borderRadius: '10px',
-              mb: 5,
+              mb: 3,
             }}
           />
 

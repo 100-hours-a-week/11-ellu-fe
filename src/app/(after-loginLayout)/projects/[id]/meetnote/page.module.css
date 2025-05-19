@@ -8,6 +8,7 @@
   background-color: whitesmoke;
   border-radius: 10px;
   width: 30%;
+  min-width: 350px;
   height: calc(100% - 25px);
   padding: 15px;
 }
@@ -29,12 +30,9 @@
 .container h1 {
   font-size: 1.7rem;
   font-weight: 600;
-  margin: 0;
 }
 
 .meetnote {
   width: 100%;
   height: calc(100% - 100px);
-  display: flex;
-  gap: 20px;
 }
