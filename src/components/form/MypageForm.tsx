@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, Avatar, Typography, Skeleton, Alert } from '@mui/material';
+import { Box, TextField, Button, Avatar, Typography, Skeleton, Alert, Link } from '@mui/material';
 import style from './MypageForm.module.css';
 import { userStore } from '@/stores/userStore';
 import { useEditMyInfo } from '@/hooks/api/user/useEditMyInfo';
@@ -136,6 +136,19 @@ export default function MypageForm() {
           {isPending ? '변경 중...' : '닉네임 변경하기'}
         </Button>
       </Box>
+      <Link
+        href="https://naver.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{
+          textDecoration: 'none',
+          fontSize: '0.8rem',
+          mt: 2,
+          color: 'gray',
+        }}
+      >
+        💬 고객센터 문의
+      </Link>
     </Box>
   );
 }
