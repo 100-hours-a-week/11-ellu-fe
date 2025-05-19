@@ -75,3 +75,29 @@
 .calendarContainer :global(.fc-daygrid-event-dot) {
   display: none !important;
 }
+
+/* 일정박스 스타일 */
+.eventBox {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.eventBoxTime {
+  width: 100%;
+  height: 10%;
+  padding-right: 4px;
+  line-height: 25px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+}
+
+.eventBoxIcon {
+  margin-top: 2px;
+  color: greenyellow;
+}
+
+.smallIcon {
+  font-size: 18px !important;
+}

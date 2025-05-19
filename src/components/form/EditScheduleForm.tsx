@@ -52,16 +52,14 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
 
   // 할일 유효성 검사 함수
   const validateDescription = (description: string) => {
-    if (description.length < 1) return '상세일정을 입력해주세요.';
-    if (description.length > 20) return '상세일정은 20자 이하여야 합니다.';
-    if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(description)) return '한글, 영문, 숫자만 입력 가능합니다.';
+    if (description && description.length > 20) return '상세일정은 20자 이하여야 합니다.';
+    if (description && !/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(description)) return '한글, 영문, 숫자만 입력 가능합니다.';
     return '';
   };
 
   // 초기 유효성 검사 실행
   useEffect(() => {
     setTitleError(validateTitle(formData.title));
-    setDescriptionError(validateDescription(formData.description || ''));
   }, []);
 
   // 입력 변경 핸들러

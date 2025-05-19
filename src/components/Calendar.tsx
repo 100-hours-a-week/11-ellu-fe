@@ -17,6 +17,8 @@ import { useCalendarModals } from '@/hooks/useCalendarModals';
 import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
 import { EventData } from '@/types/calendar';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -130,18 +132,21 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           ...event,
           id: `project-${event.id}`,
         }));
+        console.log('프로젝트 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
         const formattedData = projectMonthlyData.map((event) => ({
           ...event,
           id: `project-${event.id}`,
         }));
+        console.log('프로젝트 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if (currentView === 'year' && projectYearlyData) {
         const formattedData = projectYearlyData.map((event) => ({
           ...event,
           id: `project-${event.id}`,
         }));
+        console.log('프로젝트 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
       }
     } else {
@@ -151,18 +156,21 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           ...event,
           id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
         }));
+        console.log('전체 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
         const formattedData = allMonthlyData.map((event) => ({
           ...event,
           id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
         }));
+        console.log('전체 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if (currentView === 'year' && allYearlyData) {
         const formattedData = allYearlyData.map((event) => ({
           ...event,
           id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
         }));
+        console.log('전체 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
       }
     }
@@ -417,6 +425,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         datesSet={handleViewChange}
         eventContent={(eventInfo) => {
           const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
+          const isCompleted = eventInfo.event.extendedProps?.is_completed;
           const backgroundColor = isProjectSchedule ? '#FF9800' : '#4285F4';
 
           return (
@@ -424,14 +433,21 @@ export default function Calendar({ projectId }: { projectId?: string }) {
               style={{
                 backgroundColor,
                 color: '#ffffff',
-                padding: '1px',
+                padding: '0 2px',
                 borderRadius: '3px',
                 width: '100%',
                 height: '100%',
               }}
             >
-              <b>{eventInfo.timeText}</b>
-              <div>{eventInfo.event.title}</div>
+              <div className={styles.eventBox}>
+                <div className={styles.eventBoxTime}>
+                  {eventInfo.timeText}
+                  <span className={styles.eventBoxIcon}>
+                    {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
+                  </span>
+                </div>
+                <div>{eventInfo.event.title}</div>
+              </div>
             </div>
           );
         }}
