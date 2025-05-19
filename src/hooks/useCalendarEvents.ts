@@ -80,7 +80,7 @@ export function useCalendarEventHandlers() {
             projectId: projectId,
             scheduleId: scheduleId,
             eventData: updatedEventData,
-            options: { is_project_schedule: true },
+            options: { is_project_schedule: true, is_completed: event.extendedProps.is_completed },
           },
           {
             onSuccess: () => {
@@ -98,7 +98,7 @@ export function useCalendarEventHandlers() {
           {
             scheduleId: scheduleId,
             eventData: updatedEventData,
-            options: { is_project_schedule: false },
+            options: { is_project_schedule: false, is_completed: event.extendedProps.is_completed },
           },
           {
             onSuccess: () => {

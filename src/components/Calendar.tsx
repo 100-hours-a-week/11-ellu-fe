@@ -203,9 +203,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 저장
   const handleSave = (newEvent: EventData) => {
-    console.log('일정 저장:', newEvent);
-
-    const createdEvent = createEvent(newEvent);
     closeCreateModal();
 
     if (calendarRef.current) {
@@ -224,15 +221,15 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
         {
           onSuccess: () => {
-            refreshCalendarData();
+            createEvent({
+              ...newEvent,
+              is_project_schedule: true,
+            });
             console.log('프로젝트 일정 생성 성공');
           },
           onError: (error) => {
             console.error('일정 저장 실패:', error);
             alert('일정 저장에 실패했습니다.');
-            if (createdEvent.id) {
-              deleteEvent(createdEvent.id);
-            }
           },
         }
       );
@@ -246,15 +243,15 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
         {
           onSuccess: () => {
-            refreshCalendarData();
+            createEvent({
+              ...newEvent,
+              is_project_schedule: false,
+            });
             console.log('일반 일정 생성 성공');
           },
           onError: (error) => {
             console.error('일정 저장 실패:', error);
             alert('일정 저장에 실패했습니다.');
-            if (createdEvent.id) {
-              deleteEvent(createdEvent.id);
-            }
           },
         }
       );
@@ -326,40 +323,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           alert('일정 삭제에 실패했습니다.');
         },
       });
-    }
-  };
-
-  const refreshCalendarData = () => {
-    if (projectIdNumber) {
-      // 프로젝트 일정 데이터 리로드
-      if (currentView === 'day') {
-        queryClient.invalidateQueries({
-          queryKey: ['project-daily-schedules', projectIdNumber, formattedDate],
-        });
-      } else if (currentView === 'week' || currentView === 'month') {
-        queryClient.invalidateQueries({
-          queryKey: ['project-monthly-schedules', projectIdNumber, formattedMonth],
-        });
-      } else {
-        queryClient.invalidateQueries({
-          queryKey: ['project-yearly-schedules', projectIdNumber, formattedYear],
-        });
-      }
-    } else {
-      // 일반 일정 데이터 리로드
-      if (currentView === 'day') {
-        queryClient.invalidateQueries({
-          queryKey: ['daily-schedules', formattedDate],
-        });
-      } else if (currentView === 'week' || currentView === 'month') {
-        queryClient.invalidateQueries({
-          queryKey: ['monthly-schedules', formattedMonth],
-        });
-      } else {
-        queryClient.invalidateQueries({
-          queryKey: ['yearly-schedules', formattedYear],
-        });
-      }
     }
   };
 
