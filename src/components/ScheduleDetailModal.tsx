@@ -1,12 +1,20 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { EditScheduleModalProps } from '../types/calendar';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, IconButton } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+
+import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
+import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 
 export default function ScheduleDetailModal({ open, onClose, eventData, onDelete, projectId }: EditScheduleModalProps) {
-  if (!eventData) return null;
+  const { mutate: updateSchedule } = useUpdateSchedule();
+  const { mutate: updateProjectSchedule } = useUpdateProjectSchedule();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('ko-KR', {
@@ -18,12 +26,48 @@ export default function ScheduleDetailModal({ open, onClose, eventData, onDelete
     });
   };
 
+  let scheduleId: number | undefined;
+
+  if (!eventData) {
+    return null;
+  }
+
+  if (eventData.id) {
+    const parts = eventData.id.split('-');
+    scheduleId = parseInt(parts[parts.length - 1]);
+  }
+
+  const handleComplete = () => {
+    if (!eventData) return;
+
+    if (!projectId) {
+      updateSchedule({
+        scheduleId: scheduleId as number,
+        eventData: eventData,
+        options: { is_completed: eventData.is_completed ? false : true },
+      });
+    }
+
+    onClose();
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
         {eventData.title}
         <Box>
-          <Link href={projectId ? `/projects/${projectId}/schedule/edit/${eventData.id}` : `/my-calendar/schedule/edit/${eventData.id}`}>
+          {!eventData.id?.includes('project') && (
+            <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
+              {eventData.is_completed ? <CheckCircleIcon color="success" /> : <CheckCircleOutlineIcon />}
+            </IconButton>
+          )}
+          <Link
+            href={
+              projectId
+                ? `/projects/${projectId}/schedule/edit/${eventData.id}`
+                : `/my-calendar/schedule/edit/${eventData.id}`
+            }
+          >
             <IconButton size="small" sx={{ mr: 1 }}>
               <EditIcon />
             </IconButton>

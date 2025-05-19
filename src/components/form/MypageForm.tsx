@@ -137,7 +137,7 @@ export default function MypageForm() {
         </Button>
       </Box>
       <Link
-        href="https://naver.com"
+        href="https://docs.google.com/forms/d/15dDCEYxSZyNY_ZHN4bozniQuE0WC5vx5JPq7jKyyYt4/edit"
         target="_blank"
         rel="noopener noreferrer"
         sx={{

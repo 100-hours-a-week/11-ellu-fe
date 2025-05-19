@@ -5,6 +5,8 @@ export interface EventData {
   end: Date;
   description?: string;
   is_project_schedule?: boolean;
+  is_completed?: boolean;
+  is_ai_recommended?: boolean;
   extendedProps?: {
     is_project_schedule?: boolean;
     is_ai_recommended?: boolean;
