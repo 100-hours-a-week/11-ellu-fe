@@ -8,7 +8,9 @@ export const useGetRecommendedSchedule = (projectId: number) => {
     queryKey: ['recommended-schedules', projectId],
     queryFn: () => getRecommendedSchedule(projectId),
     staleTime: 0,
+    gcTime: 0,
     retry: 1,
     enabled: !!projectId,
+    refetchOnMount: true,
   });
 };
