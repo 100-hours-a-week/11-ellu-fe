@@ -9,8 +9,13 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div>
         {children}
         <footer className={style.footer}>
-          <h1>Looper</h1>
-          <p>Ellu's Project</p>
+          <div className={style.footerContent}>
+            <h1>Looper</h1>
+            <p>looper@google.com</p>
+          </div>
+          <div className={style.footerBottom}>
+            <p>© 2025 Looper. All rights reserved.</p>
+          </div>
         </footer>
       </div>
     </div>
