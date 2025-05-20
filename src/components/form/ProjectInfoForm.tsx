@@ -15,6 +15,14 @@ const positions = [
   { value: 'AI', label: 'AI 개발자' },
 ];
 
+const colorOptions = [
+  { value: 'FEC178', label: '노랑' },
+  { value: 'FFDDB4', label: '연한 노랑' },
+  { value: 'FFB9B4', label: '핑크' },
+  { value: 'FFD9D7', label: '연한 핑크' },
+  { value: 'ECCAC5', label: '라일락' },
+];
+
 export default function ProjectInfoForm({ id }: { id?: string }) {
   const router = useRouter();
   const isEditMode = !!id; // id가 있으면 수정 모드
@@ -30,11 +38,13 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     title: '',
     wiki: '',
     position: '',
+    color: 'FEC178',
   });
   const [errors, setErrors] = useState({
     title: '',
     wiki: '',
     position: '',
+    color: '',
   });
 
   // 기존 프로젝트 데이터 불러오기
@@ -45,6 +55,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         title: projectData.title,
         wiki: projectData.wiki || '',
         position: projectData.members[0].position || '',
+        color: projectData.color || 'FEC178',
       });
     }
   }, [isEditMode, projectData]);
@@ -64,6 +75,10 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     if (!value) return '포지션을 선택해주세요';
     return '';
   };
+  const validateColor = (value: string) => {
+    if (!value) return '색상을 선택해주세요';
+    return '';
+  };
 
   // 폼 유효성 검사
   const isFormValid = () => {
@@ -73,7 +88,8 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       !errors.position &&
       formData.title.length >= 1 &&
       formData.wiki.length >= 50 &&
-      formData.position !== ''
+      formData.position !== '' &&
+      formData.color !== ''
     );
   };
 
@@ -98,6 +114,11 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       setErrors((prev) => ({
         ...prev,
         position: validatePosition(value),
+      }));
+    } else if (name === 'color') {
+      setErrors((prev) => ({
+        ...prev,
+        color: validateColor(value),
       }));
     }
   };
@@ -191,6 +212,39 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         disabled={isLoading}
         sx={{ width: '50%', minWidth: '300px' }}
       />
+
+      <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 2 }}>
+        프로젝트의 색상을 설정해주세요
+      </Typography>
+      <TextField
+        select
+        label="색상"
+        name="color"
+        value={formData.color}
+        onChange={handleChange}
+        error={!!errors.color}
+        helperText={errors.color}
+        required
+        disabled={isLoading}
+        sx={{ width: '160px', minWidth: '160px', mb: 4 }}
+      >
+        {colorOptions.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box
+                sx={{
+                  width: 20,
+                  height: 20,
+                  backgroundColor: `#${option.value}`,
+                  borderRadius: '50%',
+                  border: '1px solid #ddd',
+                }}
+              />
+              {option.label}
+            </Box>
+          </MenuItem>
+        ))}
+      </TextField>
 
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 0 }}>
         프로젝트 개요를 입력해주세요(깃허브 wiki, readme의 내용 등)

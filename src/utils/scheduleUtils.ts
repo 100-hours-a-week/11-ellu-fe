@@ -14,6 +14,7 @@ export const convertToEventData = (scheduleResponses: ScheduleResponse[]): Event
       is_completed: schedule.is_completed,
       is_ai_recommended: schedule.is_ai_recommended,
       is_project_schedule: schedule.is_project_schedule,
+      color: schedule.color,
     },
   }));
 };
