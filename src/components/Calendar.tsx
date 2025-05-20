@@ -18,7 +18,6 @@ import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
 import { EventData } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -33,6 +32,7 @@ import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
 import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
 
 import { useScheduleStore } from '@/stores/scheduleStore';
+import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 
 const CALENDAR_VIEWS = {
   multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
@@ -76,6 +76,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const formattedYear = format(currentDate, 'yyyy');
 
   // tanstack query
+  // 프로젝트 정보 가져오기
+  const { data: projectData, isLoading: isLoadingProject } = useGetProjectById(projectIdNumber as number);
   // 프로젝트
   // 일별 일정
   const { data: projectDailyData, isLoading: isLoadingProjectDaily } = useGetProjectDailySchedules(
@@ -366,7 +368,10 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   );
 
   return (
-    <div className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}>
+    <div
+      className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
+      style={projectData?.color ? ({ '--project-color': `#${projectData.color}` } as React.CSSProperties) : undefined}
+    >
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
@@ -389,7 +394,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         eventContent={(eventInfo) => {
           const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
           const isCompleted = eventInfo.event.extendedProps?.is_completed;
-          const backgroundColor = isProjectSchedule ? '#FF9800' : '#4285F4';
+          const backgroundColor = !isProjectSchedule ? '#4285F4' : `#${eventInfo.event.extendedProps?.color}`;
 
           return (
             <div

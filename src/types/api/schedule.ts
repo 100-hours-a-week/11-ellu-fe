@@ -8,6 +8,7 @@ export interface ScheduleResponse {
   is_project_schedule: boolean;
   start_time: string;
   end_time: string;
+  color?: string;
 }
 
 export type ScheduleOptions = {
