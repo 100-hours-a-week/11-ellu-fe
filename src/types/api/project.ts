@@ -27,6 +27,7 @@ export interface ProjectFormData {
   title: string;
   position: string;
   wiki: string;
+  color: string;
 }
 
 // 프로젝트 수정타입

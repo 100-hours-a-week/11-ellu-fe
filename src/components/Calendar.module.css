@@ -45,7 +45,7 @@
 
 /* 선택된 영역 스타일 */
 .projectCalendar :global(.fc-highlight) {
-  background-color: #ff9800 !important; /* 주황색 */
+  background-color: var(--project-color) !important;
 }
 
 /* 일반 캘린더용 하이라이트 스타일 */
