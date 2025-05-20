@@ -53,9 +53,11 @@ export default function ScheduleDetailModal({ open, onClose, eventData, onDelete
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-        {eventData.title}
-        <Box>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', p: 2 }}>
+        <Typography variant="h6" sx={{ flex: 1, mr: 2, wordBreak: 'break-word' }}>
+          {eventData.title}
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           {!eventData.id?.includes('project') && (
             <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
               {eventData.is_completed ? <CheckCircleIcon color="success" /> : <CheckCircleOutlineIcon />}
@@ -88,7 +90,9 @@ export default function ScheduleDetailModal({ open, onClose, eventData, onDelete
               <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                 상세일정
               </Typography>
-              <Typography variant="body1">{eventData.description}</Typography>
+              <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '13px' }}>
+                {eventData.description}
+              </Typography>
             </Box>
           )}
         </Box>

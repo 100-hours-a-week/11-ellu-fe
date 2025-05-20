@@ -45,14 +45,14 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   // 제목 유효성 검사 함수
   const validateTitle = (title: string) => {
     if (title.length < 1) return '제목을 입력해주세요.';
-    if (title.length > 20) return '제목은 20자 이하여야 합니다.';
+    if (title.length > 30) return '제목은 30자 이하여야 합니다.';
     if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(title)) return '한글, 영문, 숫자만 입력 가능합니다.';
     return '';
   };
 
   // 할일 유효성 검사 함수
   const validateDescription = (description: string) => {
-    if (description && description.length > 20) return '상세일정은 20자 이하여야 합니다.';
+    if (description && description.length > 100) return '상세일정은 100자 이하여야 합니다.';
     if (description && !/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(description)) return '한글, 영문, 숫자만 입력 가능합니다.';
     return '';
   };
