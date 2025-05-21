@@ -1,37 +1,22 @@
 'use client';
 
-import { Box, Modal, Typography, Button, IconButton } from '@mui/material';
+import { Box, Modal, Typography, Button, IconButton, Avatar } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelIcon from '@mui/icons-material/Cancel';
 import styles from './InviteTeamMemberModal.module.css';
 import { InviteTeamMemberModalProps } from '../../types/project';
 import { useState } from 'react';
-
-// 목데이터 타입 정의
-interface TeamMember {
-  id: number;
-  nickname: string;
-}
-
-// 목데이터
-const mockData: TeamMember[] = [
-  { id: 1, nickname: '홍길동' },
-  { id: 2, nickname: '김철수' },
-  { id: 3, nickname: '이영희' },
-  { id: 4, nickname: '박지성' },
-  { id: 5, nickname: '최유진' },
-  { id: 6, nickname: '홍리' },
-  { id: 7, nickname: '홍리' },
-  { id: 8, nickname: '홍리22' },
-];
+import { useSearchUser } from '@/hooks/api/user/useSearchUser';
+import { User } from '@/types/api/user';
 
 export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMemberModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(true);
-  const [invitedMembers, setInvitedMembers] = useState<string[]>([]);
+  const [invitedMembers, setInvitedMembers] = useState<User[]>([]);
 
-  const filteredMembers = mockData.filter((member) => member.nickname.toLowerCase().includes(searchTerm.toLowerCase()));
+  const { data: searchResults } = useSearchUser(searchTerm);
+  const filteredMembers = searchResults || [];
 
   // 검색어 입력 핸들러
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,17 +25,17 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
   };
 
   // 검색결과 처리 핸들러
-  const handleInvite = (id: number, nickname: string) => {
-    if (!invitedMembers.includes(nickname)) {
-      setInvitedMembers([...invitedMembers, nickname]);
+  const handleInvite = (id: number, nickname: string, imageUrl: string) => {
+    if (!invitedMembers.some((member) => member.id === id)) {
+      setInvitedMembers([...invitedMembers, { id, nickname, imageUrl }]);
     }
     setShowResults(false);
     setSearchTerm('');
   };
 
   // 초대 멤버 삭제 핸들러
-  const handleRemoveInvite = (nicknameToRemove: string) => {
-    setInvitedMembers(invitedMembers.filter((nickname) => nickname !== nicknameToRemove));
+  const handleRemoveInvite = (id: number) => {
+    setInvitedMembers(invitedMembers.filter((member) => member.id !== id));
   };
 
   // 저장 클릭시
@@ -90,9 +75,10 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
                 {filteredMembers.map((member) => (
                   <div
                     key={member.id}
-                    onClick={() => handleInvite(member.id, member.nickname)}
+                    onClick={() => handleInvite(member.id, member.nickname, member.imageUrl)}
                     className={styles.resultItem}
                   >
+                    <Avatar src={member.imageUrl} alt={member.nickname} className={styles.avatar} />
                     {member.nickname}
                   </div>
                 ))}
@@ -103,10 +89,11 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
         <div className={styles.bottom}>
           <h1>초대 목록</h1>
           <div className={styles.invitedList}>
-            {invitedMembers.map((nickname, index) => (
-              <div key={index} className={styles.invitedItem}>
+            {invitedMembers.map(({ id, nickname, imageUrl }) => (
+              <div key={id} className={styles.invitedItem}>
+                <Avatar src={imageUrl} alt={nickname} className={styles.avatar} />
                 <span>{nickname}</span>
-                <IconButton size="small" onClick={() => handleRemoveInvite(nickname)} className={styles.removeButton}>
+                <IconButton size="small" onClick={() => handleRemoveInvite(id)} className={styles.removeButton}>
                   <CancelIcon fontSize="small" />
                 </IconButton>
               </div>
