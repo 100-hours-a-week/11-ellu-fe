@@ -1,12 +1,14 @@
 'use client';
 
-import { Box, TextField, Button, MenuItem, Typography, CircularProgress, Alert } from '@mui/material';
+import { Box, TextField, Button, MenuItem, Typography, CircularProgress, Alert, IconButton } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectFormData } from '@/types/api/project';
 import { useCreateProject } from '@/hooks/api/projects/useCreateProject';
 import { useEditProject } from '@/hooks/api/projects/useEditProject';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
+import AddIcon from '@mui/icons-material/Add';
+import InviteTeamMemberModal from '../projects/InviteTeamMemberModal';
 
 const positions = [
   { value: 'FE', label: 'FE개발자' },
@@ -46,6 +48,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     position: '',
     color: '',
   });
+  const [openInviteModal, setOpenInviteModal] = useState(false);
 
   // 기존 프로젝트 데이터 불러오기
   useEffect(() => {
@@ -156,6 +159,14 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         },
       });
     }
+  };
+
+  const handleOpenInviteModal = () => {
+    setOpenInviteModal(true);
+  };
+
+  const handleCloseInviteModal = () => {
+    setOpenInviteModal(false);
   };
 
   // 프로젝트 정보 불러오기 로딩
@@ -288,6 +299,26 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
           </MenuItem>
         ))}
       </TextField>
+
+      <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 2 }}>
+        프로젝트에 초대할 팀원을 선택해주세요
+      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'start', mb: 4 }}>
+        <IconButton
+          onClick={handleOpenInviteModal}
+          sx={{
+            backgroundColor: 'primary.main',
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+            },
+          }}
+        >
+          <AddIcon />
+        </IconButton>
+      </Box>
+
+      <InviteTeamMemberModal open={openInviteModal} onClose={handleCloseInviteModal} />
 
       <Button
         type="submit"
