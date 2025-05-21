@@ -9,13 +9,15 @@ import { InviteTeamMemberModalProps } from '../../types/project';
 import { useState } from 'react';
 import { useSearchUser } from '@/hooks/api/user/useSearchUser';
 import { User } from '@/types/api/user';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMemberModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(true);
   const [invitedMembers, setInvitedMembers] = useState<User[]>([]);
 
-  const { data: searchResults } = useSearchUser(searchTerm);
+  const debouncedSearchTerm = useDebounce(searchTerm, 800); // 입력 멈춘후 0.8초마다 검색 api 호출
+  const { data: searchResults } = useSearchUser(debouncedSearchTerm);
   const filteredMembers = searchResults || [];
 
   // 검색어 입력 핸들러
@@ -91,8 +93,10 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
           <div className={styles.invitedList}>
             {invitedMembers.map(({ id, nickname, imageUrl }) => (
               <div key={id} className={styles.invitedItem}>
-                <Avatar src={imageUrl} alt={nickname} className={styles.avatar} />
-                <span>{nickname}</span>
+                <div className={styles.memberInfo}>
+                  <Avatar src={imageUrl} alt={nickname} className={styles.avatar} />
+                  <span>{nickname}</span>
+                </div>
                 <IconButton size="small" onClick={() => handleRemoveInvite(id)} className={styles.removeButton}>
                   <CancelIcon fontSize="small" />
                 </IconButton>
