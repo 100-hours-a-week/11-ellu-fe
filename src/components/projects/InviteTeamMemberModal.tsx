@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Modal, Typography, Button, IconButton, Avatar } from '@mui/material';
+import { Box, Modal, Button, IconButton, Avatar } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -16,7 +16,7 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
   const [showResults, setShowResults] = useState(true);
   const [invitedMembers, setInvitedMembers] = useState<User[]>([]);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, 800); // 입력 멈춘후 0.8초마다 검색 api 호출
+  const debouncedSearchTerm = useDebounce(searchTerm, 300); // 입력 멈춘후 0.3초마다 검색 api 호출
   const { data: searchResults } = useSearchUser(debouncedSearchTerm);
   const filteredMembers = searchResults || [];
 
@@ -28,6 +28,9 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
 
   // 검색결과 처리 핸들러
   const handleInvite = (id: number, nickname: string, imageUrl: string) => {
+    if (invitedMembers.length >= 7) {
+      return;
+    }
     if (!invitedMembers.some((member) => member.id === id)) {
       setInvitedMembers([...invitedMembers, { id, nickname, imageUrl }]);
     }
@@ -68,8 +71,12 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
                 aria-label="search"
                 value={searchTerm}
                 onChange={handleSearchChange}
+                disabled={invitedMembers.length >= 7}
               />
             </div>
+            {invitedMembers.length >= 7 && (
+              <div className={styles.errorMessage}>최대 7명까지만 초대할 수 있습니다.</div>
+            )}
           </div>
           <div className={styles.searchResultWrapper}>
             {searchTerm && filteredMembers.length > 0 && showResults && (
