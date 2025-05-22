@@ -54,7 +54,10 @@ export default function ScheduleDetailModal({ open, onClose, eventData, onDelete
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', p: 2 }}>
-        <Typography variant="h6" sx={{ flex: 1, mr: 2, wordBreak: 'break-word' }}>
+        <Typography
+          variant="body1"
+          sx={{ flex: 1, mr: 2, wordBreak: 'break-word', fontSize: '1.25rem', fontWeight: 'bold' }}
+        >
           {eventData.title}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
