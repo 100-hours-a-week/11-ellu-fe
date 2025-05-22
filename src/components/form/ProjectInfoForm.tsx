@@ -8,11 +8,13 @@ import { useCreateProject } from '@/hooks/api/projects/useCreateProject';
 import { useEditProject } from '@/hooks/api/projects/useEditProject';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
 import InviteTeamMemberModal from '../projects/InviteTeamMemberModal';
+import styles from './ProjectInfoForm.module.css';
 
 const positions = [
-  { value: 'FE', label: 'FE개발자' },
-  { value: 'BE', label: 'BE개발자' },
+  { value: 'FE', label: 'FE 개발자' },
+  { value: 'BE', label: 'BE 개발자' },
   { value: 'CLOUD', label: '클라우드개발자' },
   { value: 'AI', label: 'AI 개발자' },
 ];
@@ -41,6 +43,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     wiki: '',
     position: '',
     color: 'FEC178',
+    members: [],
   });
   const [errors, setErrors] = useState({
     title: '',
@@ -59,6 +62,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         wiki: projectData.wiki || '',
         position: projectData.members[0].position || '',
         color: projectData.color || 'FEC178',
+        members: projectData.members,
       });
     }
   }, [isEditMode, projectData]);
@@ -168,6 +172,25 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   const handleCloseInviteModal = () => {
     setOpenInviteModal(false);
   };
+
+  const handleRemoveMember = (memberId: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      members: prev.members.filter((member) => member.id !== memberId),
+    }));
+  };
+
+  const handlePositionChange = (memberId: number, position: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      members: prev.members.map((member) => (member.id === memberId ? { ...member, position } : member)),
+    }));
+  };
+
+  // formData 변경 감지
+  useEffect(() => {
+    console.log('formData updated:', formData.members);
+  }, [formData]);
 
   // 프로젝트 정보 불러오기 로딩
   if (isEditMode && isLoadingProject) {
@@ -303,19 +326,56 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 2 }}>
         프로젝트에 초대할 팀원을 선택해주세요
       </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'start', mb: 4 }}>
-        <IconButton
-          onClick={handleOpenInviteModal}
-          sx={{
-            backgroundColor: 'primary.main',
-            color: 'white',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-            },
-          }}
-        >
-          <AddIcon />
-        </IconButton>
+      <Box className={styles.memberListContainer}>
+        {formData.members && formData.members.length > 0 ? (
+          <Box className={styles.memberList}>
+            {formData.members.map((member) => (
+              <Box key={member.id} className={styles.memberItem}>
+                <Box className={styles.memberInfo}>
+                  {member.profileImageUrl && (
+                    <Box
+                      component="img"
+                      src={member.profileImageUrl}
+                      alt={member.nickname}
+                      className={styles.memberImage}
+                    />
+                  )}
+                  <Typography variant="body2" className={styles.memberName}>
+                    {member.nickname}
+                  </Typography>
+                </Box>
+                <Box className={styles.controlsContainer}>
+                  <TextField
+                    select
+                    value={member.position || ''}
+                    onChange={(e) => handlePositionChange(member.id, e.target.value)}
+                    className={styles.positionSelect}
+                    size="small"
+                  >
+                    {positions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleRemoveMember(member.id)}
+                    className={styles.removeButton}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          <Box className={styles.addButtonContainer}>
+            <IconButton onClick={handleOpenInviteModal} className={styles.addButton}>
+              <AddIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
 
       <InviteTeamMemberModal open={openInviteModal} onClose={handleCloseInviteModal} />

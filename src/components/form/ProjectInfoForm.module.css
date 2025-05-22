@@ -1,0 +1,156 @@
+.memberListContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.memberListContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.memberListContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.memberListContainer::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.memberListContainer::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.memberList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.memberList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.memberList::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.memberList::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.memberList::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.memberItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-radius: 20px;
+  width: 70%;
+}
+
+.memberInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.memberImage {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 0.8px solid gray;
+}
+
+.memberName {
+  font-size: 18px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.controlsContainer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 36px;
+}
+
+.positionSelect {
+  min-width: 140px;
+}
+
+.positionSelect :global(.MuiOutlinedInput-root) {
+  margin-top: 40px;
+  height: 36px;
+}
+
+.positionSelect :global(.MuiOutlinedInput-input) {
+  padding: 8px 14px;
+  font-size: 14px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.positionSelect :global(.MuiSelect-select) {
+  width: 90px;
+  padding: 8px 14px;
+  font-size: 14px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.positionSelect :global(.MuiOutlinedInput-notchedOutline) {
+  border-color: #e0e0e0;
+}
+
+.removeButton {
+  color: #757575;
+  padding: 4px;
+  flex-shrink: 0;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.removeButton:hover {
+  color: #d32f2f;
+  background-color: rgba(211, 47, 47, 0.04);
+}
+
+.addButtonContainer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.addButton {
+  background-color: #1976d2 !important;
+  color: white !important;
+}
+
+.addButton:hover {
+  background-color: #1565c0 !important;
+}

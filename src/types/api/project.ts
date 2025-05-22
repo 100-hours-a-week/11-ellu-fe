@@ -28,6 +28,7 @@ export interface ProjectFormData {
   position: string;
   wiki: string;
   color: string;
+  members: ProjectMember[];
 }
 
 // 프로젝트 수정타입
