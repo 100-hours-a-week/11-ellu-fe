@@ -10,11 +10,13 @@ import { useSearchUser } from '@/hooks/api/user/useSearchUser';
 import { User } from '@/types/api/user';
 import { useDebounce } from '@/hooks/useDebounce';
 import { InviteTeamMemberModalProps } from '@/types/project';
+import { userStore } from '@/stores/userStore';
 
 export default function InviteTeamMemberModal({ open, onClose, onSave }: InviteTeamMemberModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(true);
   const [invitedMembers, setInvitedMembers] = useState<User[]>([]);
+  const currentUser = userStore((state) => state.user);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300); // 입력 멈춘후 0.3초마다 검색 api 호출
   const { data: searchResults } = useSearchUser(debouncedSearchTerm);
@@ -29,6 +31,11 @@ export default function InviteTeamMemberModal({ open, onClose, onSave }: InviteT
   // 검색결과 처리 핸들러
   const handleInvite = (id: number, nickname: string, imageUrl: string) => {
     if (invitedMembers.length >= 7) {
+      return;
+    }
+    // 이미 초대된 멤버 중에 자기 자신이 있는지 확인
+    if (id === currentUser?.id) {
+      alert('자기 자신은 초대 목록에 포함될 수 없습니다.');
       return;
     }
     if (!invitedMembers.some((member) => member.id === id)) {
