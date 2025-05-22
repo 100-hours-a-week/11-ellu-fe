@@ -1,16 +1,34 @@
 'use client';
 
-import { Box, TextField, Button, MenuItem, Typography, CircularProgress, Alert } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Button,
+  MenuItem,
+  Typography,
+  CircularProgress,
+  Alert,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectFormData } from '@/types/api/project';
+import { User } from '@/types/api/user';
 import { useCreateProject } from '@/hooks/api/projects/useCreateProject';
 import { useEditProject } from '@/hooks/api/projects/useEditProject';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
+import InviteTeamMemberModal from '../projects/InviteTeamMemberModal';
+import styles from './ProjectInfoForm.module.css';
 
 const positions = [
-  { value: 'FE', label: 'FE개발자' },
-  { value: 'BE', label: 'BE개발자' },
+  { value: 'FE', label: 'FE 개발자' },
+  { value: 'BE', label: 'BE 개발자' },
   { value: 'CLOUD', label: '클라우드개발자' },
   { value: 'AI', label: 'AI 개발자' },
 ];
@@ -39,6 +57,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     wiki: '',
     position: '',
     color: 'FEC178',
+    added_members: [],
   });
   const [errors, setErrors] = useState({
     title: '',
@@ -46,6 +65,9 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     position: '',
     color: '',
   });
+  const [openInviteModal, setOpenInviteModal] = useState(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
 
   // 기존 프로젝트 데이터 불러오기
   useEffect(() => {
@@ -54,8 +76,9 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       setFormData({
         title: projectData.title,
         wiki: projectData.wiki || '',
-        position: projectData.members[0].position || '',
+        position: projectData.position || '',
         color: projectData.color || 'FEC178',
+        added_members: projectData.added_members,
       });
     }
   }, [isEditMode, projectData]);
@@ -158,10 +181,79 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     }
   };
 
+  const handleOpenInviteModal = () => {
+    setOpenInviteModal(true);
+  };
+
+  const handleCloseInviteModal = () => {
+    setOpenInviteModal(false);
+  };
+
+  const handleSaveInvitedMembers = (invitedMembers: User[]) => {
+    if (formData.added_members.length >= 7) {
+      alert('프로젝트 멤버는 최대 7명까지만 추가할 수 있습니다.');
+      return;
+    }
+
+    const remainingSlots = 7 - formData.added_members.length;
+    const filteredInvitedMembers = invitedMembers
+      .filter((member) => !formData.added_members.some((existingMember) => existingMember.id === member.id))
+      .slice(0, remainingSlots);
+
+    if (filteredInvitedMembers.length < invitedMembers.length) {
+      alert('프로젝트 멤버는 최대 7명까지만 추가할 수 있습니다.');
+    }
+
+    const membersWithPosition = filteredInvitedMembers.map((member) => ({
+      id: member.id,
+      nickname: member.nickname,
+      profileImageUrl: member.imageUrl,
+      position: 'FE', // 모든 멤버의 포지션을 FE로 설정
+    }));
+
+    setFormData((prev) => ({
+      ...prev,
+      added_members: [...prev.added_members, ...membersWithPosition],
+    }));
+  };
+
+  const handleRemoveMember = (memberId: number) => {
+    setMemberToRemove(memberId);
+    setOpenRemoveModal(true);
+  };
+
+  const handleConfirmRemove = () => {
+    if (memberToRemove) {
+      setFormData((prev) => ({
+        ...prev,
+        added_members: prev.added_members.filter((member) => member.id !== memberToRemove),
+      }));
+      setOpenRemoveModal(false);
+      setMemberToRemove(null);
+    }
+  };
+
+  const handleCancelRemove = () => {
+    setOpenRemoveModal(false);
+    setMemberToRemove(null);
+  };
+
+  const handlePositionChange = (memberId: number, position: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      added_members: prev.added_members.map((member) => (member.id === memberId ? { ...member, position } : member)),
+    }));
+  };
+
+  // formData 변경 감지
+  useEffect(() => {
+    console.log('formData updated:', formData.added_members);
+  }, [formData]);
+
   // 프로젝트 정보 불러오기 로딩
   if (isEditMode && isLoadingProject) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+      <Box className={styles.loadingContainer}>
         <CircularProgress />
       </Box>
     );
@@ -169,8 +261,8 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   // 프로젝트 정보 불러오기 실패
   if (isEditMode && fetchError) {
     return (
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" gap={2}>
-        <Alert severity="error" sx={{ width: '80%', maxWidth: '600px' }}>
+      <Box className={styles.errorContainer}>
+        <Alert severity="error" className={styles.errorAlert}>
           프로젝트 정보를 불러오는데 실패했습니다:
         </Alert>
       </Box>
@@ -288,6 +380,90 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
           </MenuItem>
         ))}
       </TextField>
+
+      <Typography
+        variant="subtitle1"
+        sx={{ fontSize: '1rem', fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
+      >
+        프로젝트에 초대할 팀원을 선택해주세요
+        {formData.added_members && formData.added_members.length > 0 ? (
+          <IconButton onClick={handleOpenInviteModal} className={styles.addButton}>
+            <AddIcon />
+          </IconButton>
+        ) : null}
+      </Typography>
+      <Box className={styles.memberListContainer}>
+        {formData.added_members && formData.added_members.length > 0 ? (
+          <Box className={styles.memberList}>
+            {formData.added_members.map((member) => (
+              <Box key={member.id} className={styles.memberItem}>
+                <Box className={styles.memberInfo}>
+                  {member.profileImageUrl && (
+                    <Box
+                      component="img"
+                      src={member.profileImageUrl}
+                      alt={member.nickname}
+                      className={styles.memberImage}
+                    />
+                  )}
+                  <Typography variant="body2" className={styles.memberName}>
+                    {member.nickname}
+                  </Typography>
+                </Box>
+                <Box className={styles.controlsContainer}>
+                  <TextField
+                    select
+                    value={member.position || ''}
+                    onChange={(e) => handlePositionChange(member.id, e.target.value)}
+                    className={styles.positionSelect}
+                    size="small"
+                  >
+                    {positions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleRemoveMember(member.id)}
+                    className={styles.removeButton}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          <Box className={styles.addButtonContainer}>
+            <IconButton onClick={handleOpenInviteModal} className={styles.addButton}>
+              <AddIcon />
+            </IconButton>
+          </Box>
+        )}
+      </Box>
+
+      <InviteTeamMemberModal
+        open={openInviteModal}
+        onClose={handleCloseInviteModal}
+        onSave={handleSaveInvitedMembers}
+      />
+
+      <Dialog open={openRemoveModal} onClose={handleCancelRemove} aria-labelledby="remove-member-dialog-title">
+        <DialogTitle id="remove-member-dialog-title">정말로 이 멤버를 프로젝트에서 제거하시겠습니까?</DialogTitle>
+        <DialogContent>
+          <Typography>해당 팀원이 프로젝트에서 추방됩니다.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelRemove} color="primary">
+            취소
+          </Button>
+          <Button onClick={handleConfirmRemove} color="error" autoFocus>
+            제거
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Button
         type="submit"
