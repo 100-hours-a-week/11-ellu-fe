@@ -1,9 +1,23 @@
 'use client';
 
-import { Box, TextField, Button, MenuItem, Typography, CircularProgress, Alert, IconButton } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Button,
+  MenuItem,
+  Typography,
+  CircularProgress,
+  Alert,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProjectFormData } from '@/types/api/project';
+import { User } from '@/types/api/user';
 import { useCreateProject } from '@/hooks/api/projects/useCreateProject';
 import { useEditProject } from '@/hooks/api/projects/useEditProject';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
@@ -52,6 +66,8 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     color: '',
   });
   const [openInviteModal, setOpenInviteModal] = useState(false);
+  const [openRemoveModal, setOpenRemoveModal] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
 
   // 기존 프로젝트 데이터 불러오기
   useEffect(() => {
@@ -173,11 +189,41 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     setOpenInviteModal(false);
   };
 
-  const handleRemoveMember = (memberId: number) => {
+  const handleSaveInvitedMembers = (invitedMembers: User[]) => {
+    const membersWithPosition = invitedMembers
+      .filter((member) => !formData.members.some((existingMember) => existingMember.id === member.id))
+      .map((member) => ({
+        id: member.id,
+        nickname: member.nickname,
+        profileImageUrl: member.imageUrl,
+        position: 'FE', // 모든 멤버의 포지션을 FE로 설정
+      }));
+
     setFormData((prev) => ({
       ...prev,
-      members: prev.members.filter((member) => member.id !== memberId),
+      members: [...prev.members, ...membersWithPosition],
     }));
+  };
+
+  const handleRemoveMember = (memberId: number) => {
+    setMemberToRemove(memberId);
+    setOpenRemoveModal(true);
+  };
+
+  const handleConfirmRemove = () => {
+    if (memberToRemove) {
+      setFormData((prev) => ({
+        ...prev,
+        members: prev.members.filter((member) => member.id !== memberToRemove),
+      }));
+      setOpenRemoveModal(false);
+      setMemberToRemove(null);
+    }
+  };
+
+  const handleCancelRemove = () => {
+    setOpenRemoveModal(false);
+    setMemberToRemove(null);
   };
 
   const handlePositionChange = (memberId: number, position: string) => {
@@ -195,7 +241,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   // 프로젝트 정보 불러오기 로딩
   if (isEditMode && isLoadingProject) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="300px">
+      <Box className={styles.loadingContainer}>
         <CircularProgress />
       </Box>
     );
@@ -203,8 +249,8 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   // 프로젝트 정보 불러오기 실패
   if (isEditMode && fetchError) {
     return (
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" gap={2}>
-        <Alert severity="error" sx={{ width: '80%', maxWidth: '600px' }}>
+      <Box className={styles.errorContainer}>
+        <Alert severity="error" className={styles.errorAlert}>
           프로젝트 정보를 불러오는데 실패했습니다:
         </Alert>
       </Box>
@@ -323,8 +369,16 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         ))}
       </TextField>
 
-      <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 2 }}>
+      <Typography
+        variant="subtitle1"
+        sx={{ fontSize: '1rem', fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
+      >
         프로젝트에 초대할 팀원을 선택해주세요
+        {formData.members && formData.members.length > 0 ? (
+          <IconButton onClick={handleOpenInviteModal} className={styles.addButton}>
+            <AddIcon />
+          </IconButton>
+        ) : null}
       </Typography>
       <Box className={styles.memberListContainer}>
         {formData.members && formData.members.length > 0 ? (
@@ -378,7 +432,26 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         )}
       </Box>
 
-      <InviteTeamMemberModal open={openInviteModal} onClose={handleCloseInviteModal} />
+      <InviteTeamMemberModal
+        open={openInviteModal}
+        onClose={handleCloseInviteModal}
+        onSave={handleSaveInvitedMembers}
+      />
+
+      <Dialog open={openRemoveModal} onClose={handleCancelRemove} aria-labelledby="remove-member-dialog-title">
+        <DialogTitle id="remove-member-dialog-title">정말로 이 멤버를 프로젝트에서 제거하시겠습니까?</DialogTitle>
+        <DialogContent>
+          <Typography>해당 팀원이 프로젝트에서 추방됩니다.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelRemove} color="primary">
+            취소
+          </Button>
+          <Button onClick={handleConfirmRemove} color="error" autoFocus>
+            제거
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Button
         type="submit"

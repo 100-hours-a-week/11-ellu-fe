@@ -5,13 +5,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelIcon from '@mui/icons-material/Cancel';
 import styles from './InviteTeamMemberModal.module.css';
-import { InviteTeamMemberModalProps } from '../../types/project';
 import { useState } from 'react';
 import { useSearchUser } from '@/hooks/api/user/useSearchUser';
 import { User } from '@/types/api/user';
 import { useDebounce } from '@/hooks/useDebounce';
+import { InviteTeamMemberModalProps } from '@/types/project';
 
-export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMemberModalProps) {
+export default function InviteTeamMemberModal({ open, onClose, onSave }: InviteTeamMemberModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(true);
   const [invitedMembers, setInvitedMembers] = useState<User[]>([]);
@@ -45,8 +45,8 @@ export default function InviteTeamMemberModal({ open, onClose }: InviteTeamMembe
 
   // 저장 클릭시
   const handleSave = () => {
-    console.log('초대된 멤버:', invitedMembers);
-    // onClose();
+    onSave(invitedMembers);
+    onClose();
   };
 
   return (
