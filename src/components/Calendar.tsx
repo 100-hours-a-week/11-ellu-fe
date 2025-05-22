@@ -408,12 +408,10 @@ export default function Calendar({ projectId }: { projectId?: string }) {
               }}
             >
               <div className={styles.eventBox}>
-                <div className={styles.eventBoxTime}>
-                  {eventInfo.timeText}
-                  <span className={styles.eventBoxIcon}>
-                    {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
-                  </span>
-                </div>
+                <span className={styles.eventBoxIcon}>
+                  {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
+                </span>
+                <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
                 <div>{eventInfo.event.title}</div>
               </div>
             </div>
