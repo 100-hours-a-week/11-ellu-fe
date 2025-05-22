@@ -18,7 +18,7 @@ export interface ProjectDetail {
   title: string;
   color: string;
   position: string;
-  members: ProjectMember[];
+  added_members: ProjectMember[];
   wiki: string;
 }
 
@@ -28,6 +28,7 @@ export interface ProjectFormData {
   position: string;
   wiki: string;
   color: string;
+  added_members: ProjectMember[];
 }
 
 // 프로젝트 수정타입

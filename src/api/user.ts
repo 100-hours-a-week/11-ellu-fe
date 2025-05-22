@@ -17,3 +17,9 @@ export const getMyInfo = async (): Promise<User> => {
 export const editMyInfo = async (nickname: string): Promise<void> => {
   await api.patch<ApiResponse<void>>('/users/me', { nickname });
 };
+
+// 검색기반 닉네임 조회
+export const searchUsersByNickname = async (query: string): Promise<User[]> => {
+  const res = await api.get<ApiResponse<User[]>>(`/users?query=${query}`);
+  return res.data.data;
+};
