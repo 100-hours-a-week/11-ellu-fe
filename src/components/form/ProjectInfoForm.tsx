@@ -57,7 +57,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     wiki: '',
     position: '',
     color: 'FEC178',
-    members: [],
+    added_members: [],
   });
   const [errors, setErrors] = useState({
     title: '',
@@ -76,9 +76,9 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       setFormData({
         title: projectData.title,
         wiki: projectData.wiki || '',
-        position: projectData.members[0].position || '',
+        position: projectData.position || '',
         color: projectData.color || 'FEC178',
-        members: projectData.members,
+        added_members: projectData.added_members,
       });
     }
   }, [isEditMode, projectData]);
@@ -191,7 +191,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
 
   const handleSaveInvitedMembers = (invitedMembers: User[]) => {
     const membersWithPosition = invitedMembers
-      .filter((member) => !formData.members.some((existingMember) => existingMember.id === member.id))
+      .filter((member) => !formData.added_members.some((existingMember) => existingMember.id === member.id))
       .map((member) => ({
         id: member.id,
         nickname: member.nickname,
@@ -201,7 +201,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
 
     setFormData((prev) => ({
       ...prev,
-      members: [...prev.members, ...membersWithPosition],
+      added_members: [...prev.added_members, ...membersWithPosition],
     }));
   };
 
@@ -214,7 +214,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     if (memberToRemove) {
       setFormData((prev) => ({
         ...prev,
-        members: prev.members.filter((member) => member.id !== memberToRemove),
+        added_members: prev.added_members.filter((member) => member.id !== memberToRemove),
       }));
       setOpenRemoveModal(false);
       setMemberToRemove(null);
@@ -229,13 +229,13 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   const handlePositionChange = (memberId: number, position: string) => {
     setFormData((prev) => ({
       ...prev,
-      members: prev.members.map((member) => (member.id === memberId ? { ...member, position } : member)),
+      added_members: prev.added_members.map((member) => (member.id === memberId ? { ...member, position } : member)),
     }));
   };
 
   // formData 변경 감지
   useEffect(() => {
-    console.log('formData updated:', formData.members);
+    console.log('formData updated:', formData.added_members);
   }, [formData]);
 
   // 프로젝트 정보 불러오기 로딩
@@ -374,16 +374,16 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         sx={{ fontSize: '1rem', fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}
       >
         프로젝트에 초대할 팀원을 선택해주세요
-        {formData.members && formData.members.length > 0 ? (
+        {formData.added_members && formData.added_members.length > 0 ? (
           <IconButton onClick={handleOpenInviteModal} className={styles.addButton}>
             <AddIcon />
           </IconButton>
         ) : null}
       </Typography>
       <Box className={styles.memberListContainer}>
-        {formData.members && formData.members.length > 0 ? (
+        {formData.added_members && formData.added_members.length > 0 ? (
           <Box className={styles.memberList}>
-            {formData.members.map((member) => (
+            {formData.added_members.map((member) => (
               <Box key={member.id} className={styles.memberItem}>
                 <Box className={styles.memberInfo}>
                   {member.profileImageUrl && (
