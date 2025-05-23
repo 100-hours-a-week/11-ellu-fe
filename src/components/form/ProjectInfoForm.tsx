@@ -190,21 +190,22 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   };
 
   const handleSaveInvitedMembers = (invitedMembers: User[]) => {
-    if (formData.added_members.length >= 7) {
+    console.log(formData.added_members, invitedMembers);
+    if (formData.added_members.length + invitedMembers.length > 7) {
       alert('프로젝트 멤버는 최대 7명까지만 추가할 수 있습니다.');
       return;
     }
 
-    const remainingSlots = 7 - formData.added_members.length;
-    const filteredInvitedMembers = invitedMembers
-      .filter((member) => !formData.added_members.some((existingMember) => existingMember.id === member.id))
-      .slice(0, remainingSlots);
+    const hasDuplicate = invitedMembers.some((invitedMember) =>
+      formData.added_members.some((existingMember) => existingMember.id === invitedMember.id)
+    );
 
-    if (filteredInvitedMembers.length < invitedMembers.length) {
-      alert('프로젝트 멤버는 최대 7명까지만 추가할 수 있습니다.');
+    if (hasDuplicate) {
+      alert('이미 초대된 멤버가 있습니다.');
+      return;
     }
 
-    const membersWithPosition = filteredInvitedMembers.map((member) => ({
+    const membersWithPosition = invitedMembers.map((member) => ({
       id: member.id,
       nickname: member.nickname,
       profileImageUrl: member.imageUrl,
