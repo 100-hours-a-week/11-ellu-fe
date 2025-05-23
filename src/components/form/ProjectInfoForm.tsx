@@ -219,8 +219,15 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   };
 
   const handleRemoveMember = (memberId: number) => {
-    setMemberToRemove(memberId);
-    setOpenRemoveModal(true);
+    if (isEditMode && projectData) {
+      setMemberToRemove(memberId);
+      setOpenRemoveModal(true);
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        added_members: prev.added_members.filter((member) => member.id !== memberId),
+      }));
+    }
   };
 
   const handleConfirmRemove = () => {
@@ -245,11 +252,6 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       added_members: prev.added_members.map((member) => (member.id === memberId ? { ...member, position } : member)),
     }));
   };
-
-  // formData 변경 감지
-  useEffect(() => {
-    console.log('formData updated:', formData.added_members);
-  }, [formData]);
 
   // 프로젝트 정보 불러오기 로딩
   if (isEditMode && isLoadingProject) {
