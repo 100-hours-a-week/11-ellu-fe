@@ -105,7 +105,7 @@ export default function ProjectsList() {
           <TableHead sx={{ backgroundColor: '#528ad3' }}>
             <TableRow>
               <TableCell sx={{ width: '30%', color: 'white' }}>프로젝트명</TableCell>
-              <TableCell sx={{ width: '70%', color: 'white' }}>멤버</TableCell>
+              <TableCell sx={{ width: '70%', color: 'white' }}>팀원</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
@@ -123,12 +123,14 @@ export default function ProjectsList() {
                         border: '1px solid #ccc',
                       }}
                     />
-                    <Typography variant="body1">{project.title}</Typography>
+                    <Typography variant="body1" className={style.projectTitle}>
+                      {project.title}
+                    </Typography>
                   </Stack>
                 </TableCell>
                 <TableCell>
-                  <Stack direction="row" spacing={1}>
-                    {project.members.map((member) => (
+                  <Stack direction="row" spacing={1} className={style.membersContainer}>
+                    {project.members.slice(0, 4).map((member) => (
                       <Avatar
                         key={member.nickname}
                         alt={member.nickname}
@@ -136,6 +138,20 @@ export default function ProjectsList() {
                         sx={{ width: 32, height: 32, border: '1px solid gray' }}
                       />
                     ))}
+                    {project.members.length > 4 && (
+                      <Avatar
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          border: '1px solid gray',
+                          backgroundColor: '#e0e0e0',
+                          fontSize: '0.875rem',
+                          color: '#666',
+                        }}
+                      >
+                        +{project.members.length - 4}
+                      </Avatar>
+                    )}
                   </Stack>
                 </TableCell>
                 <TableCell>

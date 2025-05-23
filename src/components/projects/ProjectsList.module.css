@@ -21,3 +21,21 @@
 .noProject div {
   margin-top: 20px;
 }
+
+.projectTitle {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.membersContainer {
+  max-width: 210px;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.membersContainer > * {
+  flex-shrink: 0;
+}
