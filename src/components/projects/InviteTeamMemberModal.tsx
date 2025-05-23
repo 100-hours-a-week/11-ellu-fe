@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import CancelIcon from '@mui/icons-material/Cancel';
 import styles from './InviteTeamMemberModal.module.css';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useSearchUser } from '@/hooks/api/user/useSearchUser';
 import { User } from '@/types/api/user';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -17,6 +17,20 @@ export default function InviteTeamMemberModal({ open, onClose, onSave }: InviteT
   const [showResults, setShowResults] = useState(true);
   const [invitedMembers, setInvitedMembers] = useState<User[]>([]);
   const currentUser = userStore((state) => state.user);
+  const searchResultRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchResultRef.current && !searchResultRef.current.contains(event.target as Node)) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 300); // 입력 멈춘후 0.3초마다 검색 api 호출
   const { data: searchResults } = useSearchUser(debouncedSearchTerm);
@@ -38,9 +52,11 @@ export default function InviteTeamMemberModal({ open, onClose, onSave }: InviteT
       alert('자기 자신은 초대 목록에 포함될 수 없습니다.');
       return;
     }
-    if (!invitedMembers.some((member) => member.id === id)) {
-      setInvitedMembers([...invitedMembers, { id, nickname, imageUrl }]);
+    if (invitedMembers.some((member) => member.id === id)) {
+      alert('이미 초대된 멤버입니다.');
+      return;
     }
+    setInvitedMembers([...invitedMembers, { id, nickname, imageUrl }]);
     setShowResults(false);
     setSearchTerm('');
   };
@@ -53,6 +69,7 @@ export default function InviteTeamMemberModal({ open, onClose, onSave }: InviteT
   // 저장 클릭시
   const handleSave = () => {
     onSave(invitedMembers);
+    setInvitedMembers([]);
     onClose();
   };
 
@@ -85,7 +102,7 @@ export default function InviteTeamMemberModal({ open, onClose, onSave }: InviteT
               <div className={styles.errorMessage}>최대 7명까지만 초대할 수 있습니다.</div>
             )}
           </div>
-          <div className={styles.searchResultWrapper}>
+          <div className={styles.searchResultWrapper} ref={searchResultRef}>
             {searchTerm && filteredMembers.length > 0 && showResults && (
               <div className={styles.resultContainer}>
                 {filteredMembers.map((member) => (
