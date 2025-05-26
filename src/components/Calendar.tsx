@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useRef, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import FullCalendar from '@fullcalendar/react';
@@ -11,8 +12,6 @@ import koLocale from '@fullcalendar/core/locales/ko';
 import { format } from 'date-fns';
 import styles from './Calendar.module.css';
 import { DateSelectArg } from '@fullcalendar/core';
-import CreateScheduleModal from './CreateScheduleModal';
-import ScheduleDetailModal from './ScheduleDetailModal';
 import { useCalendarModals } from '@/hooks/useCalendarModals';
 import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
@@ -31,8 +30,20 @@ import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySc
 import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
 import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
 
+import CreateScheduleModalSkeleton from './skeleton/CreateScheduleModalSkeleton';
+import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton';
+
 import { useScheduleStore } from '@/stores/scheduleStore';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
+
+// 일정생성 모달 지연로딩 처리
+const CreateScheduleModal = dynamic(() => import('./CreateScheduleModal'), {
+  loading: ({ isLoading = false }) => <CreateScheduleModalSkeleton open={isLoading} />,
+});
+// 일정상세 모달 지연로딩 처리
+const ScheduleDetailModal = dynamic(() => import('./ScheduleDetailModal'), {
+  loading: ({ isLoading = false }) => <ScheduleDetailModalSkeleton open={isLoading} />,
+});
 
 const CALENDAR_VIEWS = {
   multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
@@ -419,24 +430,28 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         }}
       />
 
-      <CreateScheduleModal
-        open={openCreateModal}
-        onClose={closeCreateModal}
-        onCancel={handleCancel}
-        onSave={handleSave}
-        selectedEvent={selectedEvent}
-        eventData={eventData}
-        onInputChange={handleInputChange}
-        projectId={projectId}
-      />
+      {openCreateModal && (
+        <CreateScheduleModal
+          open={openCreateModal}
+          onClose={closeCreateModal}
+          onCancel={handleCancel}
+          onSave={handleSave}
+          selectedEvent={selectedEvent}
+          eventData={eventData}
+          onInputChange={handleInputChange}
+          projectId={projectId}
+        />
+      )}
 
-      <ScheduleDetailModal
-        open={openDetailModal}
-        onClose={closeDetailModal}
-        eventData={selectedEventData}
-        onDelete={handleDelete}
-        projectId={projectId}
-      />
+      {openDetailModal && (
+        <ScheduleDetailModal
+          open={openDetailModal}
+          onClose={closeDetailModal}
+          eventData={selectedEventData}
+          onDelete={handleDelete}
+          projectId={projectId}
+        />
+      )}
     </div>
   );
 }
