@@ -1,11 +1,11 @@
 .memberListContainer {
+  width: 450px;
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-bottom: 32px;
   max-height: 250px;
   overflow-y: auto;
-  padding-right: 8px;
 }
 
 .memberListContainer::-webkit-scrollbar {
@@ -60,7 +60,7 @@
   padding: 12px 16px;
   background-color: #f5f5f5;
   border-radius: 20px;
-  width: 70%;
+  width: 90%;
   min-width: 320px;
 }
 
