@@ -3,6 +3,7 @@ import './globals.css';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import QueryProvider from '@/hooks/QueryProvider';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import { PublicEnvScript } from 'next-runtime-env'; // 런타임 변수 주입
 
 export const metadata: Metadata = {
   title: 'Looper',
@@ -16,6 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <PublicEnvScript />
+      </head>
       <body>
         <QueryProvider>
           <AppRouterCacheProvider>

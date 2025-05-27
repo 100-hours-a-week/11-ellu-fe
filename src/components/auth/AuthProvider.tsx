@@ -4,13 +4,15 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { userStore } from '@/stores/userStore';
 import { refreshAccessToken } from '@/api/auth';
+import { env } from 'next-runtime-env';
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { user, setUser, accessToken, setAccessToken } = userStore();
 
   // 개발 환경 인증검사 제외
-  if (process.env.NODE_ENV === 'development') {
+  const mode = env('NEXT_PUBLIC_MODE');
+  if (mode === 'development') {
     return <>{children}</>;
   }
 
