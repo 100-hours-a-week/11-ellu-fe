@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { env } from 'next-runtime-env';
 
 export default function QueryProvider({ children }: { children: React.ReactNode }) {
   const [client] = useState(
@@ -20,10 +21,13 @@ export default function QueryProvider({ children }: { children: React.ReactNode 
     })
   );
 
+  // 환경 모드 확인
+  const mode = env('NEXT_PUBLIC_MODE');
+
   return (
     <QueryClientProvider client={client}>
       {children}
-      <ReactQueryDevtools initialIsOpen={process.env.NEXT_PUBLIC_MODE === 'local'} />
+      <ReactQueryDevtools initialIsOpen={mode === 'development'} />
     </QueryClientProvider>
   );
 }
