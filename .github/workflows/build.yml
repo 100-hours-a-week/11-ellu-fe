@@ -26,6 +26,10 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+        env:
+          NEXT_PUBLIC_KAKAO_REST_KEY: ${{ secrets.NEXT_PUBLIC_KAKAO_REST_KEY }}
+          NEXT_PUBLIC_API_SERVER_URL: ${{ secrets.NEXT_PUBLIC_API_SERVER_URL }}
+          NEXT_PUBLIC_KAKAO_REDIRECT_URI: ${{ secrets.NEXT_PUBLIC_KAKAO_REDIRECT_URI }}
   package:
     name: Package and Publish
     if: ${{ github.ref == 'refs/heads/develop' }}
@@ -46,6 +50,10 @@ jobs:
           context: .
           load: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+          build-args: |
+            NEXT_PUBLIC_KAKAO_REST_KEY=${{ secrets.KAKAO_REST_KEY }}
+            NEXT_PUBLIC_API_SERVER_URL=${{ secrets.API_SERVER_URL }}
+            NEXT_PUBLIC_KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Anchore Container Scan
@@ -73,5 +81,9 @@ jobs:
           context: .
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+          build-args: |
+            NEXT_PUBLIC_KAKAO_REST_KEY=${{ secrets.KAKAO_REST_KEY }}
+            NEXT_PUBLIC_API_SERVER_URL=${{ secrets.API_SERVER_URL }}
+            NEXT_PUBLIC_KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
