@@ -44,6 +44,34 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - name: Debug secrets (safe check)
+        run: |
+          echo "=== Checking GitHub Secrets ==="
+          echo "KAKAO_REST_KEY length: ${#KAKAO_REST_KEY}"
+          echo "API_SERVER_URL length: ${#API_SERVER_URL}"
+          echo "KAKAO_REDIRECT_URI length: ${#KAKAO_REDIRECT_URI}"
+          
+          if [ -z "$KAKAO_REST_KEY" ]; then
+            echo "ERROR: KAKAO_REST_KEY is empty or not set!"
+          else
+            echo "KAKAO_REST_KEY is set (first 5 chars): ${KAKAO_REST_KEY:0:5}..."
+          fi
+          
+          if [ -z "$API_SERVER_URL" ]; then
+            echo "ERROR: API_SERVER_URL is empty or not set!"
+          else
+            echo "API_SERVER_URL is set: $API_SERVER_URL"
+          fi
+          
+          if [ -z "$KAKAO_REDIRECT_URI" ]; then
+            echo "ERROR: KAKAO_REDIRECT_URI is empty or not set!"
+          else
+            echo "KAKAO_REDIRECT_URI is set: $KAKAO_REDIRECT_URI"
+          fi
+        env:
+          KAKAO_REST_KEY: ${{ secrets.KAKAO_REST_KEY }}
+          API_SERVER_URL: ${{ secrets.API_SERVER_URL }}
+          KAKAO_REDIRECT_URI: ${{ secrets.KAKAO_REDIRECT_URI }}
       - name: Build container image
         uses: docker/build-push-action@v4
         with:
