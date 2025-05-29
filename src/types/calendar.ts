@@ -30,6 +30,10 @@ export interface CalendarModalProps {
   projectId?: string;
 }
 
+export interface ScheduleModalSkeletonProps {
+  open: boolean;
+}
+
 export interface EditScheduleModalProps {
   open: boolean;
   onClose: () => void;
