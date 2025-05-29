@@ -11,6 +11,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { logout } from '@/api/auth';
 import { userStore } from '@/stores/userStore';
 import style from './AfterLoginHeader.module.css';
+import Alarm from './Alarm';
 
 export default function AfterLoginHeader() {
   const router = useRouter();
@@ -55,35 +56,26 @@ export default function AfterLoginHeader() {
         <p>Looper</p>
       </Link>
 
-      <Box
-        className={style.myinfo}
-        onClick={handleOpenMenu}
-        sx={{
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          borderRadius: 1,
-          px: 1,
-          py: 0.5,
-          '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' },
-        }}
-      >
-        {user ? (
-          <Avatar
-            src={user.imageUrl || undefined}
-            alt={`${user.nickname} 프로필`}
-            sx={{ width: 40, height: 40, border: '1px solid gray', bgcolor: 'white' }}
-          >
-            {!user.imageUrl && user.nickname?.charAt(0).toUpperCase()}
-          </Avatar>
-        ) : (
-          <Skeleton variant="circular" width={40} height={40} />
-        )}
+      <div className={style.profileContainer}>
+        <Alarm />
+        <Box className={style.myinfo} onClick={handleOpenMenu}>
+          {user ? (
+            <Avatar
+              src={user.imageUrl || undefined}
+              alt={`${user.nickname} 프로필`}
+              sx={{ width: 40, height: 40, border: '1px solid gray', bgcolor: 'white' }}
+            >
+              {!user.imageUrl && user.nickname?.charAt(0).toUpperCase()}
+            </Avatar>
+          ) : (
+            <Skeleton variant="circular" width={40} height={40} />
+          )}
 
-        <Typography variant="body1" fontWeight="bold" sx={{ ml: 1 }}>
-          {user?.nickname || '정보없음'}
-        </Typography>
-      </Box>
+          <Typography variant="body1" fontWeight="bold" sx={{ ml: 1 }}>
+            {user?.nickname || '정보없음'}
+          </Typography>
+        </Box>
+      </div>
 
       <Menu
         anchorEl={anchorEl}
