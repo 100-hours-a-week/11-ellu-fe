@@ -30,10 +30,23 @@
   margin-left: 13px;
 }
 
+.profileContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .myinfo {
   min-width: 100px;
   display: flex;
   align-items: center;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.myinfo:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 .myinfo p {

@@ -1,0 +1,9 @@
+.alarmIcon :global(.MuiSvgIcon-root) {
+  color: var(--color-primary);
+  font-size: 30px;
+}
+
+.alarmHeader {
+  font-weight: bold;
+  padding: 8px;
+}
