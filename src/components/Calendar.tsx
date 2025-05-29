@@ -36,11 +36,10 @@ import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton'
 import { useScheduleStore } from '@/stores/scheduleStore';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 
-// 일정생성 모달 지연로딩 처리
+// 모달 지연로딩 처리
 const CreateScheduleModal = dynamic(() => import('./CreateScheduleModal'), {
   loading: ({ isLoading = false }) => <CreateScheduleModalSkeleton open={isLoading} />,
 });
-// 일정상세 모달 지연로딩 처리
 const ScheduleDetailModal = dynamic(() => import('./ScheduleDetailModal'), {
   loading: ({ isLoading = false }) => <ScheduleDetailModalSkeleton open={isLoading} />,
 });
@@ -137,52 +136,45 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   // 일정 삭제
   const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
+  const formatEventData = (data: any[], isProject: boolean) => {
+    return data.map((event) => ({
+      ...event,
+      id: isProject
+        ? `project-${event.id}`
+        : event.extendedProps?.is_project_schedule
+          ? `project-${event.id}`
+          : `schedule-${event.id}`,
+    }));
+  };
+
   useEffect(() => {
     if (projectIdNumber) {
       // 프로젝트 일정
       if (currentView === 'day' && projectDailyData) {
-        const formattedData = projectDailyData.map((event) => ({
-          ...event,
-          id: `project-${event.id}`,
-        }));
+        const formattedData = formatEventData(projectDailyData, true);
         console.log('프로젝트 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
-        const formattedData = projectMonthlyData.map((event) => ({
-          ...event,
-          id: `project-${event.id}`,
-        }));
+        const formattedData = formatEventData(projectMonthlyData, true);
         console.log('프로젝트 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if (currentView === 'year' && projectYearlyData) {
-        const formattedData = projectYearlyData.map((event) => ({
-          ...event,
-          id: `project-${event.id}`,
-        }));
+        const formattedData = formatEventData(projectYearlyData, true);
         console.log('프로젝트 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
       }
     } else {
       // 전체 일정
       if (currentView === 'day' && allDailyData) {
-        const formattedData = allDailyData.map((event) => ({
-          ...event,
-          id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
-        }));
+        const formattedData = formatEventData(allDailyData, false);
         console.log('전체 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
-        const formattedData = allMonthlyData.map((event) => ({
-          ...event,
-          id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
-        }));
+        const formattedData = formatEventData(allMonthlyData, false);
         console.log('전체 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if (currentView === 'year' && allYearlyData) {
-        const formattedData = allYearlyData.map((event) => ({
-          ...event,
-          id: event.extendedProps?.is_project_schedule ? `project-${event.id}` : `schedule-${event.id}`,
-        }));
+        const formattedData = formatEventData(allYearlyData, false);
         console.log('전체 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
       }
