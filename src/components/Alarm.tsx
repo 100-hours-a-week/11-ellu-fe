@@ -14,24 +14,24 @@ interface AlarmItem {
 export default function Alarm() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [alarms] = useState<AlarmItem[]>([
-    {
-      id: 1,
-      message: '새로운 프로젝트 초대가 있습니다',
-      time: '5분 전',
-      isRead: false,
-    },
-    {
-      id: 2,
-      message: '프로젝트 마감일이 3일 남았습니다',
-      time: '1시간 전',
-      isRead: false,
-    },
-    {
-      id: 3,
-      message: '새로운 댓글이 달렸습니다',
-      time: '2시간 전',
-      isRead: true,
-    },
+    // {
+    //   id: 1,
+    //   message: '새로운 프로젝트 초대가 있습니다',
+    //   time: '5분 전',
+    //   isRead: false,
+    // },
+    // {
+    //   id: 2,
+    //   message: '프로젝트 마감일이 3일 남았습니다',
+    //   time: '1시간 전',
+    //   isRead: false,
+    // },
+    // {
+    //   id: 3,
+    //   message: '새로운 댓글이 달렸습니다',
+    //   time: '2시간 전',
+    //   isRead: true,
+    // },
   ]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
