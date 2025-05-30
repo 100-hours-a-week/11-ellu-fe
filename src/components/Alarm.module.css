@@ -7,3 +7,39 @@
   font-weight: bold;
   padding: 8px;
 }
+
+.alarmMessage {
+  width: 100%;
+}
+
+.messageContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.messageContent {
+  flex: 1;
+}
+
+.alarmMessageText {
+  max-width: 250px;
+  font-size: 15px;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+}
+
+.buttonContainer {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.timeText {
+  margin-top: 3px;
+  margin-left: 8px;
+  color: gray;
+  font-size: 11px;
+}
