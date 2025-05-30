@@ -79,8 +79,6 @@ export default function Alarm() {
             <MenuItem
               key={index}
               sx={{
-                py: 1.5,
-                px: 2,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
