@@ -29,6 +29,7 @@
     "@types/event-source-polyfill": "^1.0.5",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "event-source-polyfill": "^1.0.31",
     "next": "15.3.1",
     "next-runtime-env": "^3.3.0",

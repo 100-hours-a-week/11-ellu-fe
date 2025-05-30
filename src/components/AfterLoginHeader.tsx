@@ -94,11 +94,11 @@ export default function AfterLoginHeader() {
           sx: { minWidth: 180, mt: 0.5 },
         }}
       >
-        <MenuItem onClick={handleNavigateToMypage} sx={{ py: 1.5 }}>
+        <MenuItem onClick={handleNavigateToMypage} sx={{ py: 1.5, '&:hover': { backgroundColor: 'transparent' } }}>
           <PersonIcon fontSize="small" sx={{ mr: 1.5 }} />
           <Typography variant="body2">마이페이지</Typography>
         </MenuItem>
-        <MenuItem onClick={handleLogout} sx={{ py: 1.5 }}>
+        <MenuItem onClick={handleLogout} sx={{ py: 1.5, '&:hover': { backgroundColor: 'transparent' } }}>
           <LogoutIcon fontSize="small" sx={{ mr: 1.5 }} />
           <Typography variant="body2">로그아웃</Typography>
         </MenuItem>
