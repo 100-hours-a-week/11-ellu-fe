@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { IconButton, Badge, Menu, MenuItem, Typography, Box, Divider } from '@mui/material';
+import { IconButton, Badge, Menu, MenuItem, Typography, Box, Divider, Button } from '@mui/material';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useAlarmStore } from '@/stores/alarmStore';
@@ -26,6 +26,16 @@ export default function Alarm() {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleAccept = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    console.log('수락');
+  };
+
+  const handleReject = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    console.log('거절');
   };
 
   useEffect(() => {
@@ -76,12 +86,29 @@ export default function Alarm() {
                 alignItems: 'flex-start',
               }}
             >
-              <Typography variant="body2" sx={{ mb: 0.5 }}>
-                {alarm.message}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {dayjs(alarm.time).fromNow()}
-              </Typography>
+              {alarm.type === 'PROJECT_INVITED' ? (
+                <Box className={style.alarmMessage}>
+                  <Box className={style.messageContainer}>
+                    <Box className={style.messageContent}>
+                      <div className={style.alarmMessageText}>{alarm.message}</div>
+                      <Box className={style.buttonContainer}>
+                        <Button variant="contained" size="small" color="primary" onClick={handleAccept}>
+                          수락
+                        </Button>
+                        <Button variant="outlined" size="small" color="error" onClick={handleReject}>
+                          거절
+                        </Button>
+                      </Box>
+                    </Box>
+                    <div className={style.timeText}>{dayjs(alarm.time).fromNow()}</div>
+                  </Box>
+                </Box>
+              ) : (
+                <Box className={style.messageContainer}>
+                  <div className={style.alarmMessageText}>{alarm.message}</div>
+                  <div className={style.timeText}>{dayjs(alarm.time).fromNow()}</div>
+                </Box>
+              )}
             </MenuItem>
           ))
         ) : (
