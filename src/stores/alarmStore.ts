@@ -1,24 +1,5 @@
 import { create } from 'zustand';
-
-// 알람 타입 정의
-type AlarmType = 'PROJECT_INVITED' | 'PROJECT_JOINED' | 'PROJECT_LEFT';
-
-interface Alarm {
-  type: AlarmType;
-  projectId: number;
-  senderId: number;
-  targetUserIds: number[];
-  message: string;
-  time?: Date;
-  isRead: boolean;
-}
-
-interface AlarmStore {
-  alarms: Alarm[];
-  addAlarm: (alarm: Alarm) => void;
-  clearAlarms: () => void;
-  markAllAsRead: () => void;
-}
+import { AlarmStore } from '@/types/alarm';
 
 export const useAlarmStore = create<AlarmStore>((set) => ({
   alarms: [],
@@ -27,12 +8,12 @@ export const useAlarmStore = create<AlarmStore>((set) => ({
   addAlarm: (alarm) =>
     set((state) => ({
       alarms: [
-        ...state.alarms,
         {
           ...alarm,
           time: new Date(),
           isRead: false,
         },
+        ...state.alarms,
       ],
     })),
 
