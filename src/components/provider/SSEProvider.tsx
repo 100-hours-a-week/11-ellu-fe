@@ -3,21 +3,27 @@
 import { useEffect, useRef } from 'react';
 import { userStore } from '@/stores/userStore';
 import { EventSourcePolyfill } from 'event-source-polyfill';
+import { useAlarmStore } from '@/stores/alarmStore';
 
 export default function SSEProvider({ children }: { children: React.ReactNode }) {
   const { user, accessToken } = userStore();
   const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
   const errorAttemptsRef = useRef(0);
   const connectTimeRef = useRef<number>(0);
+  const { addAlarm } = useAlarmStore();
 
-  const connectSSE = () => {
-    if (!user?.id || !accessToken) return;
-
-    // 기존 연결 정리
+  const clearSSE = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
     }
+    errorAttemptsRef.current = 0;
+  };
+
+  const connectSSE = () => {
+    if (!user?.id || !accessToken) return;
+
+    clearSSE();
 
     connectTimeRef.current = Date.now();
 
@@ -26,7 +32,7 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
       {
         headers: { Authorization: `Bearer ${accessToken}` },
         withCredentials: true,
-        heartbeatTimeout: 30000,
+        heartbeatTimeout: 90000, // 1분 30초동안 연결 유지
       }
     );
 
@@ -37,8 +43,14 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
     eventSource.addEventListener('notification', (event: any) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('알림:', data);
-        // 알림 처리
+        addAlarm({
+          type: data.type,
+          projectId: data.projectId,
+          senderId: data.senderId,
+          targetUserIds: data.targetUserIds,
+          message: data.message,
+          isRead: false,
+        });
       } catch (error) {
         console.error('알림 데이터 파싱 에러:', error);
       }
@@ -66,7 +78,7 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
         setTimeout(connectSSE, 10000);
       } else {
         console.log(`정상적인 연결 끊김 - 재연결`);
-        setTimeout(connectSSE, 3000);
+        setTimeout(connectSSE, 2000);
       }
     };
 
@@ -77,19 +89,11 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
     if (user?.id && accessToken) {
       connectSSE();
     } else {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
-
-      errorAttemptsRef.current = 0;
+      clearSSE();
     }
 
     return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-        eventSourceRef.current = null;
-      }
+      clearSSE();
     };
   }, [user?.id, accessToken]);
 
