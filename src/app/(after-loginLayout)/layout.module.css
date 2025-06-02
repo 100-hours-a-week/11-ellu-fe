@@ -12,6 +12,7 @@
 
 .mainbox {
   width: calc(100% - 150px);
+  max-height: calc(100vh - 180px);
   border-top-left-radius: 25px;
   background-color: white;
   padding: 50px;
