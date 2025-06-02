@@ -44,7 +44,7 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
       try {
         const data = JSON.parse(event.data);
         addAlarm({
-          id: data.id,
+          id: data.notificationId,
           type: data.type,
           projectId: data.projectId,
           senderId: data.senderId,
