@@ -39,3 +39,7 @@
 .membersContainer > * {
   flex-shrink: 0;
 }
+
+:global(.MuiTooltip-tooltip) {
+  margin-top: 5px !important;
+}
