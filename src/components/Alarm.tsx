@@ -5,6 +5,7 @@ import { IconButton, Badge, Menu, MenuItem, Typography, Box, Divider, Button } f
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useAlarmStore } from '@/stores/alarmStore';
+import { useEditInvite } from '@/hooks/api/alarm/useEditInvite';
 import style from './Alarm.module.css';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -15,9 +16,15 @@ dayjs.locale('ko');
 
 export default function Alarm() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { alarms, markAllAsRead } = useAlarmStore();
+  const { alarms, markAllAsRead, loadInitialAlarms, isLoading } = useAlarmStore();
+  const editInviteMutation = useEditInvite();
 
   const unreadAlarms = alarms.filter((alarm) => !alarm.isRead);
+
+  useEffect(() => {
+    loadInitialAlarms();
+    console.log(alarms);
+  }, [loadInitialAlarms]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -28,19 +35,15 @@ export default function Alarm() {
     setAnchorEl(null);
   };
 
-  const handleAccept = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleAccept = (e: React.MouseEvent<HTMLButtonElement>, notificationId: number) => {
     e.stopPropagation();
-    console.log('수락');
+    editInviteMutation.mutate({ notificationId, inviteStatus: 'ACCEPTED' });
   };
 
-  const handleReject = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleReject = (e: React.MouseEvent<HTMLButtonElement>, notificationId: number) => {
     e.stopPropagation();
-    console.log('거절');
+    editInviteMutation.mutate({ notificationId, inviteStatus: 'REJECTED' });
   };
-
-  useEffect(() => {
-    console.log(alarms);
-  }, [alarms]);
 
   return (
     <>
@@ -75,9 +78,9 @@ export default function Alarm() {
         <Box className={style.alarmHeader}>알림</Box>
         <Divider />
         {alarms.length > 0 ? (
-          alarms.map((alarm, index) => (
+          alarms.map((alarm) => (
             <MenuItem
-              key={index}
+              key={alarm.id}
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -90,21 +93,31 @@ export default function Alarm() {
                     <Box className={style.messageContent}>
                       <div className={style.alarmMessageText}>{alarm.message}</div>
                       <Box className={style.buttonContainer}>
-                        <Button variant="contained" size="small" color="primary" onClick={handleAccept}>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          color="primary"
+                          onClick={(e) => handleAccept(e, alarm.id)}
+                        >
                           수락
                         </Button>
-                        <Button variant="outlined" size="small" color="error" onClick={handleReject}>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          color="error"
+                          onClick={(e) => handleReject(e, alarm.id)}
+                        >
                           거절
                         </Button>
                       </Box>
                     </Box>
-                    <div className={style.timeText}>{dayjs(alarm.time).fromNow()}</div>
+                    <div className={style.timeText}>{dayjs(alarm.created_at).fromNow()}</div>
                   </Box>
                 </Box>
               ) : (
                 <Box className={style.messageContainer}>
                   <div className={style.alarmMessageText}>{alarm.message}</div>
-                  <div className={style.timeText}>{dayjs(alarm.time).fromNow()}</div>
+                  <div className={style.timeText}>{dayjs(alarm.created_at).fromNow()}</div>
                 </Box>
               )}
             </MenuItem>
