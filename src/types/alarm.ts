@@ -1,19 +1,27 @@
 // 알람 타입 정의
-type AlarmType = 'PROJECT_INVITED' | 'SCHEDULE_CREATED' | 'SCHEDULE_UPDATED' | 'SCHEDULE_DELETED';
+export type AlarmType = 'PROJECT_INVITED' | 'OTHER';
 
 export interface Alarm {
+  id: number;
   type: AlarmType;
+  invite_status?: string;
   projectId: number;
   senderId: number;
   targetUserIds: number[];
   message: string;
-  time?: Date;
+  created_at?: Date;
   isRead: boolean;
 }
 
 export interface AlarmStore {
   alarms: Alarm[];
+  isLoading: boolean;
   addAlarm: (alarm: Alarm) => void;
-  clearAlarms: () => void;
   markAllAsRead: () => void;
+  loadInitialAlarms: () => Promise<void>;
+}
+
+export interface EditInviteParams {
+  notificationId: number;
+  inviteStatus: string;
 }
