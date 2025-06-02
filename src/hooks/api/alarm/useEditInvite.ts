@@ -13,6 +13,7 @@ export const useEditInvite = () => {
     retry: false,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['alarms'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       loadInitialAlarms();
     },
   });
