@@ -14,6 +14,24 @@ import 'dayjs/locale/ko';
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
 
+const formatTimeAgo = (date: Date | undefined) => {
+  if (!date) return '';
+
+  const now = dayjs();
+  const targetDate = dayjs(date);
+  const diffHours = now.diff(targetDate, 'hour');
+
+  if (diffHours >= 11 && diffHours < 24) {
+    return '어제';
+  } else if (diffHours >= 24 && diffHours < 48) {
+    return '이틀 전';
+  } else if (diffHours >= 48) {
+    return targetDate.format('MM-DD');
+  }
+
+  return targetDate.fromNow();
+};
+
 export default function Alarm() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { alarms, markAllAsRead, loadInitialAlarms, isLoading } = useAlarmStore();
@@ -113,7 +131,7 @@ export default function Alarm() {
                         </Button>
                       </Box>
                     </Box>
-                    <div className={style.timeText}>{dayjs(alarm.created_at).fromNow()}</div>
+                    <div className={style.timeText}>{formatTimeAgo(alarm.created_at)}</div>
                   </Box>
                 </Box>
               ) : (
@@ -122,7 +140,7 @@ export default function Alarm() {
                     {!alarm.isRead && <div className={style.unreadDot} />}
                     {alarm.message}
                   </div>
-                  <div className={style.timeText}>{dayjs(alarm.created_at).fromNow()}</div>
+                  <div className={style.timeText}>{formatTimeAgo(alarm.created_at)}</div>
                 </Box>
               )}
             </MenuItem>
