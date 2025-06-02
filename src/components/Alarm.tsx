@@ -23,7 +23,6 @@ export default function Alarm() {
 
   useEffect(() => {
     loadInitialAlarms();
-    console.log(alarms);
   }, [loadInitialAlarms]);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

@@ -25,7 +25,8 @@
 
 .alarmMessageText {
   max-width: 250px;
-  font-size: 15px;
+  font-size: 13px;
+  color: var(--color-text);
   word-wrap: break-word;
   word-break: break-all;
   white-space: normal;
@@ -34,11 +35,16 @@
 .buttonContainer {
   margin-top: 10px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
+}
+
+.buttonContainer :global(.MuiButton-root) {
+  min-width: 50px;
+  padding: 2px 8px;
+  font-size: 12px;
 }
 
 .timeText {
-  margin-top: 3px;
   margin-left: 8px;
   color: gray;
   font-size: 11px;
