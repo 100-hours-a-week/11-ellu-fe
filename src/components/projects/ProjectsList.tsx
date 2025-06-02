@@ -100,7 +100,7 @@ export default function ProjectsList() {
 
   return (
     <div className={style.container}>
-      <TableContainer component={Paper} sx={{ height: '100%', maxHeight: '100%' }}>
+      <TableContainer component={Paper} sx={{ height: '95%' }}>
         <Table aria-label="project table">
           <TableHead sx={{ backgroundColor: '#528ad3' }}>
             <TableRow>
