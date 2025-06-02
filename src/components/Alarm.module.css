@@ -30,6 +30,22 @@
   word-wrap: break-word;
   word-break: break-all;
   white-space: normal;
+  position: relative;
+}
+
+.unreadDot {
+  position: absolute;
+  left: -4%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.unreadMessage {
+  padding-left: 7px;
 }
 
 .buttonContainer {

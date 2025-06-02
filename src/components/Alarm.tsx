@@ -27,11 +27,11 @@ export default function Alarm() {
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-    markAllAsRead();
   };
 
   const handleClose = () => {
     setAnchorEl(null);
+    markAllAsRead();
   };
 
   const handleAccept = (e: React.MouseEvent<HTMLButtonElement>, notificationId: number) => {
@@ -90,7 +90,10 @@ export default function Alarm() {
                 <Box className={style.alarmMessage}>
                   <Box className={style.messageContainer}>
                     <Box className={style.messageContent}>
-                      <div className={style.alarmMessageText}>{alarm.message}</div>
+                      <div className={`${style.alarmMessageText} ${!alarm.isRead ? style.unreadMessage : ''}`}>
+                        {!alarm.isRead && <div className={style.unreadDot} />}
+                        {alarm.message}
+                      </div>
                       <Box className={style.buttonContainer}>
                         <Button
                           variant="contained"
@@ -115,7 +118,10 @@ export default function Alarm() {
                 </Box>
               ) : (
                 <Box className={style.messageContainer}>
-                  <div className={style.alarmMessageText}>{alarm.message}</div>
+                  <div className={`${style.alarmMessageText} ${!alarm.isRead ? style.unreadMessage : ''}`}>
+                    {!alarm.isRead && <div className={style.unreadDot} />}
+                    {alarm.message}
+                  </div>
                   <div className={style.timeText}>{dayjs(alarm.created_at).fromNow()}</div>
                 </Box>
               )}
