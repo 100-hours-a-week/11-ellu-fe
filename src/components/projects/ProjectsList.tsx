@@ -134,7 +134,12 @@ export default function ProjectsList() {
                   <Stack direction="row" spacing={1} className={style.membersContainer}>
                     <AvatarGroup spacing="small">
                       {project.members.map((member) => (
-                        <Tooltip title={member.nickname} key={member.nickname} arrow>
+                        <Tooltip
+                          sx={{ '& .MuiTooltip-tooltip': { marginTop: '5px' } }}
+                          title={member.nickname}
+                          key={member.nickname}
+                          arrow
+                        >
                           <Avatar
                             alt={member.nickname}
                             src={member.profileImageUrl}
