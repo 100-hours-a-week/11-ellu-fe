@@ -36,6 +36,8 @@ import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton'
 import { useScheduleStore } from '@/stores/scheduleStore';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 
+import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
+
 // 모달 지연로딩 처리
 const CreateScheduleModal = dynamic(() => import('./CreateScheduleModal'), {
   loading: ({ isLoading = false }) => <CreateScheduleModalSkeleton open={isLoading} />,
@@ -62,6 +64,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const calendarRef = useRef<FullCalendar>(null);
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
+
+  const webSocketAPI = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
 
   const { setCurrentSchedule } = useScheduleStore();
 
@@ -218,26 +222,30 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     if (projectIdNumber) {
       // 프로젝트 일정 저장
       console.log('프로젝트 일정 생성:', newEvent);
-      createProjectScheduleMutate(
-        {
-          projectId: projectIdNumber,
-          eventDataList: [newEvent],
-          options: { is_project_schedule: true },
-        },
-        {
-          onSuccess: () => {
-            createEvent({
-              ...newEvent,
-              is_project_schedule: true,
-            });
-            console.log('프로젝트 일정 생성 성공');
-          },
-          onError: (error) => {
-            console.error('일정 저장 실패:', error);
-            alert('일정 저장에 실패했습니다.');
-          },
-        }
-      );
+      if (webSocketAPI) {
+        console.log('WebSocket으로 프로젝트 일정 생성:', newEvent);
+        webSocketAPI.createSchedule(newEvent);
+      }
+      // createProjectScheduleMutate(
+      //   {
+      //     projectId: projectIdNumber,
+      //     eventDataList: [newEvent],
+      //     options: { is_project_schedule: true },
+      //   },
+      //   {
+      //     onSuccess: () => {
+      //       createEvent({
+      //         ...newEvent,
+      //         is_project_schedule: true,
+      //       });
+      //       console.log('프로젝트 일정 생성 성공');
+      //     },
+      //     onError: (error) => {
+      //       console.error('일정 저장 실패:', error);
+      //       alert('일정 저장에 실패했습니다.');
+      //     },
+      //   }
+      // );
     } else {
       // 일반 일정 저장
       console.log('일반 일정 생성:', newEvent);
