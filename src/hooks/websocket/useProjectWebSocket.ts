@@ -55,9 +55,8 @@ export const useProjectWebSocket = (projectId: number) => {
       }
 
       clientRef.current.publish({
-        destination: `/app/${projectId}`,
+        destination: `/app/${projectId}/create`,
         body: JSON.stringify({
-          type: 'CREATE_SCHEDULE',
           eventData: eventData,
         }),
       });
