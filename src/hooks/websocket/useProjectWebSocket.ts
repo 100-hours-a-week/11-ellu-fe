@@ -4,6 +4,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import { userStore } from '@/stores/userStore';
 import { createWebSocketClient } from '@/lib/websocket';
 import { Client } from '@stomp/stompjs';
+import { EventData } from '@/types/calendar';
+import { convertToScheduleData } from '@/utils/scheduleUtils';
 
 export const useProjectWebSocket = (projectId: number) => {
   const clientRef = useRef<Client | null>(null);
@@ -48,11 +50,20 @@ export const useProjectWebSocket = (projectId: number) => {
   }, [accessToken, projectId]);
 
   const createSchedule = useCallback(
-    (eventData: any) => {
+    (
+      eventDataList: EventData[],
+      options: {
+        is_project_schedule?: boolean;
+        is_ai_recommended?: boolean;
+        is_completed?: boolean;
+      } = {}
+    ) => {
       if (!clientRef.current) {
         console.error('WebSocket이 연결되지 않았습니다');
         return;
       }
+
+      const scheduleData = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
 
       clientRef.current.publish({
         destination: `/app/${projectId}/create`,
@@ -60,7 +71,7 @@ export const useProjectWebSocket = (projectId: number) => {
           Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 추가
         },
         body: JSON.stringify({
-          eventData: eventData,
+          scheduleData,
         }),
       });
     },

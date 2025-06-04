@@ -224,7 +224,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       console.log('프로젝트 일정 생성:', newEvent);
       if (webSocketAPI) {
         console.log('WebSocket으로 프로젝트 일정 생성:', newEvent);
-        webSocketAPI.createSchedule(newEvent);
+        webSocketAPI.createSchedule([newEvent], { is_project_schedule: true });
       }
       // createProjectScheduleMutate(
       //   {
