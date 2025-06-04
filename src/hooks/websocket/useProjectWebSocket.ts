@@ -56,12 +56,15 @@ export const useProjectWebSocket = (projectId: number) => {
 
       clientRef.current.publish({
         destination: `/app/${projectId}/create`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 추가
+        },
         body: JSON.stringify({
           eventData: eventData,
         }),
       });
     },
-    [projectId]
+    [projectId, accessToken]
   );
 
   return {
