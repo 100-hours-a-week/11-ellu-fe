@@ -71,7 +71,7 @@ export const useProjectWebSocket = (projectId: number) => {
           Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 추가
         },
         body: JSON.stringify({
-          scheduleData,
+          project_schedules: scheduleData,
         }),
       });
     },
