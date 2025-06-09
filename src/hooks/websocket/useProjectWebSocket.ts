@@ -145,12 +145,25 @@ export const useProjectWebSocket = (projectId: number) => {
   );
 
   // 일정 분배
-  const takeSchedule = useCallback(() => {
-    if (!clientRef.current) {
-      console.error('WebSocket이 연결되지 않았습니다');
-      return;
-    }
-  }, [projectId, accessToken]);
+  const takeSchedule = useCallback(
+    (scheduleId: number) => {
+      if (!clientRef.current) {
+        console.error('WebSocket이 연결되지 않았습니다');
+        return;
+      }
+      try {
+        clientRef.current.publish({
+          destination: `/app/${projectId}/take`,
+          body: JSON.stringify({
+            schedule_id: scheduleId,
+          }),
+        });
+      } catch (error) {
+        console.error('일정 가져가기 실패:', error);
+      }
+    },
+    [projectId]
+  );
 
   return {
     client: clientRef.current,

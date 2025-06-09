@@ -8,13 +8,27 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+
+import { userStore } from '@/stores/userStore';
 
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 
-export default function ScheduleDetailModal({ open, onClose, eventData, onDelete, projectId }: EditScheduleModalProps) {
+export default function ScheduleDetailModal({
+  open,
+  onClose,
+  eventData,
+  onDelete,
+  projectId,
+  takeSchedule,
+}: EditScheduleModalProps) {
   const { mutate: updateSchedule } = useUpdateSchedule();
   const { mutate: updateProjectSchedule } = useUpdateProjectSchedule();
+
+  const { user } = userStore();
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('ko-KR', {
@@ -51,6 +65,11 @@ export default function ScheduleDetailModal({ open, onClose, eventData, onDelete
     onClose();
   };
 
+  const handleTakeSchedule = () => {
+    if (!eventData) return;
+    takeSchedule(scheduleId as number);
+  };
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', p: 2 }}>
@@ -61,10 +80,29 @@ export default function ScheduleDetailModal({ open, onClose, eventData, onDelete
           {eventData.title}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-          {!eventData.id?.includes('project') && (
+          {!eventData.id?.includes('project') ? (
             <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
               {eventData.is_completed ? <CheckCircleIcon color="success" /> : <CheckCircleOutlineIcon />}
             </IconButton>
+          ) : (
+            <Tooltip
+              title="내 일정으로 가져가기"
+              placement="bottom"
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: {
+                      marginTop: '4px',
+                    },
+                  },
+                },
+              }}
+            >
+              <IconButton onClick={handleTakeSchedule} size="small" sx={{ mr: 1 }}>
+                {eventData.assignees?.includes(user?.nickname as string) ? <AssignmentIcon /> : <AssignmentAddIcon />}
+              </IconButton>
+            </Tooltip>
           )}
           <Link
             href={

@@ -453,6 +453,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           eventData={selectedEventData}
           onDelete={handleDelete}
           projectId={projectId}
+          takeSchedule={webSocketAPI?.takeSchedule as (scheduleId: number) => void}
         />
       )}
     </div>

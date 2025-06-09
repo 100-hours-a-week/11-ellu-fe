@@ -7,7 +7,7 @@ export const useGetProjects = () => {
   return useQuery<Project[], AxiosError>({
     queryKey: ['projects'],
     queryFn: getProjects,
-    staleTime: 5 * 60 * 1000, // 5분동안 캐싱
+    staleTime: 1 * 60 * 1000, // 1분동안 캐싱
     retry: 1,
   });
 };

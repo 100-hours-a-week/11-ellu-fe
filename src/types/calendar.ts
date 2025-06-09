@@ -12,6 +12,7 @@ export interface EventData {
     is_ai_recommended?: boolean;
     is_completed?: boolean;
   };
+  assignees?: string[];
 }
 
 export interface SelectedTime {
@@ -40,4 +41,5 @@ export interface EditScheduleModalProps {
   eventData: EventData | null;
   onDelete?: () => void;
   projectId?: string;
+  takeSchedule: (scheduleId: number) => void;
 }
