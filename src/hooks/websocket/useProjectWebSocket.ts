@@ -107,12 +107,18 @@ export const useProjectWebSocket = (projectId: number) => {
 
       const editscheduleData = convertToScheduleData(scheduleData, { is_project_schedule: true });
 
+      console.log(
+        JSON.stringify({
+          ...editscheduleData,
+          schedule_id: scheduleId,
+        })
+      );
       try {
         clientRef.current.publish({
           destination: `/app/${projectId}/update`,
           body: JSON.stringify({
             ...editscheduleData,
-            id: scheduleId,
+            schedule_id: scheduleId,
           }),
         });
         // router.push(`/projects/${projectId}`);
