@@ -109,8 +109,11 @@ export const useProjectWebSocket = (projectId: number) => {
 
       try {
         clientRef.current.publish({
-          destination: `/app/${scheduleId}/update`,
-          body: JSON.stringify(editscheduleData),
+          destination: `/app/${projectId}/update`,
+          body: JSON.stringify({
+            ...editscheduleData,
+            id: scheduleId,
+          }),
         });
         // router.push(`/projects/${projectId}`);
       } catch (error) {
