@@ -99,28 +99,22 @@ export const useProjectWebSocket = (projectId: number) => {
 
   // 일정 업데이트
   const updateSchedule = useCallback(
-    (scheduleData: EventData) => {
+    (scheduleData: EventData, scheduleId: number) => {
       if (!clientRef.current) {
         console.error('WebSocket이 연결되지 않았습니다');
         return;
       }
 
       const editscheduleData = convertToScheduleData(scheduleData, { is_project_schedule: true });
-      console.log(
-        editscheduleData,
-        JSON.stringify({
-          editscheduleData,
-        })
-      );
 
       try {
         clientRef.current.publish({
-          destination: `/app/${projectId}/update`,
+          destination: `/app/${scheduleId}/update`,
           body: JSON.stringify(editscheduleData),
         });
         // router.push(`/projects/${projectId}`);
       } catch (error) {
-        console.error('일정 생성 실패:', error);
+        console.error('일정 수정 실패:', error);
       }
     },
     [projectId]

@@ -179,7 +179,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
     if (scheduleData.is_project_schedule) {
       // 프로젝트 일정 업데이트
       if (webSocketAPI) {
-        webSocketAPI.updateSchedule(updatedSchedule);
+        webSocketAPI.updateSchedule(updatedSchedule, scheduleId as number);
       } else {
         updateProjectSchedule(
           {
