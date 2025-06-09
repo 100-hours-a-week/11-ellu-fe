@@ -107,12 +107,6 @@ export const useProjectWebSocket = (projectId: number) => {
 
       const editscheduleData = convertToScheduleData(scheduleData, { is_project_schedule: true });
 
-      console.log(
-        JSON.stringify({
-          ...editscheduleData,
-          schedule_id: scheduleId,
-        })
-      );
       try {
         clientRef.current.publish({
           destination: `/app/${projectId}/update`,
@@ -121,7 +115,7 @@ export const useProjectWebSocket = (projectId: number) => {
             schedule_id: scheduleId,
           }),
         });
-        // router.push(`/projects/${projectId}`);
+        router.push(`/projects/${projectId}`);
       } catch (error) {
         console.error('일정 수정 실패:', error);
       }
