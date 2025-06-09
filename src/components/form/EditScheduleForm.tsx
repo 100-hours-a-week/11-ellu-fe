@@ -13,6 +13,8 @@ import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { useScheduleStore } from '@/stores/scheduleStore';
 
+import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
+
 interface EditScheduleFormProps {
   scheduleData: EventData;
   projectId?: string;
@@ -22,9 +24,7 @@ interface EditScheduleFormProps {
 export default function EditScheduleForm({ scheduleData, projectId, onSuccess }: EditScheduleFormProps) {
   const router = useRouter();
 
-  useEffect(() => {
-    console.log('scheduleData', scheduleData);
-  }, [scheduleData]);
+  const webSocketAPI = projectId ? useProjectWebSocket(Number(projectId)) : null;
 
   // React Query Hooks
   const { mutate: updateSchedule, isPending: isUpdatingSchedule } = useUpdateSchedule();
@@ -178,25 +178,29 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
 
     if (scheduleData.is_project_schedule) {
       // 프로젝트 일정 업데이트
-      updateProjectSchedule(
-        {
-          projectId: projectId ? Number(projectId) : 0,
-          scheduleId: scheduleId as number,
-          eventData: updatedSchedule,
-          options: { is_project_schedule: true },
-        },
-        {
-          onSuccess: () => {
-            alert('일정이 성공적으로 수정되었습니다.');
-            useScheduleStore.getState().setCurrentSchedule(null);
-            onSuccess();
+      if (webSocketAPI) {
+        webSocketAPI.updateSchedule(updatedSchedule);
+      } else {
+        updateProjectSchedule(
+          {
+            projectId: projectId ? Number(projectId) : 0,
+            scheduleId: scheduleId as number,
+            eventData: updatedSchedule,
+            options: { is_project_schedule: true },
           },
-          onError: (error) => {
-            alert('일정 수정 중 오류가 발생했습니다.');
-            console.error('수정 실패:', error);
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              alert('일정이 성공적으로 수정되었습니다.');
+              useScheduleStore.getState().setCurrentSchedule(null);
+              onSuccess();
+            },
+            onError: (error) => {
+              alert('일정 수정 중 오류가 발생했습니다.');
+              console.error('수정 실패:', error);
+            },
+          }
+        );
+      }
     } else {
       // 일반 일정 업데이트
       updateSchedule(

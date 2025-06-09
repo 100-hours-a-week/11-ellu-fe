@@ -7,8 +7,10 @@ import { Client } from '@stomp/stompjs';
 import { EventData } from '@/types/calendar';
 import { convertToScheduleData } from '@/utils/scheduleUtils';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 export const useProjectWebSocket = (projectId: number) => {
+  const router = useRouter();
   const clientRef = useRef<Client | null>(null);
   const queryClient = useQueryClient();
   const { accessToken } = userStore();
@@ -96,12 +98,33 @@ export const useProjectWebSocket = (projectId: number) => {
   );
 
   // 일정 업데이트
-  const updateSchedule = useCallback(() => {
-    if (!clientRef.current) {
-      console.error('WebSocket이 연결되지 않았습니다');
-      return;
-    }
-  }, [projectId, accessToken]);
+  const updateSchedule = useCallback(
+    (scheduleData: EventData) => {
+      if (!clientRef.current) {
+        console.error('WebSocket이 연결되지 않았습니다');
+        return;
+      }
+
+      const editscheduleData = convertToScheduleData(scheduleData, { is_project_schedule: true });
+      console.log(
+        editscheduleData,
+        JSON.stringify({
+          editscheduleData,
+        })
+      );
+
+      try {
+        clientRef.current.publish({
+          destination: `/app/${projectId}/update`,
+          body: JSON.stringify(editscheduleData),
+        });
+        // router.push(`/projects/${projectId}`);
+      } catch (error) {
+        console.error('일정 생성 실패:', error);
+      }
+    },
+    [projectId]
+  );
 
   // 일정 삭제
   const deleteSchedule = useCallback(
