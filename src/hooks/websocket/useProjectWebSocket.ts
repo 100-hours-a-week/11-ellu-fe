@@ -43,13 +43,13 @@ export const useProjectWebSocket = (projectId: number) => {
           case 'SCHEDULE_UPDATED':
           case 'SCHEDULE_DELETED':
             queryClient.invalidateQueries({
-              queryKey: ['project-daily-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM-dd')],
+              queryKey: ['project-daily-schedules', projectId],
             });
             queryClient.invalidateQueries({
-              queryKey: ['project-monthly-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM')],
+              queryKey: ['project-monthly-schedules', projectId],
             });
             queryClient.invalidateQueries({
-              queryKey: ['project-yearly-schedules', projectId, format(response.schedule.startTime, 'yyyy')],
+              queryKey: ['project-yearly-schedules', projectId],
             });
             break;
         }
