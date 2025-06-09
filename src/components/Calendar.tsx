@@ -221,34 +221,32 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (projectIdNumber) {
       // 프로젝트 일정 저장
-      console.log('프로젝트 일정 생성:', newEvent);
       if (webSocketAPI) {
-        console.log('WebSocket으로 프로젝트 일정 생성:', newEvent);
         webSocketAPI.createSchedule([newEvent], { is_project_schedule: true });
+      } else {
+        createProjectScheduleMutate(
+          {
+            projectId: projectIdNumber,
+            eventDataList: [newEvent],
+            options: { is_project_schedule: true },
+          },
+          {
+            onSuccess: () => {
+              createEvent({
+                ...newEvent,
+                is_project_schedule: true,
+              });
+              console.log('프로젝트 일정 생성 성공');
+            },
+            onError: (error) => {
+              console.error('일정 저장 실패:', error);
+              alert('일정 저장에 실패했습니다.');
+            },
+          }
+        );
       }
-      // createProjectScheduleMutate(
-      //   {
-      //     projectId: projectIdNumber,
-      //     eventDataList: [newEvent],
-      //     options: { is_project_schedule: true },
-      //   },
-      //   {
-      //     onSuccess: () => {
-      //       createEvent({
-      //         ...newEvent,
-      //         is_project_schedule: true,
-      //       });
-      //       console.log('프로젝트 일정 생성 성공');
-      //     },
-      //     onError: (error) => {
-      //       console.error('일정 저장 실패:', error);
-      //       alert('일정 저장에 실패했습니다.');
-      //     },
-      //   }
-      // );
     } else {
       // 일반 일정 저장
-      console.log('일반 일정 생성:', newEvent);
       createScheduleMutate(
         {
           eventData: newEvent,
@@ -308,22 +306,27 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (selectedEventData.is_project_schedule) {
       // 프로젝트 일정 삭제
-      deleteProjectScheduleMutate(
-        {
-          projectId: projectIdNumber ? projectIdNumber : 0,
-          scheduleId: scheduleId,
-        },
-        {
-          onSuccess: () => {
-            deleteEvent(selectedEventData.id as string);
-            closeDetailModal();
+      if (webSocketAPI) {
+        webSocketAPI.deleteSchedule(scheduleId);
+        closeDetailModal();
+      } else {
+        deleteProjectScheduleMutate(
+          {
+            projectId: projectIdNumber ? projectIdNumber : 0,
+            scheduleId: scheduleId,
           },
-          onError: (error) => {
-            console.error('일정 삭제 실패:', error);
-            alert('일정 삭제에 실패했습니다.');
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              deleteEvent(selectedEventData.id as string);
+              closeDetailModal();
+            },
+            onError: (error) => {
+              console.error('일정 삭제 실패:', error);
+              alert('일정 삭제에 실패했습니다.');
+            },
+          }
+        );
+      }
     } else {
       // 일반 일정 삭제
       deleteScheduleMutate(scheduleId, {

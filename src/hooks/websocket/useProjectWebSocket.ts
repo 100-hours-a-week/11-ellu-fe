@@ -6,6 +6,7 @@ import { createWebSocketClient } from '@/lib/websocket';
 import { Client } from '@stomp/stompjs';
 import { EventData } from '@/types/calendar';
 import { convertToScheduleData } from '@/utils/scheduleUtils';
+import { format } from 'date-fns';
 
 export const useProjectWebSocket = (projectId: number) => {
   const clientRef = useRef<Client | null>(null);
@@ -19,36 +20,51 @@ export const useProjectWebSocket = (projectId: number) => {
     const client = createWebSocketClient(accessToken);
 
     client.onConnect = () => {
-      console.log('웹소켓 연결됨');
+      console.log('웹소켓 연결 성공');
       clientRef.current = client;
 
-      const subscription = client.subscribe(`/topic/${projectId}`, (message) => {
-        console.log('받은 메시지:', message.body);
+      client.subscribe(`/topic/${projectId}`, (message) => {
         const response = JSON.parse(message.body);
+        console.log('리얼 메시지:', response);
 
-        // // 메시지 타입별 처리
-        // switch (response.type) {
-        //   case 'SCHEDULE_CREATED':
-        //   case 'SCHEDULE_UPDATED':
-        //   case 'SCHEDULE_DELETED':
-        //     // 일정 변경시 캐시 무효화
-        //     queryClient.invalidateQueries({
-        //       queryKey: ['project-schedules', projectId],
-        //     });
-        //     break;
-        // }
+        // 메시지 타입별 처리
+        switch (response.type) {
+          case 'SCHEDULE_CREATED':
+            queryClient.invalidateQueries({
+              queryKey: ['project-daily-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM-dd')],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['project-monthly-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM')],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['project-yearly-schedules', projectId, format(response.schedule.startTime, 'yyyy')],
+            });
+            break;
+          case 'SCHEDULE_UPDATED':
+          case 'SCHEDULE_DELETED':
+            queryClient.invalidateQueries({
+              queryKey: ['project-daily-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM-dd')],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['project-monthly-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM')],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['project-yearly-schedules', projectId, format(response.schedule.startTime, 'yyyy')],
+            });
+            break;
+        }
       });
     };
 
     client.activate();
 
-    // cleanup 함수는 동기적이어야 함
     return () => {
       client.deactivate();
       clientRef.current = null;
     };
   }, [accessToken, projectId]);
 
+  // 일정 생성
   const createSchedule = useCallback(
     (
       eventDataList: EventData[],
@@ -65,21 +81,62 @@ export const useProjectWebSocket = (projectId: number) => {
 
       const scheduleData = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
 
-      clientRef.current.publish({
-        destination: `/app/${projectId}/create`,
-        headers: {
-          Authorization: `Bearer ${accessToken}`, // 헤더에 토큰 추가
-        },
-        body: JSON.stringify({
-          project_schedules: scheduleData,
-        }),
-      });
+      try {
+        clientRef.current.publish({
+          destination: `/app/${projectId}/create`,
+          body: JSON.stringify({
+            project_schedules: scheduleData,
+          }),
+        });
+      } catch (error) {
+        console.error('일정 생성 실패:', error);
+      }
     },
-    [projectId, accessToken]
+    [projectId]
   );
+
+  // 일정 업데이트
+  const updateSchedule = useCallback(() => {
+    if (!clientRef.current) {
+      console.error('WebSocket이 연결되지 않았습니다');
+      return;
+    }
+  }, [projectId, accessToken]);
+
+  // 일정 삭제
+  const deleteSchedule = useCallback(
+    (scheduleId: number) => {
+      if (!clientRef.current) {
+        console.error('WebSocket이 연결되지 않았습니다');
+        return;
+      }
+      try {
+        clientRef.current.publish({
+          destination: `/app/${projectId}/delete`,
+          body: JSON.stringify({
+            schedule_id: scheduleId,
+          }),
+        });
+      } catch (error) {
+        console.error('일정 삭제 실패:', error);
+      }
+    },
+    [projectId]
+  );
+
+  // 일정 분배
+  const takeSchedule = useCallback(() => {
+    if (!clientRef.current) {
+      console.error('WebSocket이 연결되지 않았습니다');
+      return;
+    }
+  }, [projectId, accessToken]);
 
   return {
     client: clientRef.current,
     createSchedule,
+    updateSchedule,
+    deleteSchedule,
+    takeSchedule,
   };
 };

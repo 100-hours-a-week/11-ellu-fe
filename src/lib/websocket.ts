@@ -1,4 +1,3 @@
-// src/lib/websocket.ts
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 
@@ -8,6 +7,6 @@ export const createWebSocketClient = (token: string) => {
     connectHeaders: {
       Authorization: `Bearer ${token}`,
     },
-    reconnectDelay: 0,
+    reconnectDelay: 5000,
   });
 };
