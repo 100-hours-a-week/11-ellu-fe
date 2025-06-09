@@ -1,3 +1,8 @@
+export interface Assignee {
+  nickname: string;
+  profile_image_url: string;
+}
+
 export interface EventData {
   id?: string;
   title: string;
@@ -12,7 +17,7 @@ export interface EventData {
     is_ai_recommended?: boolean;
     is_completed?: boolean;
   };
-  assignees?: string[];
+  assignees?: Assignee[];
 }
 
 export interface SelectedTime {

@@ -1,4 +1,4 @@
-import { EventData } from '@/types/calendar';
+import { EventData, Assignee } from '@/types/calendar';
 import { ScheduleResponse } from '@/types/api/schedule';
 import { changeTime } from './changeTime';
 
@@ -16,6 +16,7 @@ export const convertToEventData = (scheduleResponses: ScheduleResponse[]): Event
       is_project_schedule: schedule.is_project_schedule,
       color: schedule.color,
     },
+    assignees: schedule.assignees?.map((a) => ({ nickname: a.nickname, profile_image_url: a.profile_image_url })),
   }));
 };
 

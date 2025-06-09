@@ -15,8 +15,10 @@ import { DateSelectArg } from '@fullcalendar/core';
 import { useCalendarModals } from '@/hooks/useCalendarModals';
 import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
-import { EventData } from '@/types/calendar';
+import { EventData, Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Avatar, AvatarGroup } from '@mui/material';
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -280,6 +282,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       is_completed: info.event.extendedProps.is_completed || false,
       is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
       is_project_schedule: info.event.extendedProps.is_project_schedule || false,
+      assignees: info.event.extendedProps.assignees || [],
     };
     setCurrentSchedule(eventData);
     openDetailScheduleModal(eventData);
@@ -409,6 +412,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
           const isCompleted = eventInfo.event.extendedProps?.is_completed;
           const backgroundColor = !isProjectSchedule ? '#4285F4' : `#${eventInfo.event.extendedProps?.color}`;
+          const assignees = eventInfo.event.extendedProps?.assignees;
 
           return (
             <div
@@ -424,6 +428,31 @@ export default function Calendar({ projectId }: { projectId?: string }) {
               <div className={styles.eventBox}>
                 <span className={styles.eventBoxIcon}>
                   {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
+                  <AvatarGroup spacing="small" max={3}>
+                    {assignees?.map((assignee: Assignee) => (
+                      <Tooltip
+                        title={assignee.nickname}
+                        key={assignee.nickname}
+                        arrow
+                        slotProps={{
+                          popper: {
+                            sx: {
+                              [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
+                                {
+                                  marginTop: '4px',
+                                },
+                            },
+                          },
+                        }}
+                      >
+                        <Avatar
+                          alt={assignee.nickname}
+                          src={assignee.profile_image_url}
+                          sx={{ width: 20, height: 20, bgcolor: 'gray', border: 'none' }}
+                        />
+                      </Tooltip>
+                    ))}
+                  </AvatarGroup>
                 </span>
                 <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
                 <div>{eventInfo.event.title}</div>

@@ -3,7 +3,18 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { EditScheduleModalProps } from '../types/calendar';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box, IconButton } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Box,
+  IconButton,
+  Avatar,
+  AvatarGroup,
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -16,6 +27,7 @@ import { userStore } from '@/stores/userStore';
 
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
+import { Assignee } from '@/types/calendar';
 
 export default function ScheduleDetailModal({
   open,
@@ -68,17 +80,40 @@ export default function ScheduleDetailModal({
   const handleTakeSchedule = () => {
     if (!eventData) return;
     takeSchedule(scheduleId as number);
+
+    onClose();
   };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', p: 2 }}>
-        <Typography
-          variant="body1"
-          sx={{ flex: 1, mr: 2, wordBreak: 'break-word', fontSize: '1.25rem', fontWeight: 'bold' }}
-        >
+      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 2 }}>
+        <Typography variant="body1" sx={{ flex: 1, wordBreak: 'break-word', fontSize: '1.25rem', fontWeight: 'bold' }}>
           {eventData.title}
         </Typography>
+        <AvatarGroup spacing="small" max={6}>
+          {eventData.assignees?.map((assignee: Assignee) => (
+            <Tooltip
+              title={assignee.nickname}
+              key={assignee.nickname}
+              arrow
+              slotProps={{
+                popper: {
+                  sx: {
+                    [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: {
+                      marginTop: '4px',
+                    },
+                  },
+                },
+              }}
+            >
+              <Avatar
+                alt={assignee.nickname}
+                src={assignee.profile_image_url}
+                sx={{ width: 24, height: 24, bgcolor: 'gray', border: 'none' }}
+              />
+            </Tooltip>
+          ))}
+        </AvatarGroup>
         <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           {!eventData.id?.includes('project') ? (
             <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
@@ -99,8 +134,10 @@ export default function ScheduleDetailModal({
                 },
               }}
             >
-              <IconButton onClick={handleTakeSchedule} size="small" sx={{ mr: 1 }}>
-                {eventData.assignees?.includes(user?.nickname as string) ? <AssignmentIcon /> : <AssignmentAddIcon />}
+              <IconButton size="small" sx={{ mr: 1 }}>
+                {eventData.assignees?.some((assignee) => assignee.nickname === user?.nickname) ? null : (
+                  <AssignmentAddIcon onClick={handleTakeSchedule} />
+                )}
               </IconButton>
             </Tooltip>
           )}
