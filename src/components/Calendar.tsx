@@ -18,7 +18,6 @@ import { useCalendarView } from '@/hooks/useCalendarView';
 import { EventData, Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Avatar, AvatarGroup } from '@mui/material';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -428,29 +427,19 @@ export default function Calendar({ projectId }: { projectId?: string }) {
               <div className={styles.eventBox}>
                 <span className={styles.eventBoxIcon}>
                   {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
-                  <AvatarGroup spacing="small" max={3}>
+                  <AvatarGroup
+                    spacing="small"
+                    max={3}
+                    sx={{
+                      '& .MuiAvatarGroup-avatar': {
+                        width: 20,
+                        height: 20,
+                        fontSize: '0.75rem',
+                      },
+                    }}
+                  >
                     {assignees?.map((assignee: Assignee) => (
-                      <Tooltip
-                        title={assignee.nickname}
-                        key={assignee.nickname}
-                        arrow
-                        slotProps={{
-                          popper: {
-                            sx: {
-                              [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]:
-                                {
-                                  marginTop: '4px',
-                                },
-                            },
-                          },
-                        }}
-                      >
-                        <Avatar
-                          alt={assignee.nickname}
-                          src={assignee.profile_image_url}
-                          sx={{ width: 20, height: 20, bgcolor: 'gray', border: 'none' }}
-                        />
-                      </Tooltip>
+                      <Avatar alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
                     ))}
                   </AvatarGroup>
                 </span>

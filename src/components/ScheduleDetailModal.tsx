@@ -20,8 +20,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
+import styles from './ScheduleDetailModal.module.css';
 
 import { userStore } from '@/stores/userStore';
 
@@ -84,13 +84,23 @@ export default function ScheduleDetailModal({
     onClose();
   };
 
+  console.log(eventData.assignees);
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 2 }}>
-        <Typography variant="body1" sx={{ flex: 1, wordBreak: 'break-word', fontSize: '1.25rem', fontWeight: 'bold' }}>
-          {eventData.title}
-        </Typography>
-        <AvatarGroup spacing="small" max={6}>
+      <DialogTitle className={styles.dialogTitle}>
+        <Typography className={styles.title}>{eventData.title}</Typography>
+        <AvatarGroup
+          max={9}
+          spacing="small"
+          sx={{
+            '& .MuiAvatarGroup-avatar': {
+              width: 28,
+              height: 28,
+              fontSize: '0.75rem',
+            },
+          }}
+        >
           {eventData.assignees?.map((assignee: Assignee) => (
             <Tooltip
               title={assignee.nickname}
@@ -106,15 +116,11 @@ export default function ScheduleDetailModal({
                 },
               }}
             >
-              <Avatar
-                alt={assignee.nickname}
-                src={assignee.profile_image_url}
-                sx={{ width: 24, height: 24, bgcolor: 'gray', border: 'none' }}
-              />
+              <Avatar alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
             </Tooltip>
           ))}
         </AvatarGroup>
-        <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+        <Box className={styles.actionButtons}>
           {!eventData.id?.includes('project') ? (
             <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
               {eventData.is_completed ? <CheckCircleIcon color="success" /> : <CheckCircleOutlineIcon />}
@@ -134,7 +140,7 @@ export default function ScheduleDetailModal({
                 },
               }}
             >
-              <IconButton size="small" sx={{ mr: 1 }}>
+              <IconButton size="small">
                 {eventData.assignees?.some((assignee) => assignee.nickname === user?.nickname) ? null : (
                   <AssignmentAddIcon onClick={handleTakeSchedule} />
                 )}
@@ -148,7 +154,7 @@ export default function ScheduleDetailModal({
                 : `/my-calendar/schedule/edit/${eventData.id}`
             }
           >
-            <IconButton size="small" sx={{ mr: 1 }}>
+            <IconButton size="small">
               <EditIcon />
             </IconButton>
           </Link>
