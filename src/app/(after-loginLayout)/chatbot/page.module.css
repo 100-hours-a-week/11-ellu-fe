@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.leftcontainer {
+  background-color: #f2f9ff;
+  border-radius: 10px;
+  width: 30%;
+  min-width: 350px;
+  height: calc(100% - 25px);
+  padding: 15px;
+}
+
+.rightcontainer {
+  margin-left: 50px;
+  width: 65%;
+  height: 100%;
+  max-height: 100%;
+}
+
+.chatbot {
+  width: 100%;
+  height: 100%;
+}

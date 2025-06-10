@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import style from './LeftNaviagtionBar.module.css';
@@ -8,7 +7,6 @@ import style from './LeftNaviagtionBar.module.css';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import ChatIcon from '@mui/icons-material/Chat';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 
 export default function LeftNavigationBar() {
