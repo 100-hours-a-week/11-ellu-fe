@@ -4,16 +4,7 @@ import { EventDropArg } from '@fullcalendar/core';
 import { EventResizeDoneArg } from '@fullcalendar/interaction';
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
-
-import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
-
-// WebSocket API 인터페이스 타입 정의
-interface webSocketAPI {
-  updateSchedule: (eventData: EventData, scheduleId: number) => void;
-}
-interface UseCalendarEventHandlersProps {
-  webSocketAPI?: webSocketAPI | null;
-}
+import { UseCalendarEventHandlersProps } from '@/types/calendar';
 
 export function useCalendarEventHandlers({ webSocketAPI }: UseCalendarEventHandlersProps) {
   const [events, setEvents] = useState<EventData[]>([]);

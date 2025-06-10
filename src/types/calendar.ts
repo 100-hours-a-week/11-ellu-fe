@@ -48,3 +48,11 @@ export interface EditScheduleModalProps {
   projectId?: string;
   takeSchedule: (scheduleId: number) => void;
 }
+
+export interface webSocketAPI {
+  updateSchedule: (eventData: EventData, scheduleId: number) => void;
+}
+
+export interface UseCalendarEventHandlersProps {
+  webSocketAPI?: webSocketAPI | null;
+}
