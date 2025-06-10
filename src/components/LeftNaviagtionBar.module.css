@@ -1,6 +1,6 @@
 .container {
   width: 170px;
-  max-width: 170px;
+  min-width: 170px;
   height: calc(100vh - 80px);
 }
 
@@ -20,7 +20,7 @@
 
 .container li a {
   text-decoration: none;
-  color: black;
+  color: #333446;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -37,6 +37,7 @@
 
 .container li svg {
   margin-right: 13px;
+  margin-bottom: 3px;
   font-size: 30px;
   color: var(--color-primary);
 }

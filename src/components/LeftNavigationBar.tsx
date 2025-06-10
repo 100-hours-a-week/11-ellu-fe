@@ -9,6 +9,7 @@ import Diversity3Icon from '@mui/icons-material/Diversity3';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ChatIcon from '@mui/icons-material/Chat';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 
 export default function LeftNavigationBar() {
   const pathname = usePathname();
@@ -16,8 +17,8 @@ export default function LeftNavigationBar() {
   const navItems = [
     { label: '프로젝트', href: 'projects', icon: <Diversity3Icon /> },
     { label: '캘린더', href: 'my-calendar', icon: <EditCalendarIcon /> },
+    { label: '일정루틴 챗봇', href: 'chatbot', icon: <SmartToyIcon /> },
     { label: '마이페이지', href: 'mypage', icon: <AccountCircleIcon /> },
-    { label: '챗봇', href: 'chatbot', icon: <ChatIcon /> },
   ];
 
   return (
