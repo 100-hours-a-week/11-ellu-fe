@@ -84,8 +84,6 @@ export default function ScheduleDetailModal({
     onClose();
   };
 
-  console.log(eventData.assignees);
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle className={styles.dialogTitle}>

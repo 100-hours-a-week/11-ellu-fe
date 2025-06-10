@@ -27,7 +27,6 @@ export const useProjectWebSocket = (projectId: number) => {
 
       client.subscribe(`/topic/${projectId}`, (message) => {
         const response = JSON.parse(message.body);
-        console.log('리얼 메시지:', response);
 
         // 메시지 타입별 처리
         switch (response.type) {

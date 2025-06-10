@@ -83,7 +83,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers();
+  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({ webSocketAPI });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
