@@ -1,34 +1,33 @@
+// hooks/useChatSSE.ts
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { userStore } from '@/stores/userStore';
 import { EventSourcePolyfill } from 'event-source-polyfill';
-import { useAlarmStore } from '@/stores/alarmStore';
 
-export default function SSEProvider({ children }: { children: React.ReactNode }) {
+export function useChatSSE(onMessage: (message: any) => void) {
   const { user, accessToken } = userStore();
   const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
-  const errorAttemptsRef = useRef(0);
+  const [isConnected, setIsConnected] = useState(false);
+  const isMountedRef = useRef(true);
   const connectTimeRef = useRef<number>(0);
-  const { addAlarm } = useAlarmStore();
 
-  const clearSSE = () => {
+  const clearChatSSE = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
     }
-    errorAttemptsRef.current = 0;
+    setIsConnected(false);
   };
 
-  const connectSSE = () => {
-    if (!user?.id || !accessToken) return;
+  const connectChatSSE = () => {
+    if (!user?.id || !accessToken || !isMountedRef.current) return;
 
-    clearSSE();
-
+    clearChatSSE();
     connectTimeRef.current = Date.now();
 
     const eventSource = new EventSourcePolyfill(
-      `${process.env.NEXT_PUBLIC_API_SERVER_URL}/sse/subscribe?userId=${user.id}`,
+      `${process.env.NEXT_PUBLIC_API_SERVER_URL}/sse/chat/stream?userId=${user.id}`, // 중괄호 하나 제거
       {
         headers: { Authorization: `Bearer ${accessToken}` },
         withCredentials: true,
@@ -37,42 +36,34 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
     );
 
     eventSource.onopen = () => {
-      errorAttemptsRef.current = 0;
+      setIsConnected(true);
     };
 
-    eventSource.addEventListener('notification', (event: any) => {
+    eventSource.addEventListener('chat-message', (event: any) => {
       try {
         const data = JSON.parse(event.data);
-        addAlarm({
-          id: data.notificationId,
-          type: data.type,
-          projectId: data.projectId,
-          senderId: data.senderId,
-          targetUserIds: data.targetUserIds,
-          message: data.message,
-          isRead: false,
-        });
+        onMessage(data);
       } catch (error) {
-        console.error('알림 데이터 파싱 에러:', error);
+        console.error('채팅 메시지 파싱 에러:', error);
       }
     });
 
     eventSource.onerror = (error: any) => {
+      setIsConnected(false);
       eventSource.close();
 
       const connectionDuration = Date.now() - connectTimeRef.current;
 
-      // 토큰만료시 연결해제
       if (error?.target?.status === 403) {
         return;
       }
 
       if (connectionDuration < 5000) {
         console.log(`연결이 ${connectionDuration}ms 만에 끊어짐 - 실제 에러`);
-        setTimeout(connectSSE, 30000);
+        setTimeout(connectChatSSE, 30000);
       } else {
         console.log(`정상적인 연결 끊김 - 재연결`);
-        setTimeout(connectSSE, 2000);
+        setTimeout(connectChatSSE, 2000);
       }
     };
 
@@ -80,16 +71,16 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
   };
 
   useEffect(() => {
+    isMountedRef.current = true;
     if (user?.id && accessToken) {
-      connectSSE();
-    } else {
-      clearSSE();
+      connectChatSSE();
     }
 
     return () => {
-      clearSSE();
+      isMountedRef.current = false;
+      clearChatSSE();
     };
   }, [user?.id, accessToken]);
 
-  return <>{children}</>;
+  return { clearChatSSE, isConnected };
 }

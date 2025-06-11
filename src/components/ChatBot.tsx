@@ -7,6 +7,7 @@ import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { useState, useEffect, useRef } from 'react';
 import { Message } from '@/types/chatbot';
 import { usePostMessage } from '@/hooks/api/chatbot/usePostMessage';
+import { useChatSSE } from '@/hooks/useChatSSE';
 
 export default function ChatBot() {
   const { user } = userStore();
@@ -14,8 +15,20 @@ export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([]);
   const { mutate: postMessage, isPending: isPosting } = usePostMessage();
 
+  // const handleSSEMessage = (data: any) => {
+  //   console.log('받은 response', data);
+  //   setMessages((prev) => [...prev, { content: data.content, isUser: false }]);
+  // };
+
+  // 채팅 SSE 연결
+  // const { isConnected } = useChatSSE(handleSSEMessage);
+
   const handleSubmit = () => {
     if (!message.trim()) return;
+    // if (!isConnected) {
+    //   alert('채팅 서버와 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.');
+    //   return;
+    // }
     postMessage(
       { message },
       {
@@ -27,14 +40,6 @@ export default function ChatBot() {
         },
       }
     );
-    // setMessages((prevMessages) => [
-    //   ...prevMessages,
-    //   { content: message, isUser: true },
-    //   {
-    //     content: '저의 선택은요',
-    //     isUser: false,
-    //   },
-    // ]);
     setMessage('');
   };
 
