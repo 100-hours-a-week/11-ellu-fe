@@ -5,11 +5,7 @@ import style from './ChatBot.module.css';
 import Image from 'next/image';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { useState, useEffect, useRef } from 'react';
-
-interface Message {
-  content: string;
-  isUser: boolean;
-}
+import { Message } from '@/types/chatbot';
 
 export default function ChatBot() {
   const { user } = userStore();
@@ -22,7 +18,10 @@ export default function ChatBot() {
     setMessages((prevMessages) => [
       ...prevMessages,
       { content: message, isUser: true },
-      { content: '저의 선택은요', isUser: false },
+      {
+        content: '저의 선택은요',
+        isUser: false,
+      },
     ]);
     setMessage('');
   };
