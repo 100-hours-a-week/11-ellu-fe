@@ -6,23 +6,35 @@ import Image from 'next/image';
 import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { useState, useEffect, useRef } from 'react';
 import { Message } from '@/types/chatbot';
+import { usePostMessage } from '@/hooks/api/chatbot/usePostMessage';
 
 export default function ChatBot() {
   const { user } = userStore();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const { mutate: postMessage, isPending: isPosting } = usePostMessage();
 
   const handleSubmit = () => {
     if (!message.trim()) return;
-    // setMessages([...messages, { content: message, isUser: true }]);
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { content: message, isUser: true },
+    postMessage(
+      { message },
       {
-        content: '저의 선택은요',
-        isUser: false,
-      },
-    ]);
+        onSuccess: () => {
+          setMessages([...messages, { content: message, isUser: true }]);
+        },
+        onError: (error) => {
+          alert('메세지 전송에 실패했습니다');
+        },
+      }
+    );
+    // setMessages((prevMessages) => [
+    //   ...prevMessages,
+    //   { content: message, isUser: true },
+    //   {
+    //     content: '저의 선택은요',
+    //     isUser: false,
+    //   },
+    // ]);
     setMessage('');
   };
 
