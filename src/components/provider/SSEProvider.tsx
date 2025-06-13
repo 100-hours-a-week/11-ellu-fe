@@ -76,7 +76,7 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
         setTimeout(connectSSE, 30000);
       } else {
         console.log(`정상적인 연결 끊김 - 재연결`);
-        setTimeout(connectSSE, 2000);
+        connectSSE();
       }
     };
 
