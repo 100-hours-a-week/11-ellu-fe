@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Tooltip,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -23,6 +24,7 @@ import { useEditProject } from '@/hooks/api/projects/useEditProject';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import CachedIcon from '@mui/icons-material/Cached';
 import InviteTeamMemberModal from '../projects/InviteTeamMemberModal';
 import styles from './ProjectInfoForm.module.css';
 
@@ -68,6 +70,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
+  const [isRotating, setIsRotating] = useState(false);
 
   // 기존 프로젝트 데이터 불러오기
   useEffect(() => {
@@ -83,6 +86,9 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     }
   }, [isEditMode, projectData]);
 
+  // url 형식 정규식
+  const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+
   // 유효성 검사 함수
   const validateTitle = (value: string) => {
     if (value.length < 1 || value.length > 10) return '최소 1자, 최대 10자이내로 입력해주세요';
@@ -90,8 +96,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     return '';
   };
   const validateWiki = (value: string) => {
-    if (value.length < 50) return '최소 50자 이상 입력해주세요';
-    if (value.length > 1000) return '최대 1000자까지 입력 가능합니다';
+    if (!urlPattern.test(value)) return '올바른 URL 형식이 아닙니다';
     return '';
   };
   const validatePosition = (value: string) => {
@@ -110,7 +115,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       !errors.wiki &&
       !errors.position &&
       formData.title.length >= 1 &&
-      formData.wiki.length >= 50 &&
+      urlPattern.test(formData.wiki) &&
       formData.position !== '' &&
       formData.color !== ''
     );
@@ -253,6 +258,17 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     }));
   };
 
+  // 프로젝트 개요 URL 동기화
+  const handleSyncClick = () => {
+    if (!urlPattern.test(formData.wiki)) {
+      return;
+    }
+    setIsRotating(true);
+    setTimeout(() => {
+      setIsRotating(false);
+    }, 1000);
+  };
+
   // 프로젝트 정보 불러오기 로딩
   if (isEditMode && isLoadingProject) {
     return (
@@ -344,22 +360,39 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 0 }}>
         프로젝트 개요를 입력해주세요(깃허브 wiki, readme의 내용 등)
       </Typography>
-      <Typography variant="subtitle2" sx={{ fontSize: '0.8rem', color: 'text.secondary', mb: 2 }}>
+      <Typography variant="subtitle2" sx={{ fontSize: '0.8rem', color: 'text.secondary', mb: 3 }}>
         프로젝트에 대한 자세한 설명이 있을 수록 Looper가 더욱 꼼꼼한 일정을 짜드릴 수 있어요
       </Typography>
-      <TextField
-        label="프로젝트 개요"
-        name="wiki"
-        value={formData.wiki}
-        onChange={handleChange}
-        multiline
-        rows={6}
-        fullWidth
-        required
-        error={!!errors.wiki}
-        helperText={errors.wiki}
-        disabled={isLoading}
-      />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <TextField
+          label="프로젝트 개요 URL"
+          name="wiki"
+          value={formData.wiki}
+          onChange={handleChange}
+          required
+          error={!!errors.wiki}
+          helperText={errors.wiki}
+          disabled={isLoading}
+          sx={{ width: '70%', minWidth: '400px' }}
+        />
+        {isEditMode && (
+          <Tooltip title="동기화" placement="bottom">
+            <IconButton
+              sx={{
+                mt: -5,
+                ml: 1,
+                border: '1px solid #e0e0e0',
+                '&:hover': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                },
+              }}
+              onClick={handleSyncClick}
+            >
+              <CachedIcon className={isRotating ? styles.rotating : ''} />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
 
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 2 }}>
         프로젝트에서 당신의 포지션을 선택해주세요
