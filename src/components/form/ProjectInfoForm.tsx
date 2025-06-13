@@ -264,9 +264,22 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       return;
     }
     setIsRotating(true);
-    setTimeout(() => {
-      setIsRotating(false);
-    }, 1000);
+    editProject(
+      {
+        projectId: Number(id),
+        data: formData,
+      },
+      {
+        onSuccess: () => {
+          setTimeout(() => {
+            setIsRotating(false);
+          }, 3000);
+        },
+        onError: (error) => {
+          console.log('동기화에 실패했습니다');
+        },
+      }
+    );
   };
 
   // 프로젝트 정보 불러오기 로딩
