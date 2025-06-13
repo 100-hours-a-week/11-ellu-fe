@@ -63,7 +63,7 @@ export function useChatSSE(onMessage: (message: any) => void) {
         setTimeout(connectChatSSE, 30000);
       } else {
         console.log(`정상적인 연결 끊김 - 재연결`);
-        setTimeout(connectChatSSE, 2000);
+        connectChatSSE();
       }
     };
 
