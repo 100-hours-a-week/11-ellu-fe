@@ -14,6 +14,7 @@ export interface Alarm {
 export interface AlarmStore {
   alarms: Alarm[];
   isLoading: boolean;
+  error: string | null;
   addAlarm: (alarm: Alarm) => void;
   markAllAsRead: () => void;
   loadInitialAlarms: () => Promise<void>;

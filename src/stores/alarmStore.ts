@@ -5,10 +5,11 @@ import { getAlarms } from '@/api/alarm';
 export const useAlarmStore = create<AlarmStore>((set) => ({
   alarms: [],
   isLoading: false,
+  error: null,
 
   // 초기 알람 로딩
   loadInitialAlarms: async () => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
       const apiAlarms = await getAlarms();
       const transformedAlarms = apiAlarms.map((alarm) => ({
@@ -16,9 +17,10 @@ export const useAlarmStore = create<AlarmStore>((set) => ({
         type: (alarm.invite_status === 'PENDING' ? 'PROJECT_INVITED' : 'OTHER') as AlarmType,
         isRead: true,
       }));
-      set({ alarms: transformedAlarms });
+      set({ alarms: transformedAlarms, error: null });
     } catch (error) {
-      console.error('Failed to load initial alarms:', error);
+      set({ error: '알람을 불러오는데 실패했습니다.' });
+      alert('알람을 불러오는데 실패했습니다.');
     } finally {
       set({ isLoading: false });
     }
