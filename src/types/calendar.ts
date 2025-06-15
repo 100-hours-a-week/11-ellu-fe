@@ -49,10 +49,10 @@ export interface EditScheduleModalProps {
   takeSchedule: (scheduleId: number) => void;
 }
 
-export interface webSocketAPI {
+export interface webSocketApi {
   updateSchedule: (eventData: EventData, scheduleId: number) => void;
 }
 
 export interface UseCalendarEventHandlersProps {
-  webSocketAPI?: webSocketAPI | null;
+  webSocketApi?: webSocketApi | null;
 }

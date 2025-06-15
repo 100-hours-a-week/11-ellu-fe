@@ -24,7 +24,7 @@ interface EditScheduleFormProps {
 export default function EditScheduleForm({ scheduleData, projectId, onSuccess }: EditScheduleFormProps) {
   const router = useRouter();
 
-  const webSocketAPI = projectId ? useProjectWebSocket(Number(projectId)) : null;
+  const webSocketApi = projectId ? useProjectWebSocket(Number(projectId)) : null;
 
   // React Query Hooks
   const { mutate: updateSchedule, isPending: isUpdatingSchedule } = useUpdateSchedule();
@@ -178,8 +178,8 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
 
     if (scheduleData.is_project_schedule) {
       // 프로젝트 일정 업데이트
-      if (webSocketAPI) {
-        webSocketAPI.updateSchedule(updatedSchedule, scheduleId as number);
+      if (webSocketApi) {
+        webSocketApi.updateSchedule(updatedSchedule, scheduleId as number);
       } else {
         updateProjectSchedule(
           {

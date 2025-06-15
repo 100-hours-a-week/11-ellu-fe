@@ -66,7 +66,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
 
-  const webSocketAPI = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
+  const webSocketApi = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
 
   const { setCurrentSchedule } = useScheduleStore();
 
@@ -83,7 +83,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({ webSocketAPI });
+  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({ webSocketApi });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
@@ -222,8 +222,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (projectIdNumber) {
       // 프로젝트 일정 저장
-      if (webSocketAPI) {
-        webSocketAPI.createSchedule([newEvent], { is_project_schedule: true });
+      if (webSocketApi) {
+        webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
       } else {
         createProjectScheduleMutate(
           {
@@ -308,8 +308,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (selectedEventData.is_project_schedule) {
       // 프로젝트 일정 삭제
-      if (webSocketAPI) {
-        webSocketAPI.deleteSchedule(scheduleId);
+      if (webSocketApi) {
+        webSocketApi.deleteSchedule(scheduleId);
         closeDetailModal();
       } else {
         deleteProjectScheduleMutate(
@@ -471,7 +471,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           eventData={selectedEventData}
           onDelete={handleDelete}
           projectId={projectId}
-          takeSchedule={webSocketAPI?.takeSchedule as (scheduleId: number) => void}
+          takeSchedule={webSocketApi?.takeSchedule as (scheduleId: number) => void}
         />
       )}
     </div>

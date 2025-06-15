@@ -6,7 +6,7 @@ import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { UseCalendarEventHandlersProps } from '@/types/calendar';
 
-export function useCalendarEventHandlers({ webSocketAPI }: UseCalendarEventHandlersProps) {
+export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandlersProps) {
   const [events, setEvents] = useState<EventData[]>([]);
 
   const { mutate: updateScheduleMutate } = useUpdateSchedule();
@@ -76,8 +76,8 @@ export function useCalendarEventHandlers({ webSocketAPI }: UseCalendarEventHandl
         // 프로젝트 일정 업데이트
         const projectId = parseInt(info.event.extendedProps.projectId || '0');
 
-        if (webSocketAPI) {
-          webSocketAPI.updateSchedule(updatedEventData, scheduleId as number);
+        if (webSocketApi) {
+          webSocketApi.updateSchedule(updatedEventData, scheduleId as number);
         } else {
           updateProjectScheduleMutate(
             {
