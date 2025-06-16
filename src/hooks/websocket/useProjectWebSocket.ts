@@ -6,8 +6,8 @@ import { createWebSocketClient } from '@/lib/websocket';
 import { Client } from '@stomp/stompjs';
 import { EventData } from '@/types/calendar';
 import { convertToScheduleData } from '@/utils/scheduleUtils';
-import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
+import { QUERY_KEYS } from '@/constants/queryKeys';
 
 export const useProjectWebSocket = (projectId: number) => {
   const router = useRouter();
@@ -31,26 +31,16 @@ export const useProjectWebSocket = (projectId: number) => {
         // 메시지 타입별 처리
         switch (response.type) {
           case 'SCHEDULE_CREATED':
-            queryClient.invalidateQueries({
-              queryKey: ['project-daily-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM-dd')],
-            });
-            queryClient.invalidateQueries({
-              queryKey: ['project-monthly-schedules', projectId, format(response.schedule.startTime, 'yyyy-MM')],
-            });
-            queryClient.invalidateQueries({
-              queryKey: ['project-yearly-schedules', projectId, format(response.schedule.startTime, 'yyyy')],
-            });
-            break;
           case 'SCHEDULE_UPDATED':
           case 'SCHEDULE_DELETED':
             queryClient.invalidateQueries({
-              queryKey: ['project-daily-schedules', projectId],
+              queryKey: QUERY_KEYS.schedules.projectDaily(projectId),
             });
             queryClient.invalidateQueries({
-              queryKey: ['project-monthly-schedules', projectId],
+              queryKey: QUERY_KEYS.schedules.projectMonthly(projectId),
             });
             queryClient.invalidateQueries({
-              queryKey: ['project-yearly-schedules', projectId],
+              queryKey: QUERY_KEYS.schedules.projectYearly(projectId),
             });
             break;
         }
