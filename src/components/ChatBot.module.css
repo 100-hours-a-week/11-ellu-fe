@@ -46,7 +46,7 @@
   font-size: 0.95rem;
   line-height: 1.5;
   width: fit-content;
-  max-width: 60%;
+  max-width: 90%;
   height: auto;
   min-height: fit-content;
   white-space: pre-wrap;
@@ -92,6 +92,23 @@
   border-style: solid;
   border-width: 0 17px 11px 7px;
   border-color: transparent transparent white transparent;
+}
+
+/* 스트리밍 중인 메시지에 shimmer 효과 */
+.bot_message.streamingMessage {
+  background: linear-gradient(90deg, #ffffff 0%, #f0f8ff 50%, #ffffff 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border: 1px solid rgba(0, 123, 255, 0.1);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .chatbot_input {
