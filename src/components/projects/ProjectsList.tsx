@@ -78,8 +78,6 @@ export default function ProjectsList() {
     );
   }
 
-  console.log(projects);
-
   if (isError) {
     return (
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="60%" gap={2}>
