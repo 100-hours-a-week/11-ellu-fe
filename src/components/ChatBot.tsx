@@ -12,21 +12,34 @@ import { useChatSSE } from '@/hooks/useChatSSE';
 export default function ChatBot() {
   const { user } = userStore();
   const [message, setMessage] = useState('');
-  const [receivedMessage, setReceivedMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingMessage, setStreamingMessage] = useState('');
+  const [finalMessage, setFinalMessage] = useState('');
   const { mutate: postMessage, isPending: isPosting } = usePostMessage();
 
-  const handleSSEMessage = (data: any) => {
-    console.log('ChatBot 컴포넌트에서 받은 SSE 메시지:', data);
-    setReceivedMessage(data.message);
-    if (data.done) {
-      console.log('receivedMessage', receivedMessage);
-      handleReceivedMessage(receivedMessage);
+  // 최종 메시지가 설정되면 대화 목록에 추가
+  useEffect(() => {
+    if (finalMessage) {
+      setMessages((prev) => [...prev, { content: finalMessage, isUser: false }]);
+      setFinalMessage('');
     }
-  };
+  }, [finalMessage]);
 
-  const handleReceivedMessage = (finalMessage: string) => {
-    setMessages((prev) => [...prev, { content: finalMessage, isUser: false }]);
+  const handleSSEMessage = (data: any) => {
+    if (data.done) {
+      // 스트리밍 완료
+      setStreamingMessage((prev) => {
+        const completed = prev + ' ' + data.message;
+        setFinalMessage(completed);
+        return '';
+      });
+      setIsStreaming(false);
+    } else {
+      // 스트리밍 중 - 메시지 누적
+      setIsStreaming(true);
+      setStreamingMessage((prev) => prev + ' ' + data.message);
+    }
   };
 
   // 채팅 SSE 연결
@@ -34,11 +47,16 @@ export default function ChatBot() {
 
   const handleSubmit = () => {
     if (!message.trim()) return;
+
+    // 새 메시지 전송 시 초기화
+    setStreamingMessage('');
+    setFinalMessage('');
+
     postMessage(
       { message },
       {
         onSuccess: () => {
-          setMessages([...messages, { content: message, isUser: true }]);
+          setMessages((prev) => [...prev, { content: message, isUser: true }]);
         },
         onError: (error) => {
           alert('메세지 전송에 실패했습니다');
@@ -59,14 +77,14 @@ export default function ChatBot() {
 
   return (
     <div className={style.container}>
-      {messages.length === 0 && (
+      {messages.length === 0 && !isStreaming && (
         <div className={style.header}>
           <Image src="/images/logo.svg" alt="로고" width={28} height={28} />
           {user?.nickname}님, &nbsp;안녕하세요
         </div>
       )}
       <div className={style.chatbot}>
-        {messages.length > 0 && (
+        {(messages.length > 0 || isStreaming) && (
           <div className={style.messageBox}>
             {messages.map((msg, index) =>
               msg.isUser ? (
@@ -76,11 +94,18 @@ export default function ChatBot() {
               ) : (
                 <div key={index}>
                   <Image src="/images/logo.svg" alt="로고" width={25} height={25} />
-                  <div key={index} className={`${style.message} ${style.bot_message}`}>
-                    {msg.content}
-                  </div>
+                  <div className={`${style.message} ${style.bot_message}`}>{msg.content}</div>
                 </div>
               )
+            )}
+            {/* 스트리밍 중인 메시지 실시간 표시 */}
+            {isStreaming && streamingMessage && (
+              <div>
+                <Image src="/images/logo.svg" alt="로고" width={25} height={25} />
+                <div className={`${style.message} ${style.bot_message} ${style.streamingMessage}`}>
+                  {streamingMessage}
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -91,8 +116,13 @@ export default function ChatBot() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            disabled={isStreaming}
           />
-          <button className={style.chatbot_input_button} disabled={!message.trim()} onClick={handleSubmit}>
+          <button
+            className={style.chatbot_input_button}
+            disabled={!message.trim() || isStreaming}
+            onClick={handleSubmit}
+          >
             <ArrowCircleUpIcon />
           </button>
         </div>
