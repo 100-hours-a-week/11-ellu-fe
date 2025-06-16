@@ -17,6 +17,18 @@ export default function ChatBot() {
   const [streamingMessage, setStreamingMessage] = useState('');
   const [finalMessage, setFinalMessage] = useState('');
   const { mutate: postMessage, isPending: isPosting } = usePostMessage();
+  const messageBoxRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    if (messageBoxRef.current) {
+      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+    }
+  };
+
+  // 메시지가 추가될 때마다 스크롤을 아래로 내림
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, streamingMessage]);
 
   // 최종 메시지가 설정되면 대화 목록에 추가
   useEffect(() => {
@@ -37,7 +49,6 @@ export default function ChatBot() {
       setIsStreaming(false);
     } else {
       // 스트리밍 중 - 메시지 누적
-      setIsStreaming(true);
       setStreamingMessage((prev) => prev + ' ' + data.message);
     }
   };
@@ -64,6 +75,7 @@ export default function ChatBot() {
       }
     );
     setMessage('');
+    setIsStreaming(true);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -85,7 +97,7 @@ export default function ChatBot() {
       )}
       <div className={style.chatbot}>
         {(messages.length > 0 || isStreaming) && (
-          <div className={style.messageBox}>
+          <div className={style.messageBox} ref={messageBoxRef}>
             {messages.map((msg, index) =>
               msg.isUser ? (
                 <div key={index} className={`${style.message} ${style.user_message}`}>
