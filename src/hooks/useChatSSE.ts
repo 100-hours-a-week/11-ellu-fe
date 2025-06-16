@@ -1,4 +1,3 @@
-// hooks/useChatSSE.ts
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
@@ -8,7 +7,6 @@ import { EventSourcePolyfill } from 'event-source-polyfill';
 export function useChatSSE(onMessage: (message: any) => void) {
   const { user, accessToken } = userStore();
   const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
   const isMountedRef = useRef(true);
   const connectTimeRef = useRef<number>(0);
 
@@ -17,7 +15,6 @@ export function useChatSSE(onMessage: (message: any) => void) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
     }
-    setIsConnected(false);
   };
 
   const connectChatSSE = () => {
@@ -35,11 +32,9 @@ export function useChatSSE(onMessage: (message: any) => void) {
       }
     );
 
-    eventSource.onopen = () => {
-      setIsConnected(true);
-    };
+    eventSource.onopen = () => {};
 
-    eventSource.addEventListener('chat-message', (event: any) => {
+    eventSource.addEventListener('message', (event: any) => {
       try {
         const data = JSON.parse(event.data);
         onMessage(data);
@@ -49,7 +44,6 @@ export function useChatSSE(onMessage: (message: any) => void) {
     });
 
     eventSource.onerror = (error: any) => {
-      setIsConnected(false);
       eventSource.close();
 
       const connectionDuration = Date.now() - connectTimeRef.current;
@@ -82,5 +76,5 @@ export function useChatSSE(onMessage: (message: any) => void) {
     };
   }, [user?.id, accessToken]);
 
-  return { clearChatSSE, isConnected };
+  return { clearChatSSE };
 }
