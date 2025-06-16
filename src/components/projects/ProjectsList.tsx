@@ -35,10 +35,13 @@ import { useState } from 'react';
 import { useDeleteProject } from '@/hooks/api/projects/useDeleteProject';
 import { useGetProjects } from '@/hooks/api/projects/useGetProjects';
 import style from './ProjectsList.module.css';
+import { userStore } from '@/stores/userStore';
 
 export default function ProjectsList() {
   const [open, setOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const { user } = userStore();
 
   const { data: projects, isLoading, isError, error, refetch } = useGetProjects();
   const { mutate: deleteProject } = useDeleteProject();
@@ -74,6 +77,8 @@ export default function ProjectsList() {
       </Box>
     );
   }
+
+  console.log(projects);
 
   if (isError) {
     return (
@@ -146,7 +151,7 @@ export default function ProjectsList() {
                   </Stack>
                 </TableCell>
                 <TableCell>
-                  <Stack direction="row" spacing={1} alignItems="center">
+                  <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
                     <Link href={`/projects/${project.id}/meetnote`}>
                       <Button
                         variant="contained"
@@ -165,14 +170,18 @@ export default function ProjectsList() {
                         <CalendarIcon />
                       </IconButton>
                     </Link>
-                    <Link href={`/projects/${project.id}/edit`}>
-                      <IconButton aria-label="수정하기" size="small">
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Link>
-                    <IconButton aria-label="삭제하기" size="small" onClick={() => handleClickOpen(project)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    {project.members[0].nickname === user?.nickname && (
+                      <>
+                        <Link href={`/projects/${project.id}/edit`}>
+                          <IconButton aria-label="수정하기" size="small">
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Link>
+                        <IconButton aria-label="삭제하기" size="small" onClick={() => handleClickOpen(project)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </>
+                    )}
                   </Stack>
                 </TableCell>
               </TableRow>
