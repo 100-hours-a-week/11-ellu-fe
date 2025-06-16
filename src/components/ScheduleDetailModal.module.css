@@ -1,0 +1,22 @@
+.dialogTitle {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  justify-content: space-between;
+}
+
+.title {
+  min-width: 180px;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}

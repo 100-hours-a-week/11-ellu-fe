@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { userStore } from '@/stores/userStore';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 import { useAlarmStore } from '@/stores/alarmStore';
+import { NotificationData } from '@/types/alarm';
 
 export default function SSEProvider({ children }: { children: React.ReactNode }) {
   const { user, accessToken } = userStore();
@@ -40,21 +41,24 @@ export default function SSEProvider({ children }: { children: React.ReactNode })
       errorAttemptsRef.current = 0;
     };
 
-    eventSource.addEventListener('notification', (event: any) => {
-      try {
-        const data = JSON.parse(event.data);
-        addAlarm({
-          id: data.notificationId,
-          type: data.type,
-          projectId: data.projectId,
-          senderId: data.senderId,
-          targetUserIds: data.targetUserIds,
-          message: data.message,
-          isRead: false,
-        });
-      } catch (error) {
-        console.error('알림 데이터 파싱 에러:', error);
-      }
+    eventSource.addEventListener('notification', {
+      handleEvent(event: Event) {
+        const messageEvent = event as MessageEvent;
+        try {
+          const data: NotificationData = JSON.parse(messageEvent.data);
+          addAlarm({
+            id: data.notificationId,
+            type: data.type,
+            projectId: data.projectId,
+            senderId: data.senderId,
+            targetUserIds: data.receiverId,
+            message: data.message,
+            isRead: false,
+          });
+        } catch (error) {
+          console.error('알림 데이터 파싱 에러:', error);
+        }
+      },
     });
 
     eventSource.onerror = (error: any) => {

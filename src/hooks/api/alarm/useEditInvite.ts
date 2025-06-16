@@ -16,5 +16,8 @@ export const useEditInvite = () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       loadInitialAlarms();
     },
+    onError: (error) => {
+      alert('알람을 처리하는데 실패했습니다.');
+    },
   });
 };

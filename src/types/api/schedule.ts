@@ -1,4 +1,4 @@
-import { EventData } from '../calendar';
+import { EventData, Assignee } from '../calendar';
 export interface ScheduleResponse {
   id: number;
   title: string;
@@ -9,6 +9,7 @@ export interface ScheduleResponse {
   start_time: string;
   end_time: string;
   color?: string;
+  assignees?: Assignee[];
 }
 
 export type ScheduleOptions = {

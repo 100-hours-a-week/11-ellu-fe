@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { IconButton, Badge, Menu, MenuItem, Typography, Box, Divider, Button } from '@mui/material';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -37,7 +37,7 @@ export default function Alarm() {
   const { alarms, markAllAsRead, loadInitialAlarms, isLoading } = useAlarmStore();
   const editInviteMutation = useEditInvite();
 
-  const unreadAlarms = alarms.filter((alarm) => !alarm.isRead);
+  const unreadAlarms = useMemo(() => alarms.filter((alarm) => !alarm.isRead), [alarms]);
 
   useEffect(() => {
     loadInitialAlarms();

@@ -15,8 +15,9 @@ import { DateSelectArg } from '@fullcalendar/core';
 import { useCalendarModals } from '@/hooks/useCalendarModals';
 import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
-import { EventData } from '@/types/calendar';
+import { EventData, Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Avatar, AvatarGroup } from '@mui/material';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -35,6 +36,8 @@ import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton'
 
 import { useScheduleStore } from '@/stores/scheduleStore';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
+
+import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
 
 // 모달 지연로딩 처리
 const CreateScheduleModal = dynamic(() => import('./CreateScheduleModal'), {
@@ -63,6 +66,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
 
+  const webSocketApi = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
+
   const { setCurrentSchedule } = useScheduleStore();
 
   // 커스텀 훅 사용
@@ -78,7 +83,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers();
+  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({ webSocketApi });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
@@ -217,30 +222,32 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (projectIdNumber) {
       // 프로젝트 일정 저장
-      console.log('프로젝트 일정 생성:', newEvent);
-      createProjectScheduleMutate(
-        {
-          projectId: projectIdNumber,
-          eventDataList: [newEvent],
-          options: { is_project_schedule: true },
-        },
-        {
-          onSuccess: () => {
-            createEvent({
-              ...newEvent,
-              is_project_schedule: true,
-            });
-            console.log('프로젝트 일정 생성 성공');
+      if (webSocketApi) {
+        webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
+      } else {
+        createProjectScheduleMutate(
+          {
+            projectId: projectIdNumber,
+            eventDataList: [newEvent],
+            options: { is_project_schedule: true },
           },
-          onError: (error) => {
-            console.error('일정 저장 실패:', error);
-            alert('일정 저장에 실패했습니다.');
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              createEvent({
+                ...newEvent,
+                is_project_schedule: true,
+              });
+              console.log('프로젝트 일정 생성 성공');
+            },
+            onError: (error) => {
+              console.error('일정 저장 실패:', error);
+              alert('일정 저장에 실패했습니다.');
+            },
+          }
+        );
+      }
     } else {
       // 일반 일정 저장
-      console.log('일반 일정 생성:', newEvent);
       createScheduleMutate(
         {
           eventData: newEvent,
@@ -274,6 +281,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       is_completed: info.event.extendedProps.is_completed || false,
       is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
       is_project_schedule: info.event.extendedProps.is_project_schedule || false,
+      assignees: info.event.extendedProps.assignees || [],
     };
     setCurrentSchedule(eventData);
     openDetailScheduleModal(eventData);
@@ -300,22 +308,27 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (selectedEventData.is_project_schedule) {
       // 프로젝트 일정 삭제
-      deleteProjectScheduleMutate(
-        {
-          projectId: projectIdNumber ? projectIdNumber : 0,
-          scheduleId: scheduleId,
-        },
-        {
-          onSuccess: () => {
-            deleteEvent(selectedEventData.id as string);
-            closeDetailModal();
+      if (webSocketApi) {
+        webSocketApi.deleteSchedule(scheduleId);
+        closeDetailModal();
+      } else {
+        deleteProjectScheduleMutate(
+          {
+            projectId: projectIdNumber ? projectIdNumber : 0,
+            scheduleId: scheduleId,
           },
-          onError: (error) => {
-            console.error('일정 삭제 실패:', error);
-            alert('일정 삭제에 실패했습니다.');
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              deleteEvent(selectedEventData.id as string);
+              closeDetailModal();
+            },
+            onError: (error) => {
+              console.error('일정 삭제 실패:', error);
+              alert('일정 삭제에 실패했습니다.');
+            },
+          }
+        );
+      }
     } else {
       // 일반 일정 삭제
       deleteScheduleMutate(scheduleId, {
@@ -398,6 +411,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
           const isCompleted = eventInfo.event.extendedProps?.is_completed;
           const backgroundColor = !isProjectSchedule ? '#4285F4' : `#${eventInfo.event.extendedProps?.color}`;
+          const assignees = eventInfo.event.extendedProps?.assignees;
 
           return (
             <div
@@ -413,6 +427,21 @@ export default function Calendar({ projectId }: { projectId?: string }) {
               <div className={styles.eventBox}>
                 <span className={styles.eventBoxIcon}>
                   {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
+                  <AvatarGroup
+                    spacing="small"
+                    max={3}
+                    sx={{
+                      '& .MuiAvatarGroup-avatar': {
+                        width: 20,
+                        height: 20,
+                        fontSize: '0.75rem',
+                      },
+                    }}
+                  >
+                    {assignees?.map((assignee: Assignee) => (
+                      <Avatar alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
+                    ))}
+                  </AvatarGroup>
                 </span>
                 <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
                 <div>{eventInfo.event.title}</div>
@@ -442,6 +471,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           eventData={selectedEventData}
           onDelete={handleDelete}
           projectId={projectId}
+          takeSchedule={webSocketApi?.takeSchedule as (scheduleId: number) => void}
         />
       )}
     </div>

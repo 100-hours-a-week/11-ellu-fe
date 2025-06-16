@@ -4,8 +4,9 @@ import { EventDropArg } from '@fullcalendar/core';
 import { EventResizeDoneArg } from '@fullcalendar/interaction';
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
+import { UseCalendarEventHandlersProps } from '@/types/calendar';
 
-export function useCalendarEventHandlers() {
+export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandlersProps) {
   const [events, setEvents] = useState<EventData[]>([]);
 
   const { mutate: updateScheduleMutate } = useUpdateSchedule();
@@ -67,7 +68,6 @@ export function useCalendarEventHandlers() {
               }
             : evt
         );
-        console.log('일정 업데이트 후:', updatedEvents);
         return updatedEvents;
       });
 
@@ -75,23 +75,28 @@ export function useCalendarEventHandlers() {
       if (updatedEventData.is_project_schedule) {
         // 프로젝트 일정 업데이트
         const projectId = parseInt(info.event.extendedProps.projectId || '0');
-        updateProjectScheduleMutate(
-          {
-            projectId: projectId,
-            scheduleId: scheduleId,
-            eventData: updatedEventData,
-            options: { is_project_schedule: true, is_completed: event.extendedProps.is_completed },
-          },
-          {
-            onSuccess: () => {
-              console.log('프로젝트 일정 업데이트 성공');
+
+        if (webSocketApi) {
+          webSocketApi.updateSchedule(updatedEventData, scheduleId as number);
+        } else {
+          updateProjectScheduleMutate(
+            {
+              projectId: projectId,
+              scheduleId: scheduleId,
+              eventData: updatedEventData,
+              options: { is_project_schedule: true, is_completed: event.extendedProps.is_completed },
             },
-            onError: (error) => {
-              console.error('프로젝트 일정 업데이트 실패:', error);
-              alert('일정 업데이트 실패');
-            },
-          }
-        );
+            {
+              onSuccess: () => {
+                console.log('프로젝트 일정 업데이트 성공');
+              },
+              onError: (error) => {
+                console.error('프로젝트 일정 업데이트 실패:', error);
+                alert('일정 업데이트 실패');
+              },
+            }
+          );
+        }
       } else {
         // 일반 일정 업데이트
         updateScheduleMutate(

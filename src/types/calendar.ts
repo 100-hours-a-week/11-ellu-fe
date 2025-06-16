@@ -1,3 +1,8 @@
+export interface Assignee {
+  nickname: string;
+  profile_image_url: string;
+}
+
 export interface EventData {
   id?: string;
   title: string;
@@ -12,6 +17,7 @@ export interface EventData {
     is_ai_recommended?: boolean;
     is_completed?: boolean;
   };
+  assignees?: Assignee[];
 }
 
 export interface SelectedTime {
@@ -40,4 +46,13 @@ export interface EditScheduleModalProps {
   eventData: EventData | null;
   onDelete?: () => void;
   projectId?: string;
+  takeSchedule: (scheduleId: number) => void;
+}
+
+export interface webSocketApi {
+  updateSchedule: (eventData: EventData, scheduleId: number) => void;
+}
+
+export interface UseCalendarEventHandlersProps {
+  webSocketApi?: webSocketApi | null;
 }
