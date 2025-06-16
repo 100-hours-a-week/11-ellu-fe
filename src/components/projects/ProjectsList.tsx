@@ -7,6 +7,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Paper,
   Avatar,
   Stack,
@@ -21,6 +22,7 @@ import {
   CircularProgress,
   Box,
   Alert,
+  AvatarGroup,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -100,7 +102,7 @@ export default function ProjectsList() {
 
   return (
     <div className={style.container}>
-      <TableContainer component={Paper} sx={{ height: '100%', maxHeight: '100%' }}>
+      <TableContainer component={Paper} sx={{ height: '95%' }}>
         <Table aria-label="project table">
           <TableHead sx={{ backgroundColor: '#528ad3' }}>
             <TableRow>
@@ -130,28 +132,17 @@ export default function ProjectsList() {
                 </TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={1} className={style.membersContainer}>
-                    {project.members.slice(0, 4).map((member) => (
-                      <Avatar
-                        key={member.nickname}
-                        alt={member.nickname}
-                        src={member.profileImageUrl}
-                        sx={{ width: 32, height: 32, border: '1px solid gray' }}
-                      />
-                    ))}
-                    {project.members.length > 4 && (
-                      <Avatar
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          border: '1px solid gray',
-                          backgroundColor: '#e0e0e0',
-                          fontSize: '0.875rem',
-                          color: '#666',
-                        }}
-                      >
-                        +{project.members.length - 4}
-                      </Avatar>
-                    )}
+                    <AvatarGroup spacing="small">
+                      {project.members.map((member) => (
+                        <Tooltip title={member.nickname} key={member.nickname} arrow>
+                          <Avatar
+                            alt={member.nickname}
+                            src={member.profileImageUrl}
+                            sx={{ width: 40, height: 40, bgcolor: 'gray' }}
+                          />
+                        </Tooltip>
+                      ))}
+                    </AvatarGroup>
                   </Stack>
                 </TableCell>
                 <TableCell>

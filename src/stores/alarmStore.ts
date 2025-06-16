@@ -10,6 +10,7 @@ export const useAlarmStore = create<AlarmStore>((set) => ({
   // 초기 알람 로딩
   loadInitialAlarms: async () => {
     set({ isLoading: true, error: null });
+
     try {
       const apiAlarms = await getAlarms();
       const transformedAlarms = apiAlarms.map((alarm) => ({
