@@ -12,23 +12,28 @@ import { useChatSSE } from '@/hooks/useChatSSE';
 export default function ChatBot() {
   const { user } = userStore();
   const [message, setMessage] = useState('');
+  const [receivedMessage, setReceivedMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const { mutate: postMessage, isPending: isPosting } = usePostMessage();
 
-  // const handleSSEMessage = (data: any) => {
-  //   console.log('받은 response', data);
-  //   setMessages((prev) => [...prev, { content: data.content, isUser: false }]);
-  // };
+  const handleSSEMessage = (data: any) => {
+    console.log('ChatBot 컴포넌트에서 받은 SSE 메시지:', data);
+    setReceivedMessage(data.message);
+    if (data.done) {
+      console.log('receivedMessage', receivedMessage);
+      handleReceivedMessage(receivedMessage);
+    }
+  };
+
+  const handleReceivedMessage = (finalMessage: string) => {
+    setMessages((prev) => [...prev, { content: finalMessage, isUser: false }]);
+  };
 
   // 채팅 SSE 연결
-  // const { isConnected } = useChatSSE(handleSSEMessage);
+  useChatSSE(handleSSEMessage);
 
   const handleSubmit = () => {
     if (!message.trim()) return;
-    // if (!isConnected) {
-    //   alert('채팅 서버와 연결이 끊어졌습니다. 잠시 후 다시 시도해주세요.');
-    //   return;
-    // }
     postMessage(
       { message },
       {
