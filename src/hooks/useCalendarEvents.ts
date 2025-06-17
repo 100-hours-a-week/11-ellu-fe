@@ -1,16 +1,23 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { EventData } from '@/types/calendar';
 import { EventDropArg } from '@fullcalendar/core';
 import { EventResizeDoneArg } from '@fullcalendar/interaction';
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { UseCalendarEventHandlersProps } from '@/types/calendar';
+import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
 
 export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandlersProps) {
+  const { previewEvents } = usePreviewSchedulesStore();
   const [events, setEvents] = useState<EventData[]>([]);
 
   const { mutate: updateScheduleMutate } = useUpdateSchedule();
   const { mutate: updateProjectScheduleMutate } = useUpdateProjectSchedule();
+
+  const displayEvents = useMemo(() => {
+    console.log('previewEvents', [...events, ...previewEvents]);
+    return [...events, ...previewEvents];
+  }, [events, previewEvents]);
 
   // 일정 생성
   const createEvent = useCallback((newEvent: EventData) => {
@@ -141,7 +148,7 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
   }, []);
 
   return {
-    events,
+    events: displayEvents,
     setEvents,
     createEvent,
     updateEvent,
