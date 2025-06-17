@@ -15,7 +15,6 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
   const { mutate: updateProjectScheduleMutate } = useUpdateProjectSchedule();
 
   const displayEvents = useMemo(() => {
-    console.log('previewEvents', [...events, ...previewEvents]);
     return [...events, ...previewEvents];
   }, [events, previewEvents]);
 

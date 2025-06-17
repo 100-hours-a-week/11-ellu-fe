@@ -9,6 +9,7 @@ import { Message } from '@/types/chatbot';
 import { usePostMessage } from '@/hooks/api/chatbot/usePostMessage';
 import { useChatSSE } from '@/hooks/useChatSSE';
 import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
+import { useChatbotCreateSchedule } from '@/hooks/api/chatbot/useChatbotCreateSchedule';
 
 export default function ChatBot() {
   const { user } = userStore();
@@ -17,10 +18,12 @@ export default function ChatBot() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState('');
   const [finalMessage, setFinalMessage] = useState('');
+  const [planTitle, setPlanTitle] = useState('');
   const { mutate: postMessage, isPending: isPosting } = usePostMessage();
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [showScheduleButtons, setShowScheduleButtons] = useState(false);
-  const { addPreviewEvent, clearAll } = usePreviewSchedulesStore();
+  const { previewEvents, addPreviewEvent, clearAll } = usePreviewSchedulesStore();
+  const { mutate: chatbotCreateSchedule } = useChatbotCreateSchedule();
 
   const scrollToBottom = () => {
     if (messageBoxRef.current) {
@@ -58,7 +61,8 @@ export default function ChatBot() {
 
   const handleSSESchedule = (data: any) => {
     setShowScheduleButtons(true);
-    const previewEvents = {
+    setPlanTitle(data.task_title);
+    const previewEvent = {
       id: `schedule-${Date.now()}`,
       title: `🤖 ${data.schedule_preview[0].title}`,
       start: new Date(data.schedule_preview[0].start_time),
@@ -70,7 +74,7 @@ export default function ChatBot() {
       },
     };
     // 스토어에 미리보기 데이터 저장
-    addPreviewEvent(previewEvents);
+    addPreviewEvent(previewEvent);
   };
 
   // 채팅 SSE 연결
@@ -110,8 +114,21 @@ export default function ChatBot() {
 
   // 전체 수락
   const handleAcceptAll = () => {
-    // TODO: API 호출로 실제 일정 저장
-    console.log('모든 일정 수락:');
+    chatbotCreateSchedule(
+      {
+        planTitle: planTitle,
+        eventDataList: previewEvents,
+      },
+      {
+        onSuccess: () => {
+          console.log('일반 일정 생성 성공');
+        },
+        onError: (error) => {
+          console.error('일정 저장 실패:', error);
+          alert('일정 저장에 실패했습니다.');
+        },
+      }
+    );
     clearPreviewAndButtons();
   };
 
