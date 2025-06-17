@@ -2,6 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import React, { useRef, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -30,6 +32,9 @@ import { useGetAllMonthlySchedules } from '@/hooks/api/schedule/useGetAllMonthly
 import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySchedules';
 import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
 import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
+
+import CreateScheduleModalSkeleton from './skeleton/CreateScheduleModalSkeleton';
+import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton';
 
 import CreateScheduleModalSkeleton from './skeleton/CreateScheduleModalSkeleton';
 import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton';
@@ -93,6 +98,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   // tanstack query
   // 프로젝트 정보 가져오기
   const { data: projectData, isLoading: isLoadingProject } = useGetProjectById(projectIdNumber as number);
+  // 프로젝트 정보 가져오기
+  const { data: projectData, isLoading: isLoadingProject } = useGetProjectById(projectIdNumber as number);
   // 프로젝트
   // 일별 일정
   const { data: projectDailyData, isLoading: isLoadingProjectDaily } = useGetProjectDailySchedules(
@@ -152,6 +159,17 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }));
   };
 
+  const formatEventData = (data: any[], isProject: boolean) => {
+    return data.map((event) => ({
+      ...event,
+      id: isProject
+        ? `project-${event.id}`
+        : event.extendedProps?.is_project_schedule
+          ? `project-${event.id}`
+          : `schedule-${event.id}`,
+    }));
+  };
+
   useEffect(() => {
     if (projectIdNumber) {
       // 프로젝트 일정
@@ -159,11 +177,20 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         const formattedData = formatEventData(projectDailyData, true);
         console.log('프로젝트 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
+        const formattedData = formatEventData(projectDailyData, true);
+        console.log('프로젝트 일별 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
         const formattedData = formatEventData(projectMonthlyData, true);
         console.log('프로젝트 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
+        const formattedData = formatEventData(projectMonthlyData, true);
+        console.log('프로젝트 주간/월간 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if (currentView === 'year' && projectYearlyData) {
+        const formattedData = formatEventData(projectYearlyData, true);
+        console.log('프로젝트 연간 일정 데이터:', formattedData);
+        setEvents(formattedData);
         const formattedData = formatEventData(projectYearlyData, true);
         console.log('프로젝트 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
@@ -174,11 +201,20 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         const formattedData = formatEventData(allDailyData, false);
         console.log('전체 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
+        const formattedData = formatEventData(allDailyData, false);
+        console.log('전체 일별 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
         const formattedData = formatEventData(allMonthlyData, false);
         console.log('전체 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
+        const formattedData = formatEventData(allMonthlyData, false);
+        console.log('전체 주간/월간 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if (currentView === 'year' && allYearlyData) {
+        const formattedData = formatEventData(allYearlyData, false);
+        console.log('전체 연간 일정 데이터:', formattedData);
+        setEvents(formattedData);
         const formattedData = formatEventData(allYearlyData, false);
         console.log('전체 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
@@ -259,6 +295,10 @@ export default function Calendar({ projectId }: { projectId?: string }) {
               ...newEvent,
               is_project_schedule: false,
             });
+            createEvent({
+              ...newEvent,
+              is_project_schedule: false,
+            });
             console.log('일반 일정 생성 성공');
           },
           onError: (error) => {
@@ -290,8 +330,17 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   // 일정 삭제
   const handleDelete = () => {
     console.log('일정삭제:', selectedEventData);
+    console.log('일정삭제:', selectedEventData);
     if (!selectedEventData || !selectedEventData.id) {
       return;
+    }
+
+    let scheduleId;
+    if (selectedEventData.id.includes('-')) {
+      const parts = selectedEventData.id.split('-');
+      scheduleId = parseInt(parts[parts.length - 1]);
+    } else {
+      scheduleId = parseInt(selectedEventData.id);
     }
 
     let scheduleId;
@@ -382,8 +431,50 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     },
     [handleDatesSet, projectIdNumber, queryClient, setEvents]
   );
+  // 뷰 변경 시 이벤트 데이터 초기화 및 새로 불러오기
+  const handleViewChange = useCallback(
+    (dateInfo: any) => {
+      handleDatesSet(dateInfo);
+      setEvents([]);
+
+      if (projectIdNumber) {
+        if (dateInfo.view.type === 'timeGridDay') {
+          queryClient.invalidateQueries({
+            queryKey: ['project-daily-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM-dd')],
+          });
+        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
+          queryClient.invalidateQueries({
+            queryKey: ['project-monthly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM')],
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: ['project-yearly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy')],
+          });
+        }
+      } else {
+        if (dateInfo.view.type === 'timeGridDay') {
+          queryClient.invalidateQueries({
+            queryKey: ['daily-schedules', format(dateInfo.start, 'yyyy-MM-dd')],
+          });
+        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
+          queryClient.invalidateQueries({
+            queryKey: ['monthly-schedules', format(dateInfo.start, 'yyyy-MM')],
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: ['yearly-schedules', format(dateInfo.start, 'yyyy')],
+          });
+        }
+      }
+    },
+    [handleDatesSet, projectIdNumber, queryClient, setEvents]
+  );
 
   return (
+    <div
+      className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
+      style={projectData?.color ? ({ '--project-color': `#${projectData.color}` } as React.CSSProperties) : undefined}
+    >
     <div
       className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
       style={projectData?.color ? ({ '--project-color': `#${projectData.color}` } as React.CSSProperties) : undefined}

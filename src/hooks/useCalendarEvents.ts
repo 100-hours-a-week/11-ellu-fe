@@ -4,7 +4,10 @@ import { EventDropArg } from '@fullcalendar/core';
 import { EventResizeDoneArg } from '@fullcalendar/interaction';
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
+<<<<<<< HEAD
 import { UseCalendarEventHandlersProps } from '@/types/calendar';
+=======
+>>>>>>> stage
 
 export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandlersProps) {
   const [events, setEvents] = useState<EventData[]>([]);
@@ -68,6 +71,10 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
               }
             : evt
         );
+<<<<<<< HEAD
+=======
+        console.log('일정 업데이트 후:', updatedEvents);
+>>>>>>> stage
         return updatedEvents;
       });
 
@@ -75,6 +82,7 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
       if (updatedEventData.is_project_schedule) {
         // 프로젝트 일정 업데이트
         const projectId = parseInt(info.event.extendedProps.projectId || '0');
+<<<<<<< HEAD
 
         if (webSocketApi) {
           webSocketApi.updateSchedule(updatedEventData, scheduleId as number);
@@ -97,6 +105,25 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
             }
           );
         }
+=======
+        updateProjectScheduleMutate(
+          {
+            projectId: projectId,
+            scheduleId: scheduleId,
+            eventData: updatedEventData,
+            options: { is_project_schedule: true, is_completed: event.extendedProps.is_completed },
+          },
+          {
+            onSuccess: () => {
+              console.log('프로젝트 일정 업데이트 성공');
+            },
+            onError: (error) => {
+              console.error('프로젝트 일정 업데이트 실패:', error);
+              alert('일정 업데이트 실패');
+            },
+          }
+        );
+>>>>>>> stage
       } else {
         // 일반 일정 업데이트
         updateScheduleMutate(

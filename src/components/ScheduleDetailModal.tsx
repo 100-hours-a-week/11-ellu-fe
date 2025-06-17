@@ -17,30 +17,9 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import AssignmentAddIcon from '@mui/icons-material/AssignmentAdd';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import styles from './ScheduleDetailModal.module.css';
 
-import { userStore } from '@/stores/userStore';
-
-import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
-import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
-import { Assignee } from '@/types/calendar';
-
-export default function ScheduleDetailModal({
-  open,
-  onClose,
-  eventData,
-  onDelete,
-  projectId,
-  takeSchedule,
-}: EditScheduleModalProps) {
-  const { mutate: updateSchedule } = useUpdateSchedule();
-  const { mutate: updateProjectSchedule } = useUpdateProjectSchedule();
-
-  const { user } = userStore();
+export default function ScheduleDetailModal({ open, onClose, eventData, onDelete, projectId }: EditScheduleModalProps) {
+  if (!eventData) return null;
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('ko-KR', {
@@ -52,107 +31,13 @@ export default function ScheduleDetailModal({
     });
   };
 
-  let scheduleId: number | undefined;
-
-  if (!eventData) {
-    return null;
-  }
-
-  if (eventData.id) {
-    const parts = eventData.id.split('-');
-    scheduleId = parseInt(parts[parts.length - 1]);
-  }
-
-  const handleComplete = () => {
-    if (!eventData) return;
-
-    if (!projectId) {
-      updateSchedule({
-        scheduleId: scheduleId as number,
-        eventData: eventData,
-        options: { is_completed: eventData.is_completed ? false : true },
-      });
-    }
-
-    onClose();
-  };
-
-  const handleTakeSchedule = () => {
-    if (!eventData) return;
-    takeSchedule(scheduleId as number);
-
-    onClose();
-  };
-
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle className={styles.dialogTitle}>
-        <Typography className={styles.title}>{eventData.title}</Typography>
-        <AvatarGroup
-          max={9}
-          spacing="small"
-          sx={{
-            '& .MuiAvatarGroup-avatar': {
-              width: 28,
-              height: 28,
-              fontSize: '0.75rem',
-            },
-          }}
-        >
-          {eventData.assignees?.map((assignee: Assignee) => (
-            <Tooltip
-              title={assignee.nickname}
-              key={assignee.nickname}
-              arrow
-              slotProps={{
-                popper: {
-                  sx: {
-                    [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: {
-                      marginTop: '4px',
-                    },
-                  },
-                },
-              }}
-            >
-              <Avatar alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
-            </Tooltip>
-          ))}
-        </AvatarGroup>
-        <Box className={styles.actionButtons}>
-          {!eventData.id?.includes('project') ? (
-            <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
-              {eventData.is_completed ? <CheckCircleIcon color="success" /> : <CheckCircleOutlineIcon />}
-            </IconButton>
-          ) : (
-            <Tooltip
-              title="내 일정으로 가져가기"
-              placement="bottom"
-              arrow
-              slotProps={{
-                popper: {
-                  sx: {
-                    [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: {
-                      marginTop: '4px',
-                    },
-                  },
-                },
-              }}
-            >
-              <IconButton size="small">
-                {eventData.assignees?.some((assignee) => assignee.nickname === user?.nickname) ? null : (
-                  <AssignmentAddIcon onClick={handleTakeSchedule} />
-                )}
-              </IconButton>
-            </Tooltip>
-          )}
-          <Link
-            href={
-              projectId
-                ? `/projects/${projectId}/schedule/edit/${eventData.id}`
-                : `/my-calendar/schedule/edit/${eventData.id}`
-            }
-          >
-            <IconButton size="small">
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
+        {eventData.title}
+        <Box>
+          <Link href={projectId ? `/projects/${projectId}/schedule/edit/${eventData.id}` : `/my-calendar/schedule/edit/${eventData.id}`}>
+            <IconButton size="small" sx={{ mr: 1 }}>
               <EditIcon />
             </IconButton>
           </Link>
