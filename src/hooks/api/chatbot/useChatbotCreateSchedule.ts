@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createSchedule } from '@/api/schedule';
+import { chatbotCreateSchedule } from '@/api/chatbot';
 import { AxiosError } from 'axios';
-import { CreateScheduleParams } from '@/types/api/schedule';
+import { ChatbotCreateScheduleParams } from '@/types/api/schedule';
 
-export const useCreateSchedule = () => {
+export const useChatbotCreateSchedule = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<void, AxiosError<{ message: string }>, CreateScheduleParams>({
-    mutationFn: ({ eventData, options = {} }) => {
-      return createSchedule(eventData, options);
+  return useMutation<void, AxiosError<{ message: string }>, ChatbotCreateScheduleParams>({
+    mutationFn: ({ planTitle, eventDataList }) => {
+      return chatbotCreateSchedule(planTitle, eventDataList);
     },
     retry: 1,
     onSuccess: () => {
