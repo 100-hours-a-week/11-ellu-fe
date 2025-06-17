@@ -18,6 +18,7 @@ export default function ChatBot() {
   const [finalMessage, setFinalMessage] = useState('');
   const { mutate: postMessage, isPending: isPosting } = usePostMessage();
   const messageBoxRef = useRef<HTMLDivElement>(null);
+  const [showScheduleButtons, setShowScheduleButtons] = useState(false);
 
   const scrollToBottom = () => {
     if (messageBoxRef.current) {
@@ -55,6 +56,7 @@ export default function ChatBot() {
 
   const handleSSESchedule = (data: any) => {
     console.log('schedule', data);
+    setShowScheduleButtons(true);
   };
 
   // 채팅 SSE 연결
@@ -66,6 +68,7 @@ export default function ChatBot() {
     // 새 메시지 전송 시 초기화
     setStreamingMessage('');
     setFinalMessage('');
+    clearPreviewAndButtons();
 
     postMessage(
       { message },
@@ -89,6 +92,26 @@ export default function ChatBot() {
       e.stopPropagation();
       handleSubmit();
     }
+  };
+
+  // 전체 수락
+  const handleAcceptAll = () => {
+    // TODO: API 호출로 실제 일정 저장
+    console.log('모든 일정 수락:');
+
+    // 미리보기 제거하고 실제 일정으로 저장
+    clearPreviewAndButtons();
+    // 실제 일정 저장 API 호출
+  };
+
+  // 전체 거절
+  const handleRejectAll = () => {
+    console.log('모든 일정 거절');
+    clearPreviewAndButtons();
+  };
+
+  const clearPreviewAndButtons = () => {
+    setShowScheduleButtons(false);
   };
 
   return (
@@ -121,6 +144,16 @@ export default function ChatBot() {
                 <div className={`${style.message} ${style.bot_message} ${style.streamingMessage}`}>
                   {streamingMessage}
                 </div>
+              </div>
+            )}
+            {showScheduleButtons && (
+              <div className={style.scheduleButtons}>
+                <button onClick={handleAcceptAll} className={style.acceptButton}>
+                  ✅ 모든 일정 수락
+                </button>
+                <button onClick={handleRejectAll} className={style.rejectButton}>
+                  ❌ 모든 일정 거절
+                </button>
               </div>
             )}
           </div>
