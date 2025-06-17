@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { userStore } from '@/stores/userStore';
 import { EventSourcePolyfill } from 'event-source-polyfill';
 
-export function useChatSSE(onMessage: (message: any) => void) {
+export function useChatSSE(onMessage: (message: any) => void, onSchedule: (schedule: any) => void) {
   const { user, accessToken } = userStore();
   const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
   const isMountedRef = useRef(true);
@@ -38,6 +38,15 @@ export function useChatSSE(onMessage: (message: any) => void) {
       try {
         const data = JSON.parse(event.data);
         onMessage(data);
+      } catch (error) {
+        console.error('채팅 메시지 파싱 에러:', error);
+      }
+    });
+
+    eventSource.addEventListener('schedule', (event: any) => {
+      try {
+        const data = JSON.parse(event.data);
+        onSchedule(data);
       } catch (error) {
         console.error('채팅 메시지 파싱 에러:', error);
       }

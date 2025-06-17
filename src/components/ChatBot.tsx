@@ -53,8 +53,12 @@ export default function ChatBot() {
     }
   };
 
+  const handleSSESchedule = (data: any) => {
+    console.log('schedule', data);
+  };
+
   // 채팅 SSE 연결
-  useChatSSE(handleSSEMessage);
+  useChatSSE(handleSSEMessage, handleSSESchedule);
 
   const handleSubmit = () => {
     if (!message.trim()) return;
