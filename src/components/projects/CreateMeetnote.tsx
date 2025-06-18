@@ -71,38 +71,45 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
         <h2>오늘의 스크럼 회의록</h2>
         <p>데일리스크럼 때 작성하신 표 전체를 복사붙여넣기 해주세요</p>
 
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="회의록"
-            value={meetingNote}
-            onChange={handleChange}
-            margin="normal"
-            variant="outlined"
-            multiline
-            rows={13}
-            placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
-            required
-            helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
-            error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  border: 'none',
+        <form onSubmit={handleSubmit} className={style.formContainer}>
+          <div className={style.textFieldContainer}>
+            <TextField
+              fullWidth
+              label="회의록"
+              value={meetingNote}
+              onChange={handleChange}
+              variant="outlined"
+              multiline
+              placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
+              required
+              helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
+              error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
+              sx={{
+                height: '100%',
+                '& .MuiOutlinedInput-root': {
+                  height: '100%',
+                  alignItems: 'flex-start',
+                  '& fieldset': {
+                    border: 'none',
+                  },
+                  '&:hover fieldset': {
+                    border: 'none',
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: 'none',
+                  },
+                  '& textarea': {
+                    height: '100% !important',
+                    overflow: 'auto !important',
+                    resize: 'none',
+                  },
                 },
-                '&:hover fieldset': {
-                  border: 'none',
-                },
-                '&.Mui-focused fieldset': {
-                  border: 'none',
-                },
-              },
-              backgroundColor: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              mb: 3,
-            }}
-          />
+                backgroundColor: 'white',
+                border: 'none',
+                borderRadius: '10px',
+              }}
+            />
+          </div>
 
           <div className={style.secondbutton}>
             <Button
