@@ -371,9 +371,11 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       </TextField>
 
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 0 }}>
-        프로젝트 개요를 입력해주세요(깃허브 wiki, readme의 내용 등)
+        프로젝트 개요가 적혀진 깃허브 wiki URL을 입력해주세요
       </Typography>
       <Typography variant="subtitle2" sx={{ fontSize: '0.8rem', color: 'text.secondary', mb: 3 }}>
+        (ex. https://github.com/조직명/레포명/wiki)
+        <br />
         프로젝트에 대한 자세한 설명이 있을 수록 Looper가 더욱 꼼꼼한 일정을 짜드릴 수 있어요
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
