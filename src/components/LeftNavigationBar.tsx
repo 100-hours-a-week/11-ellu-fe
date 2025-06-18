@@ -1,17 +1,22 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import style from './LeftNaviagtionBar.module.css';
+
+import Diversity3Icon from '@mui/icons-material/Diversity3';
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 
 export default function LeftNavigationBar() {
   const pathname = usePathname();
 
   const navItems = [
-    { label: '프로젝트', href: 'projects', icon: '/images/project.svg' },
-    { label: '캘린더', href: 'my-calendar', icon: '/images/calendar.svg' },
-    { label: '마이페이지', href: 'mypage', icon: '/images/mypage.svg' },
+    { label: '프로젝트', href: 'projects', icon: <Diversity3Icon /> },
+    { label: '캘린더', href: 'my-calendar', icon: <EditCalendarIcon /> },
+    { label: '일정루틴 챗봇', href: 'chatbot', icon: <SmartToyIcon /> },
+    { label: '마이페이지', href: 'mypage', icon: <AccountCircleIcon /> },
   ];
 
   return (
@@ -20,7 +25,7 @@ export default function LeftNavigationBar() {
         {navItems.map((item) => (
           <li key={item.href} className={pathname.split('/')[1] === item.href ? style.active : ''}>
             <Link href={`/${item.href}`}>
-              <Image src={item.icon} alt={item.label} width={25} height={25} className={style.icon} />
+              {item.icon}
               <span>{item.label}</span>
             </Link>
           </li>

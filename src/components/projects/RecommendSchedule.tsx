@@ -40,47 +40,6 @@ export default function RecommendSchedule() {
   const { data: scheduleData, isLoading, isError, error } = useGetRecommendedSchedule(projectIdNumber);
   const { mutate: createProjectSchedules, isPending } = useCreateProjectSchedules();
 
-  // 임시 목데이터
-  // const mockScheduleData = [
-  //   {
-  //     keyword: "프로젝트 기획",
-  //     subtasks: [
-  //       "프로젝트 목표 설정",
-  //       "요구사항 분석",
-  //       "타임라인 계획 수립",
-  //       "팀원 역할 분담"
-  //     ]
-  //   },
-  //   {
-  //     keyword: "디자인",
-  //     subtasks: [
-  //       "UI/UX 디자인 시안 제작",
-  //       "디자인 시스템 구축",
-  //       "프로토타입 제작",
-  //       "디자인 리뷰"
-  //     ]
-  //   },
-  //   {
-  //     keyword: "개발",
-  //     subtasks: [
-  //       "기술 스택 선정",
-  //       "데이터베이스 설계",
-  //       "API 설계",
-  //       "프론트엔드 개발",
-  //       "백엔드 개발"
-  //     ]
-  //   },
-  //   {
-  //     keyword: "테스트",
-  //     subtasks: [
-  //       "단위 테스트 작성",
-  //       "통합 테스트",
-  //       "성능 테스트",
-  //       "사용자 테스트"
-  //     ]
-  //   }
-  // ];
-
   useEffect(() => {
     if (scheduleData) {
       const formattedTasks = scheduleData.map((schedule, groupIndex) => ({
@@ -94,18 +53,6 @@ export default function RecommendSchedule() {
 
       setRecommendedTasks(formattedTasks);
     }
-
-    // 목데이터 사용
-    // const formattedTasks = mockScheduleData.map((schedule, groupIndex) => ({
-    //   keyword: schedule.keyword,
-    //   subtasks: schedule.subtasks.map((name, subtaskIndex) => ({
-    //     id: `${groupIndex + 1}-${subtaskIndex + 1}`,
-    //     name,
-    //     isSelected: false,
-    //   })),
-    // }));
-
-    // setRecommendedTasks(formattedTasks);
   }, [scheduleData]);
 
   // 단일 서브태스크 체크박스 변경 핸들러

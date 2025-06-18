@@ -1,6 +1,6 @@
 .container {
-  width: 150px;
-  max-width: 150px;
+  width: 170px;
+  min-width: 170px;
   height: calc(100vh - 80px);
 }
 
@@ -20,13 +20,13 @@
 
 .container li a {
   text-decoration: none;
-  color: black;
-  font-weight: 500;
+  color: #333446;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .container .active {
-  font-weight: bold;
-  color: white;
   background-color: var(--color-primary);
 }
 
@@ -35,11 +35,13 @@
   color: white;
 }
 
-.icon {
-  margin-bottom: -4px;
+.container li svg {
   margin-right: 13px;
+  margin-bottom: 3px;
+  font-size: 30px;
+  color: var(--color-primary);
 }
 
-.active .icon {
-  filter: brightness(0) invert(1); /* 흑백 SVG를 흰색으로 */
+.container .active svg {
+  color: white;
 }
