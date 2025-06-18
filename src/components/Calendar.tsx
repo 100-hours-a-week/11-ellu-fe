@@ -39,6 +39,8 @@ import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 
 import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
 
+import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
+
 // 모달 지연로딩 처리
 const CreateScheduleModal = dynamic(() => import('./CreateScheduleModal'), {
   loading: ({ isLoading = false }) => <CreateScheduleModalSkeleton open={isLoading} />,
@@ -69,6 +71,9 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const webSocketApi = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
 
   const { setCurrentSchedule } = useScheduleStore();
+
+  const { previewEvents } = usePreviewSchedulesStore();
+  const isPreviewMode = previewEvents.length > 0; // 또는 별도 상태
 
   // 커스텀 훅 사용
   const {
@@ -397,8 +402,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         selectable={true}
         select={handleSelect}
         unselectAuto={false}
-        editable={true}
-        droppable={true}
+        editable={!isPreviewMode}
+        droppable={!isPreviewMode}
         eventDrop={updateEvent}
         eventResize={updateEvent}
         eventClick={handleEventClick}

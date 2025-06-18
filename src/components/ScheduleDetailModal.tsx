@@ -28,6 +28,7 @@ import { userStore } from '@/stores/userStore';
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { Assignee } from '@/types/calendar';
+import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
 
 export default function ScheduleDetailModal({
   open,
@@ -41,6 +42,8 @@ export default function ScheduleDetailModal({
   const { mutate: updateProjectSchedule } = useUpdateProjectSchedule();
 
   const { user } = userStore();
+  const { previewEvents } = usePreviewSchedulesStore();
+  const isPreviewMode = previewEvents.length > 0;
 
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('ko-KR', {
@@ -118,48 +121,50 @@ export default function ScheduleDetailModal({
             </Tooltip>
           ))}
         </AvatarGroup>
-        <Box className={styles.actionButtons}>
-          {!eventData.id?.includes('project') ? (
-            <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
-              {eventData.is_completed ? <CheckCircleIcon color="success" /> : <CheckCircleOutlineIcon />}
-            </IconButton>
-          ) : (
-            <Tooltip
-              title="내 일정으로 가져가기"
-              placement="bottom"
-              arrow
-              slotProps={{
-                popper: {
-                  sx: {
-                    [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: {
-                      marginTop: '4px',
+        {!isPreviewMode && (
+          <Box className={styles.actionButtons}>
+            {!eventData.id?.includes('project') ? (
+              <IconButton onClick={handleComplete} size="small" sx={{ mr: 1 }}>
+                {eventData.is_completed ? <CheckCircleIcon color="success" /> : <CheckCircleOutlineIcon />}
+              </IconButton>
+            ) : (
+              <Tooltip
+                title="내 일정으로 가져가기"
+                placement="bottom"
+                arrow
+                slotProps={{
+                  popper: {
+                    sx: {
+                      [`&.${tooltipClasses.popper}[data-popper-placement*="bottom"] .${tooltipClasses.tooltip}`]: {
+                        marginTop: '4px',
+                      },
                     },
                   },
-                },
-              }}
+                }}
+              >
+                <IconButton size="small">
+                  {eventData.assignees?.some((assignee) => assignee.nickname === user?.nickname) ? null : (
+                    <AssignmentAddIcon onClick={handleTakeSchedule} />
+                  )}
+                </IconButton>
+              </Tooltip>
+            )}
+            <Link
+              href={
+                projectId
+                  ? `/projects/${projectId}/schedule/edit/${eventData.id}`
+                  : `/my-calendar/schedule/edit/${eventData.id}`
+              }
             >
               <IconButton size="small">
-                {eventData.assignees?.some((assignee) => assignee.nickname === user?.nickname) ? null : (
-                  <AssignmentAddIcon onClick={handleTakeSchedule} />
-                )}
+                <EditIcon />
               </IconButton>
-            </Tooltip>
-          )}
-          <Link
-            href={
-              projectId
-                ? `/projects/${projectId}/schedule/edit/${eventData.id}`
-                : `/my-calendar/schedule/edit/${eventData.id}`
-            }
-          >
-            <IconButton size="small">
-              <EditIcon />
+            </Link>
+            <IconButton onClick={onDelete} size="small">
+              <DeleteIcon />
             </IconButton>
-          </Link>
-          <IconButton onClick={onDelete} size="small">
-            <DeleteIcon />
-          </IconButton>
-        </Box>
+          </Box>
+        )}
       </DialogTitle>
       <DialogContent sx={{ p: 2 }}>
         <Box>
