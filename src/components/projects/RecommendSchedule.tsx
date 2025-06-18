@@ -43,7 +43,7 @@ export default function RecommendSchedule() {
   useEffect(() => {
     if (scheduleData) {
       const formattedTasks = scheduleData.map((schedule, groupIndex) => ({
-        keyword: schedule.keyword,
+        keyword: schedule.task,
         subtasks: schedule.subtasks.map((name, subtaskIndex) => ({
           id: `${groupIndex + 1}-${subtaskIndex + 1}`,
           name,
