@@ -39,3 +39,12 @@
 .membersContainer > * {
   flex-shrink: 0;
 }
+
+.tableRow {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.tableRow:hover {
+  background-color: rgba(82, 138, 211, 0.1) !important;
+}
