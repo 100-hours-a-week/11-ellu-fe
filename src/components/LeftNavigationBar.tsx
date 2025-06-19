@@ -14,7 +14,7 @@ export default function LeftNavigationBar() {
 
   const navItems = [
     { label: '프로젝트', href: 'projects', icon: <Diversity3Icon /> },
-    { label: '캘린더', href: 'my-calendar', icon: <EditCalendarIcon /> },
+    { label: '마이 캘린더', href: 'my-calendar', icon: <EditCalendarIcon /> },
     { label: '일정루틴 챗봇', href: 'chatbot', icon: <SmartToyIcon /> },
     { label: '마이페이지', href: 'mypage', icon: <AccountCircleIcon /> },
   ];

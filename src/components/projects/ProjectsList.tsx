@@ -171,11 +171,6 @@ export default function ProjectsList() {
                         회의록 추가
                       </Button>
                     </Link>
-                    <Link href={`/projects/${project.id}`}>
-                      <IconButton aria-label="일정보기" size="small">
-                        <CalendarIcon />
-                      </IconButton>
-                    </Link>
                     {project.members[0].nickname === user?.nickname && (
                       <>
                         <Link href={`/projects/${project.id}/edit`}>
