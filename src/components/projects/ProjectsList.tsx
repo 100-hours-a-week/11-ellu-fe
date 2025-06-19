@@ -123,7 +123,12 @@ export default function ProjectsList() {
           </TableHead>
           <TableBody>
             {projects?.map((project) => (
-              <TableRow key={project.id} onClick={() => handleRowClick(project)} sx={{ cursor: 'pointer' }}>
+              <TableRow
+                key={project.id}
+                onClick={() => handleRowClick(project)}
+                sx={{ cursor: 'pointer' }}
+                className={style.tableRow}
+              >
                 <TableCell component="th" scope="row">
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <div
