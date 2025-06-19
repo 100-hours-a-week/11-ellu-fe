@@ -25,7 +25,7 @@ import { User } from '@/types/api/user';
 import { useCreateProject } from '@/hooks/api/projects/useCreateProject';
 import { useEditProject } from '@/hooks/api/projects/useEditProject';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
-import AddIcon from '@mui/icons-material/Add';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import CloseIcon from '@mui/icons-material/Close';
 import CachedIcon from '@mui/icons-material/Cached';
 import InviteTeamMemberModal from '../projects/InviteTeamMemberModal';
@@ -469,7 +469,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         프로젝트에 초대할 팀원을 선택해주세요
         {formData.added_members && formData.added_members.length > 0 ? (
           <IconButton onClick={handleOpenInviteModal} className={styles.addButton}>
-            <AddIcon />
+            <PersonAddAlt1Icon sx={{ scale: 0.8 }} />
           </IconButton>
         ) : null}
       </Typography>
@@ -519,7 +519,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         ) : (
           <Box className={styles.addButtonContainer}>
             <IconButton onClick={handleOpenInviteModal} className={styles.addButton}>
-              <AddIcon />
+              <PersonAddAlt1Icon sx={{ scale: 0.8 }} />
             </IconButton>
           </Box>
         )}
