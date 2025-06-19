@@ -36,8 +36,10 @@ import { useDeleteProject } from '@/hooks/api/projects/useDeleteProject';
 import { useGetProjects } from '@/hooks/api/projects/useGetProjects';
 import style from './ProjectsList.module.css';
 import { userStore } from '@/stores/userStore';
+import { useRouter } from 'next/navigation';
 
 export default function ProjectsList() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
@@ -46,12 +48,13 @@ export default function ProjectsList() {
   const { data: projects, isLoading, isError, error, refetch } = useGetProjects();
   const { mutate: deleteProject } = useDeleteProject();
 
-  const handleClickOpen = (project: Project) => {
+  const handleDeleteOpen = (project: Project, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     setSelectedProject(project);
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleDeleteClose = () => {
     setOpen(false);
     setSelectedProject(null);
   };
@@ -60,14 +63,18 @@ export default function ProjectsList() {
     if (selectedProject) {
       deleteProject(selectedProject.id, {
         onSuccess: () => {
-          handleClose();
+          handleDeleteClose();
         },
         onError: (error) => {
           alert(`삭제 실패: ${error.response?.data?.message || '알 수 없는 오류가 발생했습니다.'}`);
-          handleClose();
+          handleDeleteClose();
         },
       });
     }
+  };
+
+  const handleRowClick = (project: Project) => {
+    router.push(`/projects/${project.id}`);
   };
 
   if (isLoading) {
@@ -116,7 +123,7 @@ export default function ProjectsList() {
           </TableHead>
           <TableBody>
             {projects?.map((project) => (
-              <TableRow key={project.id}>
+              <TableRow key={project.id} onClick={() => handleRowClick(project)} sx={{ cursor: 'pointer' }}>
                 <TableCell component="th" scope="row">
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <div
@@ -159,6 +166,7 @@ export default function ProjectsList() {
                           color: 'black',
                           backgroundColor: '#e8f9ff',
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         회의록 추가
                       </Button>
@@ -171,11 +179,11 @@ export default function ProjectsList() {
                     {project.members[0].nickname === user?.nickname && (
                       <>
                         <Link href={`/projects/${project.id}/edit`}>
-                          <IconButton aria-label="수정하기" size="small">
+                          <IconButton aria-label="수정하기" size="small" onClick={(e) => e.stopPropagation()}>
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Link>
-                        <IconButton aria-label="삭제하기" size="small" onClick={() => handleClickOpen(project)}>
+                        <IconButton aria-label="삭제하기" size="small" onClick={(e) => handleDeleteOpen(project, e)}>
                           <DeleteIcon fontSize="small" />
                         </IconButton>
                       </>
@@ -190,7 +198,7 @@ export default function ProjectsList() {
 
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={handleDeleteClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -201,7 +209,7 @@ export default function ProjectsList() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>취소</Button>
+          <Button onClick={handleDeleteClose}>취소</Button>
           <Button onClick={handleDelete}>삭제</Button>
         </DialogActions>
       </Dialog>
