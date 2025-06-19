@@ -26,7 +26,7 @@ export default function RootLayout({
             <main>{children}</main>
           </AppRouterCacheProvider>
         </QueryProvider>
-        <GoogleAnalytics gaId="G-D5P575845W" />
+        <GoogleAnalytics gaId="G-XDRJBMQXDN" />
       </body>
     </html>
   );
