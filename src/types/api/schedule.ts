@@ -13,6 +13,7 @@ export interface ScheduleResponse {
 }
 
 export type ScheduleOptions = {
+  is_preview?: boolean;
   is_project_schedule?: boolean;
   is_ai_recommended?: boolean;
   is_completed?: boolean;
