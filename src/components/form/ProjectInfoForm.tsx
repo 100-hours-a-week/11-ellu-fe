@@ -14,6 +14,9 @@ import {
   DialogContent,
   DialogActions,
   Tooltip,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -87,7 +90,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   }, [isEditMode, projectData]);
 
   // url 형식 정규식
-  const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+  const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6}).*\/wiki\/?$/;
 
   // 유효성 검사 함수
   const validateTitle = (value: string) => {
@@ -374,9 +377,36 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
         프로젝트 개요가 적혀진 깃허브 wiki URL을 입력해주세요
       </Typography>
       <Typography variant="subtitle2" sx={{ fontSize: '0.8rem', color: 'text.secondary', mb: 3 }}>
-        (ex. https://github.com/조직명/레포명/wiki)
-        <br />
-        프로젝트에 대한 자세한 설명이 있을 수록 Looper가 더욱 꼼꼼한 일정을 짜드릴 수 있어요
+        <List
+          sx={{
+            pl: 2,
+            py: 0,
+            '& .MuiListItem-root': {
+              py: 0,
+              px: 0,
+              display: 'list-item',
+              listStyleType: 'disc',
+              listStylePosition: 'outside',
+            },
+            '& .MuiListItemText-root': {
+              my: 0,
+              '& .MuiListItemText-primary': {
+                fontSize: '0.75rem',
+                lineHeight: 1.4,
+              },
+            },
+          }}
+        >
+          <ListItem>
+            <ListItemText primary="(ex. https://github.com/조직명/레포명/wiki)" />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="위키 내용에 대한 학습이 완료되면 알림으로 알려드릴게요." />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="프로젝트에 대한 자세한 설명이 있을수록 Looper가 더욱 꼼꼼한 일정을 짜드릴 수 있어요!" />
+          </ListItem>
+        </List>
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <TextField
