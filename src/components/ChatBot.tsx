@@ -69,6 +69,7 @@ export default function ChatBot() {
       end: new Date(data.schedule_preview[0].end_time),
       description: '',
       extendedProps: {
+        is_preview: true,
         is_ai_recommended: true,
         is_project_schedule: false,
       },

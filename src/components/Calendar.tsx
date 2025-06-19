@@ -415,7 +415,11 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         eventContent={(eventInfo) => {
           const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
           const isCompleted = eventInfo.event.extendedProps?.is_completed;
-          const backgroundColor = !isProjectSchedule ? '#4285F4' : `#${eventInfo.event.extendedProps?.color}`;
+          const backgroundColor = !isProjectSchedule
+            ? eventInfo.event.extendedProps?.is_preview
+              ? '#bbbbbb'
+              : '#4285F4'
+            : `#${eventInfo.event.extendedProps?.color}`;
           const assignees = eventInfo.event.extendedProps?.assignees;
 
           return (
