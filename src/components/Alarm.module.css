@@ -1,0 +1,67 @@
+.alarmIcon :global(.MuiSvgIcon-root) {
+  color: var(--color-primary);
+  font-size: 33px;
+}
+
+.alarmHeader {
+  font-weight: bold;
+  padding: 8px;
+}
+
+.alarmMessage {
+  width: 100%;
+}
+
+.messageContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.messageContent {
+  flex: 1;
+}
+
+.alarmMessageText {
+  max-width: 250px;
+  font-size: 13px;
+  color: var(--color-text);
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  position: relative;
+}
+
+.unreadDot {
+  position: absolute;
+  left: -4%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: red;
+  border-radius: 50%;
+}
+
+.unreadMessage {
+  padding-left: 7px;
+}
+
+.buttonContainer {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.buttonContainer :global(.MuiButton-root) {
+  min-width: 50px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.timeText {
+  margin-left: 8px;
+  color: gray;
+  font-size: 11px;
+}

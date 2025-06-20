@@ -17,7 +17,6 @@ export default function CreateScheduleModal({
   selectedEvent,
   eventData,
   onInputChange,
-  projectId,
 }: CalendarModalProps) {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
@@ -27,7 +26,6 @@ export default function CreateScheduleModal({
   const [descriptionError, setDescriptionError] = useState<string>('');
 
   useEffect(() => {
-    console.log(projectId);
     if (selectedEvent) {
       setStartDate(selectedEvent.start);
       setStartTime(selectedEvent.start);
@@ -46,7 +44,14 @@ export default function CreateScheduleModal({
 
   const handleStartTimeChange = (newValue: Date | null) => {
     setStartTime(newValue);
-    if (newValue && endTime && startDate && endDate && startDate.getTime() === endDate.getTime() && newValue > endTime) {
+    if (
+      newValue &&
+      endTime &&
+      startDate &&
+      endDate &&
+      startDate.getTime() === endDate.getTime() &&
+      newValue > endTime
+    ) {
       setEndTime(newValue);
     }
   };
@@ -65,16 +70,13 @@ export default function CreateScheduleModal({
   // 제목 유효성 검사 함수
   const validateTitle = (title: string) => {
     if (title.length < 1) return '제목을 입력해주세요.';
-    if (title.length > 10) return '제목은 10자 이하여야 합니다.';
-    if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(title)) return '한글, 영문, 숫자만 입력 가능합니다.';
+    if (title.length > 30) return '제목은 30자 이하여야 합니다.';
     return '';
   };
 
   // 할일 유효성 검사 함수
   const validateDescription = (description: string) => {
-    if (description.length < 1) return '할일을 입력해주세요.';
-    if (description.length > 20) return '할일은 20자 이하여야 합니다.';
-    if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(description)) return '한글, 영문, 숫자만 입력 가능합니다.';
+    if (description.length > 100) return '할일은 100자 이하여야 합니다.';
     return '';
   };
 
@@ -114,7 +116,11 @@ export default function CreateScheduleModal({
 
   const isSameDay = (date1: Date | null, date2: Date | null) => {
     if (!date1 || !date2) return false;
-    return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate();
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
   };
 
   // 저장 버튼 활성화 체크함수
@@ -172,7 +178,13 @@ export default function CreateScheduleModal({
               시작 시간
             </Typography>
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <DatePicker label="시작 일자" value={startDate} onChange={handleStartDateChange} sx={{ flex: 1 }} minDate={new Date()} />
+              <DatePicker
+                label="시작 일자"
+                value={startDate}
+                onChange={handleStartDateChange}
+                sx={{ flex: 1 }}
+                minDate={new Date()}
+              />
               <TimePicker label="시작 시간" value={startTime} onChange={handleStartTimeChange} sx={{ flex: 1 }} />
             </Box>
           </Box>
@@ -182,7 +194,13 @@ export default function CreateScheduleModal({
               종료 시간
             </Typography>
             <Box sx={{ display: 'flex', gap: 1 }}>
-              <DatePicker label="종료 일자" value={endDate} onChange={handleEndDateChange} sx={{ flex: 1 }} minDate={startDate || new Date()} />
+              <DatePicker
+                label="종료 일자"
+                value={endDate}
+                onChange={handleEndDateChange}
+                sx={{ flex: 1 }}
+                minDate={startDate || new Date()}
+              />
               <TimePicker
                 label="종료 시간"
                 value={endTime}

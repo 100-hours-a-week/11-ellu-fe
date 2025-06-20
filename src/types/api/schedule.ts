@@ -1,4 +1,4 @@
-import { EventData } from '../calendar';
+import { EventData, Assignee } from '../calendar';
 export interface ScheduleResponse {
   id: number;
   title: string;
@@ -8,9 +8,12 @@ export interface ScheduleResponse {
   is_project_schedule: boolean;
   start_time: string;
   end_time: string;
+  color?: string;
+  assignees?: Assignee[];
 }
 
 export type ScheduleOptions = {
+  is_preview?: boolean;
   is_project_schedule?: boolean;
   is_ai_recommended?: boolean;
   is_completed?: boolean;
@@ -44,4 +47,11 @@ export type UpdateProjectScheduleParams = {
 export type DeleteProjectScheduleParams = {
   projectId?: number;
   scheduleId: number;
+};
+
+// 챗봇 일정 타입
+export type ChatbotCreateScheduleParams = {
+  planTitle: string;
+  eventDataList: EventData[];
+  options?: ScheduleOptions;
 };

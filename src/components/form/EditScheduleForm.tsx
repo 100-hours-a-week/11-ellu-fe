@@ -13,6 +13,8 @@ import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { useScheduleStore } from '@/stores/scheduleStore';
 
+import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
+
 interface EditScheduleFormProps {
   scheduleData: EventData;
   projectId?: string;
@@ -22,9 +24,7 @@ interface EditScheduleFormProps {
 export default function EditScheduleForm({ scheduleData, projectId, onSuccess }: EditScheduleFormProps) {
   const router = useRouter();
 
-  useEffect(() => {
-    console.log('scheduleData', scheduleData);
-  }, [scheduleData]);
+  const webSocketApi = projectId ? useProjectWebSocket(Number(projectId)) : null;
 
   // React Query Hooks
   const { mutate: updateSchedule, isPending: isUpdatingSchedule } = useUpdateSchedule();
@@ -45,23 +45,19 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   // 제목 유효성 검사 함수
   const validateTitle = (title: string) => {
     if (title.length < 1) return '제목을 입력해주세요.';
-    if (title.length > 10) return '제목은 10자 이하여야 합니다.';
-    if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(title)) return '한글, 영문, 숫자만 입력 가능합니다.';
+    if (title.length > 30) return '제목은 30자 이하여야 합니다.';
     return '';
   };
 
   // 할일 유효성 검사 함수
   const validateDescription = (description: string) => {
-    if (description.length < 1) return '상세일정을 입력해주세요.';
-    if (description.length > 20) return '상세일정은 20자 이하여야 합니다.';
-    if (!/^[가-힣ㄱ-ㅎa-zA-Z0-9\s]+$/.test(description)) return '한글, 영문, 숫자만 입력 가능합니다.';
+    if (description && description.length > 100) return '상세일정은 100자 이하여야 합니다.';
     return '';
   };
 
   // 초기 유효성 검사 실행
   useEffect(() => {
     setTitleError(validateTitle(formData.title));
-    setDescriptionError(validateDescription(formData.description || ''));
   }, []);
 
   // 입력 변경 핸들러
@@ -165,38 +161,49 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
       end: endDateTime,
     };
 
-    const scheduleId = parseInt(updatedSchedule.id || '0');
-    if (isNaN(scheduleId) || scheduleId === 0) {
+    if (!updatedSchedule.id) {
       alert('유효하지 않은 일정 ID입니다.');
       return;
     }
 
+    let scheduleId;
+    if (updatedSchedule.id && updatedSchedule.id.includes('-')) {
+      const parts = updatedSchedule.id.split('-');
+      scheduleId = parseInt(parts[parts.length - 1]);
+    } else if (updatedSchedule.id) {
+      scheduleId = parseInt(updatedSchedule.id);
+    }
+
     if (scheduleData.is_project_schedule) {
       // 프로젝트 일정 업데이트
-      updateProjectSchedule(
-        {
-          projectId: projectId ? Number(projectId) : 0,
-          scheduleId: scheduleId,
-          eventData: updatedSchedule,
-          options: { is_project_schedule: true },
-        },
-        {
-          onSuccess: () => {
-            alert('일정이 성공적으로 수정되었습니다.');
-            useScheduleStore.getState().setCurrentSchedule(null);
-            onSuccess();
+      if (webSocketApi) {
+        webSocketApi.updateSchedule(updatedSchedule, scheduleId as number);
+      } else {
+        updateProjectSchedule(
+          {
+            projectId: projectId ? Number(projectId) : 0,
+            scheduleId: scheduleId as number,
+            eventData: updatedSchedule,
+            options: { is_project_schedule: true },
           },
-          onError: (error) => {
-            alert('일정 수정 중 오류가 발생했습니다.');
-            console.error('수정 실패:', error);
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              alert('일정이 성공적으로 수정되었습니다.');
+              useScheduleStore.getState().setCurrentSchedule(null);
+              onSuccess();
+            },
+            onError: (error) => {
+              alert('일정 수정 중 오류가 발생했습니다.');
+              console.error('수정 실패:', error);
+            },
+          }
+        );
+      }
     } else {
       // 일반 일정 업데이트
       updateSchedule(
         {
-          scheduleId: scheduleId,
+          scheduleId: scheduleId as number,
           eventData: updatedSchedule,
           options: { is_project_schedule: false },
         },

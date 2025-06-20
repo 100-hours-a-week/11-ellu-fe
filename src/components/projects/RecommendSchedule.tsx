@@ -38,13 +38,12 @@ export default function RecommendSchedule() {
   const queryClient = useQueryClient();
 
   const { data: scheduleData, isLoading, isError, error } = useGetRecommendedSchedule(projectIdNumber);
-
   const { mutate: createProjectSchedules, isPending } = useCreateProjectSchedules();
 
   useEffect(() => {
     if (scheduleData) {
       const formattedTasks = scheduleData.map((schedule, groupIndex) => ({
-        keyword: schedule.keyword,
+        keyword: schedule.task,
         subtasks: schedule.subtasks.map((name, subtaskIndex) => ({
           id: `${groupIndex + 1}-${subtaskIndex + 1}`,
           name,
@@ -78,12 +77,14 @@ export default function RecommendSchedule() {
   };
 
   // 모든 서브태스크 체크박스 변경 핸들러
-  const handleSelectAll = (isSelected: boolean) => {
+  const handleSelectAll = () => {
+    const isAllSelected = recommendedTasks.every((group) => group.subtasks.every((st) => st.isSelected));
+
     const newTasks = recommendedTasks.map((group) => ({
       ...group,
       subtasks: group.subtasks.map((st) => ({
         ...st,
-        isSelected,
+        isSelected: !isAllSelected,
       })),
     }));
     setRecommendedTasks(newTasks);
@@ -242,11 +243,11 @@ export default function RecommendSchedule() {
         <Button
           variant="outlined"
           color="primary"
-          onClick={() => handleSelectAll(true)}
+          onClick={handleSelectAll}
           startIcon={<CheckIcon />}
           disabled={isSubmitted}
         >
-          전체 선택
+          {recommendedTasks.every((group) => group.subtasks.every((st) => st.isSelected)) ? '전체 해제' : '전체 선택'}
         </Button>
       </Box>
 
@@ -338,21 +339,14 @@ export default function RecommendSchedule() {
                           '&:hover': { bgcolor: isSubmitted ? 'inherit' : 'rgba(0, 0, 0, 0.03)' },
                           pointerEvents: isSubmitted ? 'none' : 'auto',
                           opacity: isSubmitted ? 0.7 : 1,
-                        }}
-                        onClick={(e) => {
-                          if (!isSubmitted) {
-                            e.stopPropagation();
-                            handleSubtaskChange(groupIndex, subtask.id);
-                          }
+                          cursor: 'pointer',
                         }}
                       >
                         <FormControlLabel
                           control={
                             <Checkbox
                               checked={subtask.isSelected}
-                              onClick={(e) => e.stopPropagation()}
                               onChange={(e) => {
-                                e.stopPropagation();
                                 if (!isSubmitted) {
                                   handleSubtaskChange(groupIndex, subtask.id);
                                 }
@@ -361,7 +355,20 @@ export default function RecommendSchedule() {
                             />
                           }
                           label={subtask.name}
-                          sx={{ width: '100%' }}
+                          sx={{
+                            width: '100%',
+                            margin: 0,
+                            '& .MuiFormControlLabel-label': {
+                              width: '100%',
+                            },
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!isSubmitted) {
+                              handleSubtaskChange(groupIndex, subtask.id);
+                            }
+                          }}
                         />
                       </ListItem>
                       {subtaskIndex < group.subtasks.length - 1 && <Divider variant="inset" component="li" />}

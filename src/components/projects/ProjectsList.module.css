@@ -21,3 +21,30 @@
 .noProject div {
   margin-top: 20px;
 }
+
+.projectTitle {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.membersContainer {
+  max-width: 210px;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.membersContainer > * {
+  flex-shrink: 0;
+}
+
+.tableRow {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.tableRow:hover {
+  background-color: rgba(82, 138, 211, 0.1) !important;
+}

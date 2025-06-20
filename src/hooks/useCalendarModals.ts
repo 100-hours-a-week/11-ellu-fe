@@ -12,6 +12,12 @@ export function useCalendarModals() {
     start: new Date(),
     end: new Date(),
     description: '',
+    extendedProps: {
+      is_project_schedule: false,
+      is_ai_recommended: false,
+      is_completed: false,
+    },
+    assignees: [],
   });
 
   // 일정 생성 모달 관련 함수
@@ -22,6 +28,7 @@ export function useCalendarModals() {
       start,
       end,
       description: '',
+      assignees: [],
     });
     setOpenCreateModal(true);
   };

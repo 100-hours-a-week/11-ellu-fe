@@ -1,4 +1,4 @@
-import { EventData } from '@/types/calendar';
+import { EventData, Assignee } from '@/types/calendar';
 import { ScheduleResponse } from '@/types/api/schedule';
 import { changeTime } from './changeTime';
 
@@ -14,7 +14,9 @@ export const convertToEventData = (scheduleResponses: ScheduleResponse[]): Event
       is_completed: schedule.is_completed,
       is_ai_recommended: schedule.is_ai_recommended,
       is_project_schedule: schedule.is_project_schedule,
+      color: schedule.color,
     },
+    assignees: schedule.assignees?.map((a) => ({ nickname: a.nickname, profile_image_url: a.profile_image_url })),
   }));
 };
 
@@ -36,6 +38,17 @@ export const convertToScheduleData = (
     is_completed,
     is_ai_recommended,
     is_project_schedule,
+    start_time: changeTime(eventData.start),
+    end_time: changeTime(eventData.end),
+  };
+};
+
+// FullCalendar 이벤트 데이터 => 챗봇 API 요청 형식으로 변환
+export const convertToChatbotScheduleData = (
+  eventData: EventData
+): Omit<ScheduleResponse, 'id' | 'description' | 'is_completed' | 'is_ai_recommended' | 'is_project_schedule'> => {
+  return {
+    title: eventData.title,
     start_time: changeTime(eventData.start),
     end_time: changeTime(eventData.end),
   };

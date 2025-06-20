@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,12 +12,12 @@ import koLocale from '@fullcalendar/core/locales/ko';
 import { format } from 'date-fns';
 import styles from './Calendar.module.css';
 import { DateSelectArg } from '@fullcalendar/core';
-import CreateScheduleModal from './CreateScheduleModal';
-import ScheduleDetailModal from './ScheduleDetailModal';
 import { useCalendarModals } from '@/hooks/useCalendarModals';
 import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
-import { EventData } from '@/types/calendar';
+import { EventData, Assignee } from '@/types/calendar';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Avatar, AvatarGroup } from '@mui/material';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -30,7 +31,23 @@ import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySc
 import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
 import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
 
+import CreateScheduleModalSkeleton from './skeleton/CreateScheduleModalSkeleton';
+import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton';
+
 import { useScheduleStore } from '@/stores/scheduleStore';
+import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
+
+import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
+
+import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
+
+// 모달 지연로딩 처리
+const CreateScheduleModal = dynamic(() => import('./CreateScheduleModal'), {
+  loading: ({ isLoading = false }) => <CreateScheduleModalSkeleton open={isLoading} />,
+});
+const ScheduleDetailModal = dynamic(() => import('./ScheduleDetailModal'), {
+  loading: ({ isLoading = false }) => <ScheduleDetailModalSkeleton open={isLoading} />,
+});
 
 const CALENDAR_VIEWS = {
   multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
@@ -51,7 +68,12 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
 
+  const webSocketApi = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
+
   const { setCurrentSchedule } = useScheduleStore();
+
+  const { previewEvents } = usePreviewSchedulesStore();
+  const isPreviewMode = previewEvents.length > 0; // 또는 별도 상태
 
   // 커스텀 훅 사용
   const {
@@ -66,7 +88,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers();
+  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({ webSocketApi });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
@@ -74,6 +96,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const formattedYear = format(currentDate, 'yyyy');
 
   // tanstack query
+  // 프로젝트 정보 가져오기
+  const { data: projectData, isLoading: isLoadingProject } = useGetProjectById(projectIdNumber as number);
   // 프로젝트
   // 일별 일정
   const { data: projectDailyData, isLoading: isLoadingProjectDaily } = useGetProjectDailySchedules(
@@ -122,26 +146,47 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   // 일정 삭제
   const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
-  useEffect(() => {
-    console.log('여기~~~', formattedDate, currentView);
+  const formatEventData = (data: any[], isProject: boolean) => {
+    return data.map((event) => ({
+      ...event,
+      id: isProject
+        ? `project-${event.id}`
+        : event.extendedProps?.is_project_schedule
+          ? `project-${event.id}`
+          : `schedule-${event.id}`,
+    }));
+  };
 
+  useEffect(() => {
     if (projectIdNumber) {
       // 프로젝트 일정
       if (currentView === 'day' && projectDailyData) {
-        setEvents(projectDailyData);
+        const formattedData = formatEventData(projectDailyData, true);
+        console.log('프로젝트 일별 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
-        setEvents(projectMonthlyData);
+        const formattedData = formatEventData(projectMonthlyData, true);
+        console.log('프로젝트 주간/월간 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if (currentView === 'year' && projectYearlyData) {
-        setEvents(projectYearlyData);
+        const formattedData = formatEventData(projectYearlyData, true);
+        console.log('프로젝트 연간 일정 데이터:', formattedData);
+        setEvents(formattedData);
       }
     } else {
       // 전체 일정
       if (currentView === 'day' && allDailyData) {
-        setEvents(allDailyData);
+        const formattedData = formatEventData(allDailyData, false);
+        console.log('전체 일별 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
-        setEvents(allMonthlyData);
+        const formattedData = formatEventData(allMonthlyData, false);
+        console.log('전체 주간/월간 일정 데이터:', formattedData);
+        setEvents(formattedData);
       } else if (currentView === 'year' && allYearlyData) {
-        setEvents(allYearlyData);
+        const formattedData = formatEventData(allYearlyData, false);
+        console.log('전체 연간 일정 데이터:', formattedData);
+        setEvents(formattedData);
       }
     }
   }, [
@@ -173,8 +218,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 저장
   const handleSave = (newEvent: EventData) => {
-    console.log('일정 저장:', newEvent);
-    const createdEvent = createEvent(newEvent);
     closeCreateModal();
 
     if (calendarRef.current) {
@@ -184,30 +227,32 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (projectIdNumber) {
       // 프로젝트 일정 저장
-      console.log('프로젝트 일정 생성:', newEvent);
-      createProjectScheduleMutate(
-        {
-          projectId: projectIdNumber,
-          eventDataList: [newEvent],
-          options: { is_project_schedule: true },
-        },
-        {
-          onSuccess: () => {
-            refreshCalendarData();
-            console.log('프로젝트 일정 생성 성공');
+      if (webSocketApi) {
+        webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
+      } else {
+        createProjectScheduleMutate(
+          {
+            projectId: projectIdNumber,
+            eventDataList: [newEvent],
+            options: { is_project_schedule: true },
           },
-          onError: (error) => {
-            console.error('일정 저장 실패:', error);
-            alert('일정 저장에 실패했습니다.');
-            if (createdEvent.id) {
-              deleteEvent(createdEvent.id);
-            }
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              createEvent({
+                ...newEvent,
+                is_project_schedule: true,
+              });
+              console.log('프로젝트 일정 생성 성공');
+            },
+            onError: (error) => {
+              console.error('일정 저장 실패:', error);
+              alert('일정 저장에 실패했습니다.');
+            },
+          }
+        );
+      }
     } else {
       // 일반 일정 저장
-      console.log('일반 일정 생성:', newEvent);
       createScheduleMutate(
         {
           eventData: newEvent,
@@ -215,15 +260,15 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
         {
           onSuccess: () => {
-            refreshCalendarData();
+            createEvent({
+              ...newEvent,
+              is_project_schedule: false,
+            });
             console.log('일반 일정 생성 성공');
           },
           onError: (error) => {
             console.error('일정 저장 실패:', error);
             alert('일정 저장에 실패했습니다.');
-            if (createdEvent.id) {
-              deleteEvent(createdEvent.id);
-            }
           },
         }
       );
@@ -241,6 +286,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       is_completed: info.event.extendedProps.is_completed || false,
       is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
       is_project_schedule: info.event.extendedProps.is_project_schedule || false,
+      assignees: info.event.extendedProps.assignees || [],
     };
     setCurrentSchedule(eventData);
     openDetailScheduleModal(eventData);
@@ -248,11 +294,18 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // 일정 삭제
   const handleDelete = () => {
-    console.log('~~~~~~~~', selectedEventData);
+    console.log('일정삭제:', selectedEventData);
     if (!selectedEventData || !selectedEventData.id) {
       return;
     }
-    const scheduleId = parseInt(selectedEventData.id);
+
+    let scheduleId;
+    if (selectedEventData.id.includes('-')) {
+      const parts = selectedEventData.id.split('-');
+      scheduleId = parseInt(parts[parts.length - 1]);
+    } else {
+      scheduleId = parseInt(selectedEventData.id);
+    }
     if (isNaN(scheduleId)) {
       console.error('유효하지 않은 일정 ID:', selectedEventData.id);
       return;
@@ -260,28 +313,31 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
     if (selectedEventData.is_project_schedule) {
       // 프로젝트 일정 삭제
-      deleteProjectScheduleMutate(
-        {
-          projectId: projectIdNumber ? projectIdNumber : 0,
-          scheduleId: scheduleId,
-        },
-        {
-          onSuccess: () => {
-            console.log('프로젝트 일정 삭제 성공:', scheduleId);
-            deleteEvent(selectedEventData.id as string);
-            closeDetailModal();
+      if (webSocketApi) {
+        webSocketApi.deleteSchedule(scheduleId);
+        closeDetailModal();
+      } else {
+        deleteProjectScheduleMutate(
+          {
+            projectId: projectIdNumber ? projectIdNumber : 0,
+            scheduleId: scheduleId,
           },
-          onError: (error) => {
-            console.error('일정 삭제 실패:', error);
-            alert('일정 삭제에 실패했습니다.');
-          },
-        }
-      );
+          {
+            onSuccess: () => {
+              deleteEvent(selectedEventData.id as string);
+              closeDetailModal();
+            },
+            onError: (error) => {
+              console.error('일정 삭제 실패:', error);
+              alert('일정 삭제에 실패했습니다.');
+            },
+          }
+        );
+      }
     } else {
       // 일반 일정 삭제
       deleteScheduleMutate(scheduleId, {
         onSuccess: () => {
-          console.log('일반 일정 삭제 성공:', scheduleId);
           deleteEvent(selectedEventData.id as string);
           closeDetailModal();
         },
@@ -293,53 +349,61 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }
   };
 
-  const refreshCalendarData = () => {
-    if (projectIdNumber) {
-      // 프로젝트 일정 데이터 리로드
-      if (currentView === 'day') {
-        queryClient.invalidateQueries({
-          queryKey: ['project-daily-schedules', projectIdNumber, formattedDate],
-        });
-      } else if (currentView === 'week' || currentView === 'month') {
-        queryClient.invalidateQueries({
-          queryKey: ['project-monthly-schedules', projectIdNumber, formattedMonth],
-        });
+  // 뷰 변경 시 이벤트 데이터 초기화 및 새로 불러오기
+  const handleViewChange = useCallback(
+    (dateInfo: any) => {
+      handleDatesSet(dateInfo);
+      setEvents([]);
+
+      if (projectIdNumber) {
+        if (dateInfo.view.type === 'timeGridDay') {
+          queryClient.invalidateQueries({
+            queryKey: ['project-daily-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM-dd')],
+          });
+        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
+          queryClient.invalidateQueries({
+            queryKey: ['project-monthly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM')],
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: ['project-yearly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy')],
+          });
+        }
       } else {
-        queryClient.invalidateQueries({
-          queryKey: ['project-yearly-schedules', projectIdNumber, formattedYear],
-        });
+        if (dateInfo.view.type === 'timeGridDay') {
+          queryClient.invalidateQueries({
+            queryKey: ['daily-schedules', format(dateInfo.start, 'yyyy-MM-dd')],
+          });
+        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
+          queryClient.invalidateQueries({
+            queryKey: ['monthly-schedules', format(dateInfo.start, 'yyyy-MM')],
+          });
+        } else {
+          queryClient.invalidateQueries({
+            queryKey: ['yearly-schedules', format(dateInfo.start, 'yyyy')],
+          });
+        }
       }
-    } else {
-      // 일반 일정 데이터 리로드
-      if (currentView === 'day') {
-        queryClient.invalidateQueries({
-          queryKey: ['daily-schedules', formattedDate],
-        });
-      } else if (currentView === 'week' || currentView === 'month') {
-        queryClient.invalidateQueries({
-          queryKey: ['monthly-schedules', formattedMonth],
-        });
-      } else {
-        queryClient.invalidateQueries({
-          queryKey: ['yearly-schedules', formattedYear],
-        });
-      }
-    }
-  };
+    },
+    [handleDatesSet, projectIdNumber, queryClient, setEvents]
+  );
 
   return (
-    <div className={styles.calendarContainer}>
+    <div
+      className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
+      style={projectData?.color ? ({ '--project-color': `#${projectData.color}` } as React.CSSProperties) : undefined}
+    >
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
-        initialView="timeGridWeek"
+        initialView="dayGridMonth"
         locale={koLocale}
         headerToolbar={HEADER_TOOLBAR}
         selectable={true}
         select={handleSelect}
         unselectAuto={false}
-        editable={true}
-        droppable={true}
+        editable={!isPreviewMode}
+        droppable={!isPreviewMode}
         eventDrop={updateEvent}
         eventResize={updateEvent}
         eventClick={handleEventClick}
@@ -347,27 +411,78 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         events={events}
         nowIndicator={true}
         slotEventOverlap={false}
-        datesSet={handleDatesSet}
+        datesSet={handleViewChange}
+        eventContent={(eventInfo) => {
+          const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
+          const isCompleted = eventInfo.event.extendedProps?.is_completed;
+          const backgroundColor = !isProjectSchedule
+            ? eventInfo.event.extendedProps?.is_preview
+              ? '#bbbbbb'
+              : '#4285F4'
+            : `#${eventInfo.event.extendedProps?.color}`;
+          const assignees = eventInfo.event.extendedProps?.assignees;
+
+          return (
+            <div
+              style={{
+                backgroundColor,
+                color: '#ffffff',
+                padding: '0 2px',
+                borderRadius: '3px',
+                width: '100%',
+                height: '100%',
+              }}
+            >
+              <div className={styles.eventBox}>
+                <span className={styles.eventBoxIcon}>
+                  {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
+                  <AvatarGroup
+                    spacing="small"
+                    max={3}
+                    sx={{
+                      '& .MuiAvatarGroup-avatar': {
+                        width: 20,
+                        height: 20,
+                        fontSize: '0.75rem',
+                      },
+                    }}
+                  >
+                    {assignees?.map((assignee: Assignee) => (
+                      <Avatar alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
+                    ))}
+                  </AvatarGroup>
+                </span>
+                <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
+                <div>{eventInfo.event.title}</div>
+              </div>
+            </div>
+          );
+        }}
       />
 
-      <CreateScheduleModal
-        open={openCreateModal}
-        onClose={closeCreateModal}
-        onCancel={handleCancel}
-        onSave={handleSave}
-        selectedEvent={selectedEvent}
-        eventData={eventData}
-        onInputChange={handleInputChange}
-        projectId={projectId}
-      />
+      {openCreateModal && (
+        <CreateScheduleModal
+          open={openCreateModal}
+          onClose={closeCreateModal}
+          onCancel={handleCancel}
+          onSave={handleSave}
+          selectedEvent={selectedEvent}
+          eventData={eventData}
+          onInputChange={handleInputChange}
+          projectId={projectId}
+        />
+      )}
 
-      <ScheduleDetailModal
-        open={openDetailModal}
-        onClose={closeDetailModal}
-        eventData={selectedEventData}
-        onDelete={handleDelete}
-        projectId={projectId}
-      />
+      {openDetailModal && (
+        <ScheduleDetailModal
+          open={openDetailModal}
+          onClose={closeDetailModal}
+          eventData={selectedEventData}
+          onDelete={handleDelete}
+          projectId={projectId}
+          takeSchedule={webSocketApi?.takeSchedule as (scheduleId: number) => void}
+        />
+      )}
     </div>
   );
 }

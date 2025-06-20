@@ -4,25 +4,28 @@ import LeftNavigationBar from '@/components/LeftNavigationBar';
 import AfterLoginHeader from '@/components/AfterLoginHeader';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import AuthProvider from '@/components/auth/AuthProvider';
+import AuthProvider from '@/components/provider/AuthProvider';
+import SSEProvider from '@/components/provider/SSEProvider';
 
 export default async function Layout({ children }: { children: ReactNode }) {
-  // const cookieStore = await cookies();
-  // const refreshToken = cookieStore.get('refreshToken')?.value;
+  const cookieStore = await cookies();
+  const refreshToken = cookieStore.get('refresh_token')?.value;
 
-  // if (!refreshToken) {
-  //   redirect('/auth/login');
-  // }
+  if (!refreshToken) {
+    redirect('/auth/login');
+  }
 
   return (
     <AuthProvider>
-      <div className={style.container}>
-        <AfterLoginHeader />
-        <div className={style.box}>
-          <LeftNavigationBar />
-          <div className={style.mainbox}>{children}</div>
+      <SSEProvider>
+        <div className={style.container}>
+          <AfterLoginHeader />
+          <div className={style.box}>
+            <LeftNavigationBar />
+            <div className={style.mainbox}>{children}</div>
+          </div>
         </div>
-      </div>
+      </SSEProvider>
     </AuthProvider>
   );
 }

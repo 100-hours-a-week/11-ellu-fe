@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, TextField, Button, Avatar, Typography, Skeleton, Alert } from '@mui/material';
+import { Box, TextField, Button, Avatar, Typography, Skeleton, Alert, Link } from '@mui/material';
 import style from './MypageForm.module.css';
 import { userStore } from '@/stores/userStore';
 import { useEditMyInfo } from '@/hooks/api/user/useEditMyInfo';
@@ -23,21 +23,18 @@ export default function MypageForm() {
   }, [user]);
 
   // 닉네임 유효성 검사 규칙
-  const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,10}$/;
+  const nicknameRegex = /^[a-zA-Z0-9가-힣._]{1,10}$/;
 
   const validateNickname = (value: string): string | null => {
     if (!value.trim()) {
       return '닉네임을 입력해주세요.';
     }
-
     if (value.length > 10) {
       return '닉네임은 최대 10자까지 가능합니다.';
     }
-
     if (!nicknameRegex.test(value)) {
-      return '닉네임은 한글, 영문 또는 숫자만 사용할 수 있습니다.';
+      return '닉네임은 . , _ 를 포함한 한글, 영문 또는 숫자만 사용할 수 있습니다.';
     }
-
     return null;
   };
 
@@ -139,6 +136,19 @@ export default function MypageForm() {
           {isPending ? '변경 중...' : '닉네임 변경하기'}
         </Button>
       </Box>
+      <Link
+        href="https://docs.google.com/forms/d/15dDCEYxSZyNY_ZHN4bozniQuE0WC5vx5JPq7jKyyYt4/edit"
+        target="_blank"
+        rel="noopener noreferrer"
+        sx={{
+          textDecoration: 'none',
+          fontSize: '0.8rem',
+          mt: 2,
+          color: 'gray',
+        }}
+      >
+        💬 고객센터 문의
+      </Link>
     </Box>
   );
 }

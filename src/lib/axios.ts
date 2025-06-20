@@ -1,7 +1,19 @@
 import axios from 'axios';
 import { userStore } from '@/stores/userStore';
+import { env } from 'next-runtime-env';
 
-const baseURL = `${process.env.NEXT_PUBLIC_API_SERVER_URL}`;
+// 클라이언트에서는 env() 사용, 서버에서는 process.env 사용
+const getApiUrl = () => {
+  if (typeof window !== 'undefined') {
+    // 클라이언트 사이드
+    return env('NEXT_PUBLIC_API_SERVER_URL');
+  } else {
+    // 서버 사이드
+    return process.env.NEXT_PUBLIC_API_SERVER_URL;
+  }
+};
+
+const baseURL = getApiUrl();
 
 const api = axios.create({
   baseURL,

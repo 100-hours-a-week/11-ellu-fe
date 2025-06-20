@@ -7,6 +7,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Paper,
   Avatar,
   Stack,
@@ -21,6 +22,7 @@ import {
   CircularProgress,
   Box,
   Alert,
+  AvatarGroup,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -33,20 +35,26 @@ import { useState } from 'react';
 import { useDeleteProject } from '@/hooks/api/projects/useDeleteProject';
 import { useGetProjects } from '@/hooks/api/projects/useGetProjects';
 import style from './ProjectsList.module.css';
+import { userStore } from '@/stores/userStore';
+import { useRouter } from 'next/navigation';
 
 export default function ProjectsList() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const { user } = userStore();
 
   const { data: projects, isLoading, isError, error, refetch } = useGetProjects();
   const { mutate: deleteProject } = useDeleteProject();
 
-  const handleClickOpen = (project: Project) => {
+  const handleDeleteOpen = (project: Project, e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     setSelectedProject(project);
     setOpen(true);
   };
 
-  const handleClose = () => {
+  const handleDeleteClose = () => {
     setOpen(false);
     setSelectedProject(null);
   };
@@ -55,14 +63,18 @@ export default function ProjectsList() {
     if (selectedProject) {
       deleteProject(selectedProject.id, {
         onSuccess: () => {
-          handleClose();
+          handleDeleteClose();
         },
         onError: (error) => {
           alert(`삭제 실패: ${error.response?.data?.message || '알 수 없는 오류가 발생했습니다.'}`);
-          handleClose();
+          handleDeleteClose();
         },
       });
     }
+  };
+
+  const handleRowClick = (project: Project) => {
+    router.push(`/projects/${project.id}`);
   };
 
   if (isLoading) {
@@ -100,18 +112,23 @@ export default function ProjectsList() {
 
   return (
     <div className={style.container}>
-      <TableContainer component={Paper} sx={{ height: '100%', maxHeight: '100%' }}>
+      <TableContainer component={Paper} sx={{ height: '95%' }}>
         <Table aria-label="project table">
           <TableHead sx={{ backgroundColor: '#528ad3' }}>
             <TableRow>
               <TableCell sx={{ width: '30%', color: 'white' }}>프로젝트명</TableCell>
-              <TableCell sx={{ width: '70%', color: 'white' }}>멤버</TableCell>
+              <TableCell sx={{ width: '70%', color: 'white' }}>팀원</TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
             {projects?.map((project) => (
-              <TableRow key={project.id}>
+              <TableRow
+                key={project.id}
+                onClick={() => handleRowClick(project)}
+                sx={{ cursor: 'pointer' }}
+                className={style.tableRow}
+              >
                 <TableCell component="th" scope="row">
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <div
@@ -123,23 +140,28 @@ export default function ProjectsList() {
                         border: '1px solid #ccc',
                       }}
                     />
-                    <Typography variant="body1">{project.title}</Typography>
+                    <Typography variant="body1" className={style.projectTitle}>
+                      {project.title}
+                    </Typography>
                   </Stack>
                 </TableCell>
                 <TableCell>
-                  <Stack direction="row" spacing={1}>
-                    {project.members.map((member) => (
-                      <Avatar
-                        key={member.nickname}
-                        alt={member.nickname}
-                        src={member.profileImageUrl}
-                        sx={{ width: 32, height: 32, border: '1.5px solid gray' }}
-                      />
-                    ))}
+                  <Stack direction="row" spacing={1} className={style.membersContainer}>
+                    <AvatarGroup spacing="small">
+                      {project.members.map((member) => (
+                        <Tooltip title={member.nickname} key={member.nickname} arrow>
+                          <Avatar
+                            alt={member.nickname}
+                            src={member.profileImageUrl}
+                            sx={{ width: 40, height: 40, bgcolor: 'gray' }}
+                          />
+                        </Tooltip>
+                      ))}
+                    </AvatarGroup>
                   </Stack>
                 </TableCell>
                 <TableCell>
-                  <Stack direction="row" spacing={1} alignItems="center">
+                  <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
                     <Link href={`/projects/${project.id}/meetnote`}>
                       <Button
                         variant="contained"
@@ -149,23 +171,23 @@ export default function ProjectsList() {
                           color: 'black',
                           backgroundColor: '#e8f9ff',
                         }}
+                        onClick={(e) => e.stopPropagation()}
                       >
                         회의록 추가
                       </Button>
                     </Link>
-                    <Link href={`/projects/${project.id}`}>
-                      <IconButton aria-label="일정보기" size="small">
-                        <CalendarIcon />
-                      </IconButton>
-                    </Link>
-                    <Link href={`/projects/${project.id}/edit`}>
-                      <IconButton aria-label="수정하기" size="small">
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                    </Link>
-                    <IconButton aria-label="삭제하기" size="small" onClick={() => handleClickOpen(project)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+                    {project.members[0].nickname === user?.nickname && (
+                      <>
+                        <Link href={`/projects/${project.id}/edit`}>
+                          <IconButton aria-label="수정하기" size="small" onClick={(e) => e.stopPropagation()}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Link>
+                        <IconButton aria-label="삭제하기" size="small" onClick={(e) => handleDeleteOpen(project, e)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </>
+                    )}
                   </Stack>
                 </TableCell>
               </TableRow>
@@ -176,7 +198,7 @@ export default function ProjectsList() {
 
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={handleDeleteClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -187,7 +209,7 @@ export default function ProjectsList() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>취소</Button>
+          <Button onClick={handleDeleteClose}>취소</Button>
           <Button onClick={handleDelete}>삭제</Button>
         </DialogActions>
       </Dialog>

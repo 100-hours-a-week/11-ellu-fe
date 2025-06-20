@@ -18,7 +18,7 @@ export interface ProjectDetail {
   title: string;
   color: string;
   position: string;
-  members: ProjectMember[];
+  added_members: ProjectMember[];
   wiki: string;
 }
 
@@ -27,6 +27,8 @@ export interface ProjectFormData {
   title: string;
   position: string;
   wiki: string;
+  color: string;
+  added_members: ProjectMember[];
 }
 
 // 프로젝트 수정타입
@@ -37,7 +39,7 @@ export interface EditProjectParams {
 
 // 회의록 기반 AI 추천일정 타입
 export interface RecommendedSchedule {
-  keyword: string;
+  task: string;
   subtasks: string[];
 }
 

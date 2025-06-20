@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const refreshToken = request.cookies.get('refreshToken')?.value;
+  const refreshToken = request.cookies.get('refresh_token')?.value;
   const authPaths = ['/projects', '/my-calendar', '/mypage']; // 접근불가 페이지
   const path = request.nextUrl.pathname;
 

@@ -32,9 +32,9 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
       <div className={style.firstState} onClick={() => setStep(1)}>
         <Image src={'/images/addmeeting.svg'} width={200} height={200} alt={'소개이미지'} />
         <AddCircleOutlineIcon sx={{ fontSize: 30, color: '#528ad3' }} />
-        <h1>
+        <div className={style.titleText}>
           클릭하여 오늘의 스크럼 회의록을 추가하고 <br /> 캘린더에서 나의 할 일을 확인하세요.
-        </h1>
+        </div>
       </div>
     );
   }
@@ -63,45 +63,53 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
           },
         }
       );
+      setStep(2);
     };
 
     return (
       <div className={style.secondState}>
         <h2>오늘의 스크럼 회의록</h2>
-        <p>오늘 진행된 회의 내용을 자유롭게 작성해주세요</p>
+        <p>데일리스크럼 때 작성하신 표 전체를 복사붙여넣기 해주세요</p>
 
-        <form onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            label="회의록"
-            value={meetingNote}
-            onChange={handleChange}
-            margin="normal"
-            variant="outlined"
-            multiline
-            rows={15}
-            placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
-            required
-            helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
-            error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  border: 'none',
+        <form onSubmit={handleSubmit} className={style.formContainer}>
+          <div className={style.textFieldContainer}>
+            <TextField
+              fullWidth
+              label="회의록"
+              value={meetingNote}
+              onChange={handleChange}
+              variant="outlined"
+              multiline
+              placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
+              required
+              helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
+              error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
+              sx={{
+                height: '100%',
+                '& .MuiOutlinedInput-root': {
+                  height: '100%',
+                  alignItems: 'flex-start',
+                  '& fieldset': {
+                    border: 'none',
+                  },
+                  '&:hover fieldset': {
+                    border: 'none',
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: 'none',
+                  },
+                  '& textarea': {
+                    height: '100% !important',
+                    overflow: 'auto !important',
+                    resize: 'none',
+                  },
                 },
-                '&:hover fieldset': {
-                  border: 'none',
-                },
-                '&.Mui-focused fieldset': {
-                  border: 'none',
-                },
-              },
-              backgroundColor: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              mb: 5,
-            }}
-          />
+                backgroundColor: 'white',
+                border: 'none',
+                borderRadius: '10px',
+              }}
+            />
+          </div>
 
           <div className={style.secondbutton}>
             <Button
