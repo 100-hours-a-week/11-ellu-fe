@@ -4,6 +4,7 @@ import { MessageData } from '@/types/chatbot';
 import { EventData } from '@/types/calendar';
 import { convertToChatbotScheduleData } from '@/utils/scheduleUtils';
 import { ScheduleResponse } from '@/types/api/schedule';
+import { ChatMessage, ChatHistoryResponse } from '@/types/api/chatbot';
 
 // 메세지 전송
 export const postMessage = async (messageData: MessageData): Promise<void> => {
@@ -17,4 +18,10 @@ export const chatbotCreateSchedule = async (planTitle: string, eventDataList: Ev
     plan_title: planTitle,
     chatbot_schedules: scheduleDataList,
   });
+};
+
+// 챗봇 대화기록 조회
+export const getChatMessage = async (): Promise<ChatMessage[]> => {
+  const res = await api.get<ApiResponse<ChatHistoryResponse>>('/chat/history');
+  return res.data.data.history;
 };

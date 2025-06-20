@@ -10,6 +10,8 @@ import { usePostMessage } from '@/hooks/api/chatbot/usePostMessage';
 import { useChatSSE } from '@/hooks/useChatSSE';
 import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
 import { useChatbotCreateSchedule } from '@/hooks/api/chatbot/useChatbotCreateSchedule';
+import { useGetChatMessage } from '@/hooks/api/chatbot/useGetChatMessage';
+import { Box, CircularProgress } from '@mui/material';
 
 export default function ChatBot() {
   const { user } = userStore();
@@ -24,16 +26,21 @@ export default function ChatBot() {
   const [showScheduleButtons, setShowScheduleButtons] = useState(false);
   const { previewEvents, addPreviewEvent, clearAll } = usePreviewSchedulesStore();
   const { mutate: chatbotCreateSchedule } = useChatbotCreateSchedule();
+  const { data: chatMessages, isLoading: isChatMessagesLoading } = useGetChatMessage();
 
-  const scrollToBottom = () => {
-    if (messageBoxRef.current) {
-      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+  useEffect(() => {
+    if (chatMessages) {
+      chatMessages.forEach((message) => {
+        setMessages((prev) => [...prev, { content: message.content, isUser: message.role === 'USER' ? true : false }]);
+      });
     }
-  };
+  }, [chatMessages]);
 
   // 메시지가 추가될 때마다 스크롤을 아래로 내림
   useEffect(() => {
-    scrollToBottom();
+    if (messageBoxRef.current) {
+      messageBoxRef.current.scrollTop = messageBoxRef.current.scrollHeight;
+    }
   }, [messages, streamingMessage]);
 
   // 최종 메시지가 설정되면 대화 목록에 추가
@@ -142,6 +149,14 @@ export default function ChatBot() {
     clearAll();
     setShowScheduleButtons(false);
   };
+
+  if (isChatMessagesLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="60%">
+        <CircularProgress sx={{ scale: '1.5' }} />
+      </Box>
+    );
+  }
 
   return (
     <div className={style.container}>
