@@ -396,7 +396,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
-        initialView="timeGridWeek"
+        initialView="dayGridMonth"
         locale={koLocale}
         headerToolbar={HEADER_TOOLBAR}
         selectable={true}
