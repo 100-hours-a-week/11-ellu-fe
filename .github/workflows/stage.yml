@@ -74,4 +74,8 @@ jobs:
             --project=${{ env.DEVELOP_PROJECT_ID }} \
             --zone=${{ env.ZONE }} \
             --tunnel-through-iap \
-            --command="cd /opt && sudo docker compose pull looper-frontend && sudo docker compose up -d looper-frontend"
+            --ssh-flag="-o StrictHostKeyChecking=no" \
+            --command="cd /opt && \
+              sudo docker compose pull looper-frontend && \
+              sudo docker compose up -d looper-frontend && \
+              sudo docker compose restart looper-nginx"
