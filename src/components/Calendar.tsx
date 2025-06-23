@@ -339,45 +339,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }
   }, [selectedEventData, webSocketApi, deleteEvent, closeDetailModal, projectIdNumber]);
 
-  // 뷰 변경 시 이벤트 데이터 초기화 및 새로 불러오기
-  const handleViewChange = useCallback(
-    (dateInfo: any) => {
-      handleDatesSet(dateInfo);
-      setEvents([]);
-
-      if (projectIdNumber) {
-        if (dateInfo.view.type === 'timeGridDay') {
-          queryClient.invalidateQueries({
-            queryKey: ['project-daily-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM-dd')],
-          });
-        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
-          queryClient.invalidateQueries({
-            queryKey: ['project-monthly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM')],
-          });
-        } else {
-          queryClient.invalidateQueries({
-            queryKey: ['project-yearly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy')],
-          });
-        }
-      } else {
-        if (dateInfo.view.type === 'timeGridDay') {
-          queryClient.invalidateQueries({
-            queryKey: ['daily-schedules', format(dateInfo.start, 'yyyy-MM-dd')],
-          });
-        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
-          queryClient.invalidateQueries({
-            queryKey: ['monthly-schedules', format(dateInfo.start, 'yyyy-MM')],
-          });
-        } else {
-          queryClient.invalidateQueries({
-            queryKey: ['yearly-schedules', format(dateInfo.start, 'yyyy')],
-          });
-        }
-      }
-    },
-    [handleDatesSet, projectIdNumber, queryClient, setEvents]
-  );
-
   return (
     <div
       className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
@@ -401,7 +362,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         events={events}
         nowIndicator={true}
         slotEventOverlap={false}
-        datesSet={handleViewChange}
+        datesSet={handleDatesSet}
         eventContent={(eventInfo) => {
           const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
           const isCompleted = eventInfo.event.extendedProps?.is_completed;
