@@ -111,7 +111,7 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
           build-args: |
             NEXT_PUBLIC_KAKAO_REST_KEY=${{ secrets.KAKAO_REST_KEY }}
-            NEXT_PUBLIC_API_SERVER_URL=${{ secrets.API_SERVER_URL }}
-            NEXT_PUBLIC_KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+            NEXT_PUBLIC_API_SERVER_URL=${{ secrets.DEV_API_SERVER_URL }}
+            NEXT_PUBLIC_KAKAO_REDIRECT_URI=${{ secrets.DEV_KAKAO_REDIRECT_URI }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
