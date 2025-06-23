@@ -18,6 +18,7 @@ import { useCalendarView } from '@/hooks/useCalendarView';
 import { EventData, Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Avatar, AvatarGroup } from '@mui/material';
+import { CALENDAR_VIEWS, HEADER_TOOLBAR } from '@/constants/calendarConfig';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -48,19 +49,6 @@ const CreateScheduleModal = dynamic(() => import('./CreateScheduleModal'), {
 const ScheduleDetailModal = dynamic(() => import('./ScheduleDetailModal'), {
   loading: ({ isLoading = false }) => <ScheduleDetailModalSkeleton open={isLoading} />,
 });
-
-const CALENDAR_VIEWS = {
-  multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
-  timeGridDay: { type: 'timeGrid', duration: { days: 1 } },
-  timeGridWeek: { type: 'timeGrid', duration: { weeks: 1 } },
-  dayGridMonth: { type: 'dayGrid', duration: { months: 1 } },
-};
-
-const HEADER_TOOLBAR = {
-  left: 'prev,next today',
-  center: 'title',
-  right: 'timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear',
-};
 
 export default function Calendar({ projectId }: { projectId?: string }) {
   const queryClient = useQueryClient();
