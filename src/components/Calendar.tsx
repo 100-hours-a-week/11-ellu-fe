@@ -74,7 +74,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({ webSocketApi });
+  const { events, setEvents, updateEvent } = useCalendarEventHandlers({ webSocketApi });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
@@ -219,10 +219,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
             },
             {
               onSuccess: () => {
-                createEvent({
-                  ...newEvent,
-                  is_project_schedule: true,
-                });
                 console.log('프로젝트 일정 생성 성공');
               },
               onError: (error) => {
@@ -241,10 +237,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           },
           {
             onSuccess: () => {
-              createEvent({
-                ...newEvent,
-                is_project_schedule: false,
-              });
               console.log('일반 일정 생성 성공');
             },
             onError: (error) => {
@@ -255,7 +247,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         );
       }
     },
-    [closeCreateModal, projectIdNumber, webSocketApi, createEvent]
+    [closeCreateModal, projectIdNumber, webSocketApi]
   );
 
   // 일정 클릭 이벤트 처리
@@ -309,7 +301,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           },
           {
             onSuccess: () => {
-              deleteEvent(selectedEventData.id as string);
               closeDetailModal();
             },
             onError: (error) => {
@@ -323,7 +314,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       // 일반 일정 삭제
       deleteScheduleMutate(scheduleId, {
         onSuccess: () => {
-          deleteEvent(selectedEventData.id as string);
           closeDetailModal();
         },
         onError: (error) => {
@@ -332,7 +322,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
       });
     }
-  }, [selectedEventData, webSocketApi, deleteEvent, closeDetailModal, projectIdNumber]);
+  }, [selectedEventData, webSocketApi, closeDetailModal, projectIdNumber]);
 
   return (
     <div
