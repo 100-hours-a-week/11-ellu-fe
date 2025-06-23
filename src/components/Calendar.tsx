@@ -150,30 +150,24 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       // 프로젝트 일정
       if (currentView === 'day' && projectDailyData) {
         const formattedData = formatEventData(projectDailyData, true);
-        console.log('프로젝트 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
         const formattedData = formatEventData(projectMonthlyData, true);
-        console.log('프로젝트 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if (currentView === 'year' && projectYearlyData) {
         const formattedData = formatEventData(projectYearlyData, true);
-        console.log('프로젝트 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
       }
     } else {
       // 전체 일정
       if (currentView === 'day' && allDailyData) {
         const formattedData = formatEventData(allDailyData, false);
-        console.log('전체 일별 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
         const formattedData = formatEventData(allMonthlyData, false);
-        console.log('전체 주간/월간 일정 데이터:', formattedData);
         setEvents(formattedData);
       } else if (currentView === 'year' && allYearlyData) {
         const formattedData = formatEventData(allYearlyData, false);
-        console.log('전체 연간 일정 데이터:', formattedData);
         setEvents(formattedData);
       }
     }
@@ -191,46 +185,72 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   ]);
 
   // 캘린더에서 시간 선택 시 호출
-  const handleSelect = (selectInfo: DateSelectArg) => {
-    openCreateScheduleModal(selectInfo.start, selectInfo.end);
-  };
+  const handleSelect = useCallback(
+    (selectInfo: DateSelectArg) => {
+      openCreateScheduleModal(selectInfo.start, selectInfo.end);
+    },
+    [openCreateScheduleModal]
+  );
 
   // 모달 취소 처리
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     closeCreateModal();
     if (calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
       calendarApi.unselect();
     }
-  };
+  }, [closeCreateModal]);
 
   // 일정 저장
-  const handleSave = (newEvent: EventData) => {
-    closeCreateModal();
+  const handleSave = useCallback(
+    (newEvent: EventData) => {
+      closeCreateModal();
 
-    if (calendarRef.current) {
-      const calendarApi = calendarRef.current.getApi();
-      calendarApi.unselect();
-    }
+      if (calendarRef.current) {
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.unselect();
+      }
 
-    if (projectIdNumber) {
-      // 프로젝트 일정 저장
-      if (webSocketApi) {
-        webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
+      if (projectIdNumber) {
+        // 프로젝트 일정 저장
+        if (webSocketApi) {
+          webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
+        } else {
+          createProjectScheduleMutate(
+            {
+              projectId: projectIdNumber,
+              eventDataList: [newEvent],
+              options: { is_project_schedule: true },
+            },
+            {
+              onSuccess: () => {
+                createEvent({
+                  ...newEvent,
+                  is_project_schedule: true,
+                });
+                console.log('프로젝트 일정 생성 성공');
+              },
+              onError: (error) => {
+                console.error('일정 저장 실패:', error);
+                alert('일정 저장에 실패했습니다.');
+              },
+            }
+          );
+        }
       } else {
-        createProjectScheduleMutate(
+        // 일반 일정 저장
+        createScheduleMutate(
           {
-            projectId: projectIdNumber,
-            eventDataList: [newEvent],
-            options: { is_project_schedule: true },
+            eventData: newEvent,
+            options: { is_project_schedule: false },
           },
           {
             onSuccess: () => {
               createEvent({
                 ...newEvent,
-                is_project_schedule: true,
+                is_project_schedule: false,
               });
-              console.log('프로젝트 일정 생성 성공');
+              console.log('일반 일정 생성 성공');
             },
             onError: (error) => {
               console.error('일정 저장 실패:', error);
@@ -239,50 +259,32 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           }
         );
       }
-    } else {
-      // 일반 일정 저장
-      createScheduleMutate(
-        {
-          eventData: newEvent,
-          options: { is_project_schedule: false },
-        },
-        {
-          onSuccess: () => {
-            createEvent({
-              ...newEvent,
-              is_project_schedule: false,
-            });
-            console.log('일반 일정 생성 성공');
-          },
-          onError: (error) => {
-            console.error('일정 저장 실패:', error);
-            alert('일정 저장에 실패했습니다.');
-          },
-        }
-      );
-    }
-  };
+    },
+    [closeCreateModal, projectIdNumber, webSocketApi, createEvent]
+  );
 
   // 일정 클릭 이벤트 처리
-  const handleEventClick = (info: any) => {
-    const eventData = {
-      id: info.event.id,
-      title: info.event.title,
-      start: info.event.start,
-      end: info.event.end,
-      description: info.event.extendedProps.description || '',
-      is_completed: info.event.extendedProps.is_completed || false,
-      is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
-      is_project_schedule: info.event.extendedProps.is_project_schedule || false,
-      assignees: info.event.extendedProps.assignees || [],
-    };
-    setCurrentSchedule(eventData);
-    openDetailScheduleModal(eventData);
-  };
+  const handleEventClick = useCallback(
+    (info: any) => {
+      const eventData = {
+        id: info.event.id,
+        title: info.event.title,
+        start: info.event.start,
+        end: info.event.end,
+        description: info.event.extendedProps.description || '',
+        is_completed: info.event.extendedProps.is_completed || false,
+        is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
+        is_project_schedule: info.event.extendedProps.is_project_schedule || false,
+        assignees: info.event.extendedProps.assignees || [],
+      };
+      setCurrentSchedule(eventData);
+      openDetailScheduleModal(eventData);
+    },
+    [openDetailScheduleModal, setCurrentSchedule]
+  );
 
   // 일정 삭제
-  const handleDelete = () => {
-    console.log('일정삭제:', selectedEventData);
+  const handleDelete = useCallback(() => {
     if (!selectedEventData || !selectedEventData.id) {
       return;
     }
@@ -335,7 +337,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
       });
     }
-  };
+  }, [selectedEventData, webSocketApi, deleteEvent, closeDetailModal, projectIdNumber]);
 
   // 뷰 변경 시 이벤트 데이터 초기화 및 새로 불러오기
   const handleViewChange = useCallback(
