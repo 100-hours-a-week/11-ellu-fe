@@ -1,5 +1,6 @@
 'use client';
 
+import ChatBotLoadingDots from './ChatBotLoadingDots';
 import { userStore } from '@/stores/userStore';
 import style from './ChatBot.module.css';
 import Image from 'next/image';
@@ -182,11 +183,11 @@ export default function ChatBot() {
               )
             )}
             {/* 스트리밍 중인 메시지 실시간 표시 */}
-            {isStreaming && streamingMessage && (
+            {isStreaming && (
               <div>
                 <Image src="/images/logo.svg" alt="로고" width={25} height={25} />
                 <div className={`${style.message} ${style.bot_message} ${style.streamingMessage}`}>
-                  {streamingMessage}
+                  {streamingMessage ? streamingMessage : <ChatBotLoadingDots />}
                 </div>
               </div>
             )}
