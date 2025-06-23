@@ -18,20 +18,6 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
     return [...events, ...previewEvents];
   }, [events, previewEvents]);
 
-  // 일정 생성
-  const createEvent = useCallback((newEvent: EventData) => {
-    const eventWithId = {
-      ...newEvent,
-      id: Date.now().toString(),
-    };
-    setEvents((prevEvents) => {
-      const updatedEvents = [...prevEvents, eventWithId];
-      console.log('새로운 일정 추가:', updatedEvents);
-      return updatedEvents;
-    });
-    return eventWithId;
-  }, []);
-
   // 일정 업데이트 (드래그 앤 드롭, 리사이즈)
   const updateEvent = useCallback(
     (info: EventDropArg | EventResizeDoneArg) => {
@@ -126,32 +112,9 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
     [updateScheduleMutate, updateProjectScheduleMutate]
   );
 
-  // 특정 일정 업데이트
-  const updateSpecificEvent = useCallback((updatedEvent: EventData) => {
-    if (!updatedEvent.id) return;
-
-    setEvents((prevEvents) => {
-      const updatedEvents = prevEvents.map((evt) => (evt.id === updatedEvent.id ? updatedEvent : evt));
-      console.log('일정 업데이트:', updatedEvents);
-      return updatedEvents;
-    });
-  }, []);
-
-  // 일정 삭제
-  const deleteEvent = useCallback((eventId: string) => {
-    setEvents((prevEvents) => {
-      const filteredEvents = prevEvents.filter((event) => event.id !== eventId);
-      console.log('일정 삭제 후:', filteredEvents);
-      return filteredEvents;
-    });
-  }, []);
-
   return {
     events: displayEvents,
     setEvents,
-    createEvent,
     updateEvent,
-    updateSpecificEvent,
-    deleteEvent,
   };
 }
