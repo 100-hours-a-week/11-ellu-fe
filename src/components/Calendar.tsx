@@ -132,7 +132,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   // 일정 삭제
   const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
-  const formatEventData = (data: any[], isProject: boolean) => {
+  const formatEventData = useCallback((data: any[], isProject: boolean) => {
     return data.map((event) => ({
       ...event,
       id: isProject
@@ -141,46 +141,43 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           ? `project-${event.id}`
           : `schedule-${event.id}`,
     }));
-  };
+  }, []);
 
+  // 프로젝트 일정 데이터 처리
   useEffect(() => {
-    if (projectIdNumber) {
-      // 프로젝트 일정
-      if (currentView === 'day' && projectDailyData) {
-        const formattedData = formatEventData(projectDailyData, true);
-        setEvents(formattedData);
-      } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
-        const formattedData = formatEventData(projectMonthlyData, true);
-        setEvents(formattedData);
-      } else if (currentView === 'year' && projectYearlyData) {
-        const formattedData = formatEventData(projectYearlyData, true);
-        setEvents(formattedData);
-      }
-    } else {
-      // 전체 일정
-      if (currentView === 'day' && allDailyData) {
-        const formattedData = formatEventData(allDailyData, false);
-        setEvents(formattedData);
-      } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
-        const formattedData = formatEventData(allMonthlyData, false);
-        setEvents(formattedData);
-      } else if (currentView === 'year' && allYearlyData) {
-        const formattedData = formatEventData(allYearlyData, false);
-        setEvents(formattedData);
-      }
+    if (!projectIdNumber) return;
+
+    let formattedData;
+    if (currentView === 'day' && projectDailyData) {
+      formattedData = formatEventData(projectDailyData, true);
+    } else if (['week', 'month'].includes(currentView) && projectMonthlyData) {
+      formattedData = formatEventData(projectMonthlyData, true);
+    } else if (currentView === 'year' && projectYearlyData) {
+      formattedData = formatEventData(projectYearlyData, true);
     }
-  }, [
-    currentView,
-    currentDate,
-    projectDailyData,
-    projectMonthlyData,
-    projectYearlyData,
-    allDailyData,
-    allMonthlyData,
-    allYearlyData,
-    projectIdNumber,
-    setEvents,
-  ]);
+
+    if (formattedData) {
+      setEvents(formattedData);
+    }
+  }, [projectIdNumber, currentView, projectDailyData, projectMonthlyData, projectYearlyData]);
+
+  // 전체 일정 데이터 처리
+  useEffect(() => {
+    if (projectIdNumber) return;
+
+    let formattedData;
+    if (currentView === 'day' && allDailyData) {
+      formattedData = formatEventData(allDailyData, false);
+    } else if (['week', 'month'].includes(currentView) && allMonthlyData) {
+      formattedData = formatEventData(allMonthlyData, false);
+    } else if (currentView === 'year' && allYearlyData) {
+      formattedData = formatEventData(allYearlyData, false);
+    }
+
+    if (formattedData) {
+      setEvents(formattedData);
+    }
+  }, [projectIdNumber, currentView, allDailyData, allMonthlyData, allYearlyData]);
 
   // 캘린더에서 시간 선택 시 호출
   const handleSelect = useCallback(
