@@ -18,6 +18,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     const initializeAuth = async () => {
+      if (!accessToken && !user) {
+        return; // 로그아웃 상태
+      }
       if (!accessToken) {
         try {
           // 토큰 재발급 시도
