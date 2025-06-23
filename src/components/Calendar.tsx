@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic';
 import React, { useRef, useEffect, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -51,7 +50,6 @@ const ScheduleDetailModal = dynamic(() => import('./ScheduleDetailModal'), {
 });
 
 export default function Calendar({ projectId }: { projectId?: string }) {
-  const queryClient = useQueryClient();
   const calendarRef = useRef<FullCalendar>(null);
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
