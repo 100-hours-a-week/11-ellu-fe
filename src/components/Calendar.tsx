@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -57,8 +57,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const webSocketApi = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
 
   const { setCurrentSchedule } = useScheduleStore();
-
   const { previewEvents } = usePreviewSchedulesStore();
+
   const isPreviewMode = previewEvents.length > 0; // 또는 별도 상태
 
   // 커스텀 훅 사용
@@ -74,7 +74,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { events, setEvents, updateEvent } = useCalendarEventHandlers({ webSocketApi });
+  const { updateEvent } = useCalendarEventHandlers({ webSocketApi });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
@@ -143,41 +143,39 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }));
   }, []);
 
-  // 프로젝트 일정 데이터 처리
-  useEffect(() => {
-    if (!projectIdNumber) return;
-
-    let formattedData;
-    if (currentView === 'day' && projectDailyData) {
-      formattedData = formatEventData(projectDailyData, true);
-    } else if (['week', 'month'].includes(currentView) && projectMonthlyData) {
-      formattedData = formatEventData(projectMonthlyData, true);
-    } else if (currentView === 'year' && projectYearlyData) {
-      formattedData = formatEventData(projectYearlyData, true);
+  const serverEvents = useMemo(() => {
+    if (projectIdNumber) {
+      if (currentView === 'day' && projectDailyData) {
+        return formatEventData(projectDailyData, true);
+      } else if (['week', 'month'].includes(currentView) && projectMonthlyData) {
+        return formatEventData(projectMonthlyData, true);
+      } else if (currentView === 'year' && projectYearlyData) {
+        return formatEventData(projectYearlyData, true);
+      }
+    } else {
+      if (currentView === 'day' && allDailyData) {
+        return formatEventData(allDailyData, false);
+      } else if (['week', 'month'].includes(currentView) && allMonthlyData) {
+        return formatEventData(allMonthlyData, false);
+      } else if (currentView === 'year' && allYearlyData) {
+        return formatEventData(allYearlyData, false);
+      }
     }
+    return [];
+  }, [
+    projectIdNumber,
+    currentView,
+    projectDailyData,
+    projectMonthlyData,
+    projectYearlyData,
+    allDailyData,
+    allMonthlyData,
+    allYearlyData,
+  ]);
 
-    if (formattedData) {
-      setEvents(formattedData);
-    }
-  }, [projectIdNumber, currentView, projectDailyData, projectMonthlyData, projectYearlyData]);
-
-  // 전체 일정 데이터 처리
-  useEffect(() => {
-    if (projectIdNumber) return;
-
-    let formattedData;
-    if (currentView === 'day' && allDailyData) {
-      formattedData = formatEventData(allDailyData, false);
-    } else if (['week', 'month'].includes(currentView) && allMonthlyData) {
-      formattedData = formatEventData(allMonthlyData, false);
-    } else if (currentView === 'year' && allYearlyData) {
-      formattedData = formatEventData(allYearlyData, false);
-    }
-
-    if (formattedData) {
-      setEvents(formattedData);
-    }
-  }, [projectIdNumber, currentView, allDailyData, allMonthlyData, allYearlyData]);
+  const calendarEvents = useMemo(() => {
+    return [...serverEvents, ...previewEvents];
+  }, [serverEvents, previewEvents]);
 
   // 캘린더에서 시간 선택 시 호출
   const handleSelect = useCallback(
@@ -324,6 +322,53 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }
   }, [selectedEventData, webSocketApi, closeDetailModal, projectIdNumber]);
 
+  const renderEventContent = useCallback((eventInfo: any) => {
+    const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
+    const isCompleted = eventInfo.event.extendedProps?.is_completed;
+    const backgroundColor = !isProjectSchedule
+      ? eventInfo.event.extendedProps?.is_preview
+        ? '#bbbbbb'
+        : '#4285F4'
+      : `#${eventInfo.event.extendedProps?.color}`;
+    const assignees = eventInfo.event.extendedProps?.assignees;
+
+    return (
+      <div
+        style={{
+          backgroundColor,
+          color: '#ffffff',
+          padding: '0 2px',
+          borderRadius: '3px',
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        <div className={styles.eventBox}>
+          <span className={styles.eventBoxIcon}>
+            {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
+            <AvatarGroup
+              spacing="small"
+              max={3}
+              sx={{
+                '& .MuiAvatarGroup-avatar': {
+                  width: 20,
+                  height: 20,
+                  fontSize: '0.75rem',
+                },
+              }}
+            >
+              {assignees?.map((assignee: Assignee, index: number) => (
+                <Avatar key={index} alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
+              ))}
+            </AvatarGroup>
+          </span>
+          <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
+          <div>{eventInfo.event.title}</div>
+        </div>
+      </div>
+    );
+  }, []);
+
   return (
     <div
       className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
@@ -344,56 +389,11 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         eventResize={updateEvent}
         eventClick={handleEventClick}
         views={CALENDAR_VIEWS}
-        events={events}
+        events={calendarEvents}
         nowIndicator={true}
         slotEventOverlap={false}
         datesSet={handleDatesSet}
-        eventContent={(eventInfo) => {
-          const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
-          const isCompleted = eventInfo.event.extendedProps?.is_completed;
-          const backgroundColor = !isProjectSchedule
-            ? eventInfo.event.extendedProps?.is_preview
-              ? '#bbbbbb'
-              : '#4285F4'
-            : `#${eventInfo.event.extendedProps?.color}`;
-          const assignees = eventInfo.event.extendedProps?.assignees;
-
-          return (
-            <div
-              style={{
-                backgroundColor,
-                color: '#ffffff',
-                padding: '0 2px',
-                borderRadius: '3px',
-                width: '100%',
-                height: '100%',
-              }}
-            >
-              <div className={styles.eventBox}>
-                <span className={styles.eventBoxIcon}>
-                  {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
-                  <AvatarGroup
-                    spacing="small"
-                    max={3}
-                    sx={{
-                      '& .MuiAvatarGroup-avatar': {
-                        width: 20,
-                        height: 20,
-                        fontSize: '0.75rem',
-                      },
-                    }}
-                  >
-                    {assignees?.map((assignee: Assignee) => (
-                      <Avatar alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
-                    ))}
-                  </AvatarGroup>
-                </span>
-                <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
-                <div>{eventInfo.event.title}</div>
-              </div>
-            </div>
-          );
-        }}
+        eventContent={renderEventContent}
       />
 
       {openCreateModal && (
