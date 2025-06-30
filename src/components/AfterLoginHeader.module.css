@@ -37,7 +37,8 @@
 }
 
 .myinfo {
-  min-width: 100px;
+  width: 100%;
+  height: 50px;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -53,4 +54,10 @@
   margin-left: 10px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.nickname {
+  margin-left: 13px;
+  font-weight: bold;
+  font-size: 17px;
 }

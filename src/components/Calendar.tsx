@@ -1,8 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useRef, useEffect, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -17,7 +16,8 @@ import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
 import { EventData, Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Avatar, AvatarGroup } from '@mui/material';
+import { Avatar, AvatarGroup, CircularProgress } from '@mui/material';
+import { CALENDAR_VIEWS, HEADER_TOOLBAR } from '@/constants/calendarConfig';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
@@ -49,21 +49,7 @@ const ScheduleDetailModal = dynamic(() => import('./ScheduleDetailModal'), {
   loading: ({ isLoading = false }) => <ScheduleDetailModalSkeleton open={isLoading} />,
 });
 
-const CALENDAR_VIEWS = {
-  multiMonthYear: { type: 'multiMonth', duration: { years: 1 } },
-  timeGridDay: { type: 'timeGrid', duration: { days: 1 } },
-  timeGridWeek: { type: 'timeGrid', duration: { weeks: 1 } },
-  dayGridMonth: { type: 'dayGrid', duration: { months: 1 } },
-};
-
-const HEADER_TOOLBAR = {
-  left: 'prev,next today',
-  center: 'title',
-  right: 'timeGridDay,timeGridWeek,dayGridMonth,multiMonthYear',
-};
-
 export default function Calendar({ projectId }: { projectId?: string }) {
-  const queryClient = useQueryClient();
   const calendarRef = useRef<FullCalendar>(null);
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
@@ -71,8 +57,8 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const webSocketApi = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
 
   const { setCurrentSchedule } = useScheduleStore();
-
   const { previewEvents } = usePreviewSchedulesStore();
+
   const isPreviewMode = previewEvents.length > 0; // 또는 별도 상태
 
   // 커스텀 훅 사용
@@ -88,7 +74,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { events, setEvents, createEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({ webSocketApi });
+  const { updateEvent } = useCalendarEventHandlers({ webSocketApi });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
@@ -146,7 +132,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   // 일정 삭제
   const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
-  const formatEventData = (data: any[], isProject: boolean) => {
+  const formatEventData = useCallback((data: any[], isProject: boolean) => {
     return data.map((event) => ({
       ...event,
       id: isProject
@@ -155,94 +141,121 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           ? `project-${event.id}`
           : `schedule-${event.id}`,
     }));
-  };
+  }, []);
 
-  useEffect(() => {
+  const isCalendarDataLoading = useMemo(() => {
     if (projectIdNumber) {
-      // 프로젝트 일정
-      if (currentView === 'day' && projectDailyData) {
-        const formattedData = formatEventData(projectDailyData, true);
-        console.log('프로젝트 일별 일정 데이터:', formattedData);
-        setEvents(formattedData);
-      } else if ((currentView === 'week' || currentView === 'month') && projectMonthlyData) {
-        const formattedData = formatEventData(projectMonthlyData, true);
-        console.log('프로젝트 주간/월간 일정 데이터:', formattedData);
-        setEvents(formattedData);
-      } else if (currentView === 'year' && projectYearlyData) {
-        const formattedData = formatEventData(projectYearlyData, true);
-        console.log('프로젝트 연간 일정 데이터:', formattedData);
-        setEvents(formattedData);
-      }
+      return isLoadingProjectDaily || isLoadingProjectMonthly || isLoadingProjectYearly;
     } else {
-      // 전체 일정
-      if (currentView === 'day' && allDailyData) {
-        const formattedData = formatEventData(allDailyData, false);
-        console.log('전체 일별 일정 데이터:', formattedData);
-        setEvents(formattedData);
-      } else if ((currentView === 'week' || currentView === 'month') && allMonthlyData) {
-        const formattedData = formatEventData(allMonthlyData, false);
-        console.log('전체 주간/월간 일정 데이터:', formattedData);
-        setEvents(formattedData);
-      } else if (currentView === 'year' && allYearlyData) {
-        const formattedData = formatEventData(allYearlyData, false);
-        console.log('전체 연간 일정 데이터:', formattedData);
-        setEvents(formattedData);
-      }
+      return isLoadingAllDaily || isLoadingAllMonthly || isLoadingAllYearly;
     }
   }, [
+    projectIdNumber,
+    isLoadingProjectDaily,
+    isLoadingProjectMonthly,
+    isLoadingProjectYearly,
+    isLoadingAllDaily,
+    isLoadingAllMonthly,
+    isLoadingAllYearly,
+  ]);
+
+  const serverEvents = useMemo(() => {
+    if (isCalendarDataLoading) {
+      return [];
+    }
+    if (projectIdNumber) {
+      if (currentView === 'day' && projectDailyData) {
+        return formatEventData(projectDailyData, true);
+      } else if (['week', 'month'].includes(currentView) && projectMonthlyData) {
+        return formatEventData(projectMonthlyData, true);
+      } else if (currentView === 'year' && projectYearlyData) {
+        return formatEventData(projectYearlyData, true);
+      }
+    } else {
+      if (currentView === 'day' && allDailyData) {
+        return formatEventData(allDailyData, false);
+      } else if (['week', 'month'].includes(currentView) && allMonthlyData) {
+        return formatEventData(allMonthlyData, false);
+      } else if (currentView === 'year' && allYearlyData) {
+        return formatEventData(allYearlyData, false);
+      }
+    }
+    return [];
+  }, [
+    isCalendarDataLoading,
+    projectIdNumber,
     currentView,
-    currentDate,
     projectDailyData,
     projectMonthlyData,
     projectYearlyData,
     allDailyData,
     allMonthlyData,
     allYearlyData,
-    projectIdNumber,
-    setEvents,
   ]);
 
+  const calendarEvents = useMemo(() => {
+    return [...serverEvents, ...previewEvents];
+  }, [serverEvents, previewEvents]);
+
   // 캘린더에서 시간 선택 시 호출
-  const handleSelect = (selectInfo: DateSelectArg) => {
-    openCreateScheduleModal(selectInfo.start, selectInfo.end);
-  };
+  const handleSelect = useCallback(
+    (selectInfo: DateSelectArg) => {
+      openCreateScheduleModal(selectInfo.start, selectInfo.end);
+    },
+    [openCreateScheduleModal]
+  );
 
   // 모달 취소 처리
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     closeCreateModal();
     if (calendarRef.current) {
       const calendarApi = calendarRef.current.getApi();
       calendarApi.unselect();
     }
-  };
+  }, [closeCreateModal]);
 
   // 일정 저장
-  const handleSave = (newEvent: EventData) => {
-    closeCreateModal();
+  const handleSave = useCallback(
+    (newEvent: EventData) => {
+      closeCreateModal();
 
-    if (calendarRef.current) {
-      const calendarApi = calendarRef.current.getApi();
-      calendarApi.unselect();
-    }
+      if (calendarRef.current) {
+        const calendarApi = calendarRef.current.getApi();
+        calendarApi.unselect();
+      }
 
-    if (projectIdNumber) {
-      // 프로젝트 일정 저장
-      if (webSocketApi) {
-        webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
+      if (projectIdNumber) {
+        // 프로젝트 일정 저장
+        if (webSocketApi) {
+          webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
+        } else {
+          createProjectScheduleMutate(
+            {
+              projectId: projectIdNumber,
+              eventDataList: [newEvent],
+              options: { is_project_schedule: true },
+            },
+            {
+              onSuccess: () => {
+                console.log('프로젝트 일정 생성 성공');
+              },
+              onError: (error) => {
+                console.error('일정 저장 실패:', error);
+                alert('일정 저장에 실패했습니다.');
+              },
+            }
+          );
+        }
       } else {
-        createProjectScheduleMutate(
+        // 일반 일정 저장
+        createScheduleMutate(
           {
-            projectId: projectIdNumber,
-            eventDataList: [newEvent],
-            options: { is_project_schedule: true },
+            eventData: newEvent,
+            options: { is_project_schedule: false },
           },
           {
             onSuccess: () => {
-              createEvent({
-                ...newEvent,
-                is_project_schedule: true,
-              });
-              console.log('프로젝트 일정 생성 성공');
+              console.log('일반 일정 생성 성공');
             },
             onError: (error) => {
               console.error('일정 저장 실패:', error);
@@ -251,50 +264,32 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           }
         );
       }
-    } else {
-      // 일반 일정 저장
-      createScheduleMutate(
-        {
-          eventData: newEvent,
-          options: { is_project_schedule: false },
-        },
-        {
-          onSuccess: () => {
-            createEvent({
-              ...newEvent,
-              is_project_schedule: false,
-            });
-            console.log('일반 일정 생성 성공');
-          },
-          onError: (error) => {
-            console.error('일정 저장 실패:', error);
-            alert('일정 저장에 실패했습니다.');
-          },
-        }
-      );
-    }
-  };
+    },
+    [closeCreateModal, projectIdNumber, webSocketApi]
+  );
 
   // 일정 클릭 이벤트 처리
-  const handleEventClick = (info: any) => {
-    const eventData = {
-      id: info.event.id,
-      title: info.event.title,
-      start: info.event.start,
-      end: info.event.end,
-      description: info.event.extendedProps.description || '',
-      is_completed: info.event.extendedProps.is_completed || false,
-      is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
-      is_project_schedule: info.event.extendedProps.is_project_schedule || false,
-      assignees: info.event.extendedProps.assignees || [],
-    };
-    setCurrentSchedule(eventData);
-    openDetailScheduleModal(eventData);
-  };
+  const handleEventClick = useCallback(
+    (info: any) => {
+      const eventData = {
+        id: info.event.id,
+        title: info.event.title,
+        start: info.event.start,
+        end: info.event.end,
+        description: info.event.extendedProps.description || '',
+        is_completed: info.event.extendedProps.is_completed || false,
+        is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
+        is_project_schedule: info.event.extendedProps.is_project_schedule || false,
+        assignees: info.event.extendedProps.assignees || [],
+      };
+      setCurrentSchedule(eventData);
+      openDetailScheduleModal(eventData);
+    },
+    [openDetailScheduleModal, setCurrentSchedule]
+  );
 
   // 일정 삭제
-  const handleDelete = () => {
-    console.log('일정삭제:', selectedEventData);
+  const handleDelete = useCallback(() => {
     if (!selectedEventData || !selectedEventData.id) {
       return;
     }
@@ -324,7 +319,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           },
           {
             onSuccess: () => {
-              deleteEvent(selectedEventData.id as string);
               closeDetailModal();
             },
             onError: (error) => {
@@ -338,7 +332,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       // 일반 일정 삭제
       deleteScheduleMutate(scheduleId, {
         onSuccess: () => {
-          deleteEvent(selectedEventData.id as string);
           closeDetailModal();
         },
         onError: (error) => {
@@ -347,118 +340,89 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         },
       });
     }
-  };
+  }, [selectedEventData, webSocketApi, closeDetailModal, projectIdNumber]);
 
-  // 뷰 변경 시 이벤트 데이터 초기화 및 새로 불러오기
-  const handleViewChange = useCallback(
-    (dateInfo: any) => {
-      handleDatesSet(dateInfo);
-      setEvents([]);
+  const renderEventContent = useCallback((eventInfo: any) => {
+    const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
+    const isCompleted = eventInfo.event.extendedProps?.is_completed;
+    const backgroundColor = !isProjectSchedule
+      ? eventInfo.event.extendedProps?.is_preview
+        ? '#bbbbbb'
+        : '#4285F4'
+      : `#${eventInfo.event.extendedProps?.color}`;
+    const assignees = eventInfo.event.extendedProps?.assignees;
 
-      if (projectIdNumber) {
-        if (dateInfo.view.type === 'timeGridDay') {
-          queryClient.invalidateQueries({
-            queryKey: ['project-daily-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM-dd')],
-          });
-        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
-          queryClient.invalidateQueries({
-            queryKey: ['project-monthly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy-MM')],
-          });
-        } else {
-          queryClient.invalidateQueries({
-            queryKey: ['project-yearly-schedules', projectIdNumber, format(dateInfo.start, 'yyyy')],
-          });
-        }
-      } else {
-        if (dateInfo.view.type === 'timeGridDay') {
-          queryClient.invalidateQueries({
-            queryKey: ['daily-schedules', format(dateInfo.start, 'yyyy-MM-dd')],
-          });
-        } else if (dateInfo.view.type === 'timeGridWeek' || dateInfo.view.type === 'dayGridMonth') {
-          queryClient.invalidateQueries({
-            queryKey: ['monthly-schedules', format(dateInfo.start, 'yyyy-MM')],
-          });
-        } else {
-          queryClient.invalidateQueries({
-            queryKey: ['yearly-schedules', format(dateInfo.start, 'yyyy')],
-          });
-        }
-      }
-    },
-    [handleDatesSet, projectIdNumber, queryClient, setEvents]
-  );
+    return (
+      <div
+        style={{
+          backgroundColor,
+          color: '#ffffff',
+          padding: '0 2px',
+          borderRadius: '3px',
+          width: '100%',
+          height: '100%',
+        }}
+      >
+        <div className={styles.eventBox}>
+          <span className={styles.eventBoxIcon}>
+            {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
+            <AvatarGroup
+              spacing="small"
+              max={3}
+              sx={{
+                '& .MuiAvatarGroup-avatar': {
+                  width: 20,
+                  height: 20,
+                  fontSize: '0.75rem',
+                },
+              }}
+            >
+              {assignees?.map((assignee: Assignee, index: number) => (
+                <Avatar key={index} alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
+              ))}
+            </AvatarGroup>
+          </span>
+          <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
+          <div>{eventInfo.event.title}</div>
+        </div>
+      </div>
+    );
+  }, []);
 
   return (
     <div
       className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
       style={projectData?.color ? ({ '--project-color': `#${projectData.color}` } as React.CSSProperties) : undefined}
     >
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
-        initialView="dayGridMonth"
-        locale={koLocale}
-        headerToolbar={HEADER_TOOLBAR}
-        selectable={true}
-        select={handleSelect}
-        unselectAuto={false}
-        editable={!isPreviewMode}
-        droppable={!isPreviewMode}
-        eventDrop={updateEvent}
-        eventResize={updateEvent}
-        eventClick={handleEventClick}
-        views={CALENDAR_VIEWS}
-        events={events}
-        nowIndicator={true}
-        slotEventOverlap={false}
-        datesSet={handleViewChange}
-        eventContent={(eventInfo) => {
-          const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
-          const isCompleted = eventInfo.event.extendedProps?.is_completed;
-          const backgroundColor = !isProjectSchedule
-            ? eventInfo.event.extendedProps?.is_preview
-              ? '#bbbbbb'
-              : '#4285F4'
-            : `#${eventInfo.event.extendedProps?.color}`;
-          const assignees = eventInfo.event.extendedProps?.assignees;
-
-          return (
-            <div
-              style={{
-                backgroundColor,
-                color: '#ffffff',
-                padding: '0 2px',
-                borderRadius: '3px',
-                width: '100%',
-                height: '100%',
-              }}
-            >
-              <div className={styles.eventBox}>
-                <span className={styles.eventBoxIcon}>
-                  {isCompleted ? <CheckCircleIcon className={styles.smallIcon} /> : null}
-                  <AvatarGroup
-                    spacing="small"
-                    max={3}
-                    sx={{
-                      '& .MuiAvatarGroup-avatar': {
-                        width: 20,
-                        height: 20,
-                        fontSize: '0.75rem',
-                      },
-                    }}
-                  >
-                    {assignees?.map((assignee: Assignee) => (
-                      <Avatar alt={assignee.nickname} src={assignee.profile_image_url} sx={{ bgcolor: 'gray' }} />
-                    ))}
-                  </AvatarGroup>
-                </span>
-                <div className={styles.eventBoxTime}>{eventInfo.timeText}</div>
-                <div>{eventInfo.event.title}</div>
-              </div>
-            </div>
-          );
-        }}
-      />
+      {isCalendarDataLoading ? (
+        <div
+          style={{ width: '100%', height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <CircularProgress sx={{ scale: '1.5' }} />
+        </div>
+      ) : (
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
+          initialView="dayGridMonth"
+          locale={koLocale}
+          headerToolbar={HEADER_TOOLBAR}
+          selectable={true}
+          select={handleSelect}
+          unselectAuto={false}
+          editable={!isPreviewMode}
+          droppable={!isPreviewMode}
+          eventDrop={updateEvent}
+          eventResize={updateEvent}
+          eventClick={handleEventClick}
+          views={CALENDAR_VIEWS}
+          events={calendarEvents}
+          nowIndicator={true}
+          slotEventOverlap={false}
+          datesSet={handleDatesSet}
+          eventContent={renderEventContent}
+        />
+      )}
 
       {openCreateModal && (
         <CreateScheduleModal
