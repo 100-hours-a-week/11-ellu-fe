@@ -71,9 +71,7 @@ export default function AfterLoginHeader() {
             <Skeleton variant="circular" width={40} height={40} />
           )}
 
-          <Typography variant="body1" fontWeight="bold" sx={{ ml: 1 }}>
-            {user?.nickname || '정보없음'}
-          </Typography>
+          <div className={style.nickname}>{user?.nickname || '정보없음'}</div>
         </Box>
       </div>
 
