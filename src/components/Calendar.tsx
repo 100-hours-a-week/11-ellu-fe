@@ -16,7 +16,7 @@ import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
 import { useCalendarView } from '@/hooks/useCalendarView';
 import { EventData, Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Avatar, AvatarGroup } from '@mui/material';
+import { Avatar, AvatarGroup, CircularProgress } from '@mui/material';
 import { CALENDAR_VIEWS, HEADER_TOOLBAR } from '@/constants/calendarConfig';
 
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
@@ -143,7 +143,26 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }));
   }, []);
 
+  const isCalendarDataLoading = useMemo(() => {
+    if (projectIdNumber) {
+      return isLoadingProjectDaily || isLoadingProjectMonthly || isLoadingProjectYearly;
+    } else {
+      return isLoadingAllDaily || isLoadingAllMonthly || isLoadingAllYearly;
+    }
+  }, [
+    projectIdNumber,
+    isLoadingProjectDaily,
+    isLoadingProjectMonthly,
+    isLoadingProjectYearly,
+    isLoadingAllDaily,
+    isLoadingAllMonthly,
+    isLoadingAllYearly,
+  ]);
+
   const serverEvents = useMemo(() => {
+    if (isCalendarDataLoading) {
+      return [];
+    }
     if (projectIdNumber) {
       if (currentView === 'day' && projectDailyData) {
         return formatEventData(projectDailyData, true);
@@ -163,6 +182,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }
     return [];
   }, [
+    isCalendarDataLoading,
     projectIdNumber,
     currentView,
     projectDailyData,
@@ -374,27 +394,35 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       className={`${styles.calendarContainer} ${projectIdNumber ? styles.projectCalendar : styles.normalCalendar}`}
       style={projectData?.color ? ({ '--project-color': `#${projectData.color}` } as React.CSSProperties) : undefined}
     >
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
-        initialView="dayGridMonth"
-        locale={koLocale}
-        headerToolbar={HEADER_TOOLBAR}
-        selectable={true}
-        select={handleSelect}
-        unselectAuto={false}
-        editable={!isPreviewMode}
-        droppable={!isPreviewMode}
-        eventDrop={updateEvent}
-        eventResize={updateEvent}
-        eventClick={handleEventClick}
-        views={CALENDAR_VIEWS}
-        events={calendarEvents}
-        nowIndicator={true}
-        slotEventOverlap={false}
-        datesSet={handleDatesSet}
-        eventContent={renderEventContent}
-      />
+      {isCalendarDataLoading ? (
+        <div
+          style={{ width: '100%', height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <CircularProgress sx={{ scale: '1.5' }} />
+        </div>
+      ) : (
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, multiMonthPlugin]}
+          initialView="dayGridMonth"
+          locale={koLocale}
+          headerToolbar={HEADER_TOOLBAR}
+          selectable={true}
+          select={handleSelect}
+          unselectAuto={false}
+          editable={!isPreviewMode}
+          droppable={!isPreviewMode}
+          eventDrop={updateEvent}
+          eventResize={updateEvent}
+          eventClick={handleEventClick}
+          views={CALENDAR_VIEWS}
+          events={calendarEvents}
+          nowIndicator={true}
+          slotEventOverlap={false}
+          datesSet={handleDatesSet}
+          eventContent={renderEventContent}
+        />
+      )}
 
       {openCreateModal && (
         <CreateScheduleModal
