@@ -13,7 +13,7 @@ import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { useScheduleStore } from '@/stores/scheduleStore';
 
-import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
+import { useProjectWebSocket } from '@/hooks/integration/useProjectWebSocket';
 
 interface EditScheduleFormProps {
   scheduleData: EventData;

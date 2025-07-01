@@ -1,8 +1,8 @@
-import api from '@/lib/axios';
+import api from '@/lib/config/axios';
 import { ScheduleResponse } from '@/types/api/schedule';
 import { EventData } from '@/types/calendar';
 import { ApiResponse } from '@/types/api/common';
-import { convertToEventData, convertToScheduleData } from '@/utils/scheduleUtils';
+import { convertToEventData, convertToScheduleData } from '@/lib/utils/scheduleUtils';
 
 ////////////////////모든일정////////////////////
 

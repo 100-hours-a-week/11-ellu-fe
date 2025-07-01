@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -11,10 +12,10 @@ import koLocale from '@fullcalendar/core/locales/ko';
 import { format } from 'date-fns';
 import styles from './Calendar.module.css';
 import { DateSelectArg } from '@fullcalendar/core';
-import { useCalendarModals } from '@/hooks/useCalendarModals';
-import { useCalendarEventHandlers } from '@/hooks/useCalendarEvents';
-import { useCalendarView } from '@/hooks/useCalendarView';
-import { EventData, Assignee } from '@/types/calendar';
+import { useCalendarModals } from '@/hooks/features/calendar/useCalendarModals';
+import { useCalendarEventHandlers } from '@/hooks/features/calendar/useCalendarEvents';
+import { useCalendarView } from '@/hooks/features/calendar/useCalendarView';
+import { Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Avatar, AvatarGroup, CircularProgress } from '@mui/material';
 import { CALENDAR_VIEWS, HEADER_TOOLBAR } from '@/constants/calendarConfig';
@@ -22,14 +23,10 @@ import { CALENDAR_VIEWS, HEADER_TOOLBAR } from '@/constants/calendarConfig';
 import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
 import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
 import { useGetProjectYearlySchedules } from '@/hooks/api/schedule/project/useGetProjectYearlySchedules';
-import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
-import { useDeleteProjectSchedule } from '@/hooks/api/schedule/project/useDeleteProjectSchedule';
 
 import { useGetAllDailySchedules } from '@/hooks/api/schedule/useGetAllDailySchedules';
 import { useGetAllMonthlySchedules } from '@/hooks/api/schedule/useGetAllMonthlySchedules';
 import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySchedules';
-import { useCreateSchedule } from '@/hooks/api/schedule/useCreateSchedule';
-import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
 
 import CreateScheduleModalSkeleton from './skeleton/CreateScheduleModalSkeleton';
 import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton';
@@ -37,7 +34,7 @@ import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton'
 import { useScheduleStore } from '@/stores/scheduleStore';
 import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 
-import { useProjectWebSocket } from '@/hooks/websocket/useProjectWebSocket';
+import { useProjectWebSocket } from '@/hooks/integration/useProjectWebSocket';
 
 import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
 
@@ -51,6 +48,7 @@ const ScheduleDetailModal = dynamic(() => import('./ScheduleDetailModal'), {
 
 export default function Calendar({ projectId }: { projectId?: string }) {
   const calendarRef = useRef<FullCalendar>(null);
+  const pathname = usePathname();
 
   const projectIdNumber = projectId ? parseInt(projectId) : undefined;
 
@@ -59,7 +57,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const { setCurrentSchedule } = useScheduleStore();
   const { previewEvents } = usePreviewSchedulesStore();
 
-  const isPreviewMode = previewEvents.length > 0; // 또는 별도 상태
+  const isPreviewMode = pathname.includes('/chatbot') && previewEvents.length > 0;
 
   // 커스텀 훅 사용
   const {
@@ -74,7 +72,14 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
-  const { updateEvent } = useCalendarEventHandlers({ webSocketApi });
+  const { saveEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({
+    webSocketApi,
+    closeCreateModal,
+    closeDetailModal,
+    calendarRef,
+    projectIdNumber,
+    selectedEventData,
+  });
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
@@ -83,7 +88,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   // tanstack query
   // 프로젝트 정보 가져오기
-  const { data: projectData, isLoading: isLoadingProject } = useGetProjectById(projectIdNumber as number);
+  const { data: projectData } = useGetProjectById(projectIdNumber as number);
   // 프로젝트
   // 일별 일정
   const { data: projectDailyData, isLoading: isLoadingProjectDaily } = useGetProjectDailySchedules(
@@ -109,10 +114,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
       enabled: !!projectIdNumber && currentView === 'year',
     }
   );
-  // 일정 생성
-  const { mutate: createProjectScheduleMutate } = useCreateProjectSchedules();
-  // 일정 삭제
-  const { mutate: deleteProjectScheduleMutate } = useDeleteProjectSchedule();
 
   // 모든일정
   // 일별 일정
@@ -127,10 +128,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const { data: allYearlyData, isLoading: isLoadingAllYearly } = useGetAllYearlySchedules(formattedYear, {
     enabled: !projectIdNumber && currentView === 'year',
   });
-  // 일정 생성
-  const { mutate: createScheduleMutate } = useCreateSchedule();
-  // 일정 삭제
-  const { mutate: deleteScheduleMutate } = useDeleteSchedule();
 
   const formatEventData = useCallback((data: any[], isProject: boolean) => {
     return data.map((event) => ({
@@ -214,60 +211,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     }
   }, [closeCreateModal]);
 
-  // 일정 저장
-  const handleSave = useCallback(
-    (newEvent: EventData) => {
-      closeCreateModal();
-
-      if (calendarRef.current) {
-        const calendarApi = calendarRef.current.getApi();
-        calendarApi.unselect();
-      }
-
-      if (projectIdNumber) {
-        // 프로젝트 일정 저장
-        if (webSocketApi) {
-          webSocketApi.createSchedule([newEvent], { is_project_schedule: true });
-        } else {
-          createProjectScheduleMutate(
-            {
-              projectId: projectIdNumber,
-              eventDataList: [newEvent],
-              options: { is_project_schedule: true },
-            },
-            {
-              onSuccess: () => {
-                console.log('프로젝트 일정 생성 성공');
-              },
-              onError: (error) => {
-                console.error('일정 저장 실패:', error);
-                alert('일정 저장에 실패했습니다.');
-              },
-            }
-          );
-        }
-      } else {
-        // 일반 일정 저장
-        createScheduleMutate(
-          {
-            eventData: newEvent,
-            options: { is_project_schedule: false },
-          },
-          {
-            onSuccess: () => {
-              console.log('일반 일정 생성 성공');
-            },
-            onError: (error) => {
-              console.error('일정 저장 실패:', error);
-              alert('일정 저장에 실패했습니다.');
-            },
-          }
-        );
-      }
-    },
-    [closeCreateModal, projectIdNumber, webSocketApi]
-  );
-
   // 일정 클릭 이벤트 처리
   const handleEventClick = useCallback(
     (info: any) => {
@@ -287,60 +230,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     },
     [openDetailScheduleModal, setCurrentSchedule]
   );
-
-  // 일정 삭제
-  const handleDelete = useCallback(() => {
-    if (!selectedEventData || !selectedEventData.id) {
-      return;
-    }
-
-    let scheduleId;
-    if (selectedEventData.id.includes('-')) {
-      const parts = selectedEventData.id.split('-');
-      scheduleId = parseInt(parts[parts.length - 1]);
-    } else {
-      scheduleId = parseInt(selectedEventData.id);
-    }
-    if (isNaN(scheduleId)) {
-      console.error('유효하지 않은 일정 ID:', selectedEventData.id);
-      return;
-    }
-
-    if (selectedEventData.is_project_schedule) {
-      // 프로젝트 일정 삭제
-      if (webSocketApi) {
-        webSocketApi.deleteSchedule(scheduleId);
-        closeDetailModal();
-      } else {
-        deleteProjectScheduleMutate(
-          {
-            projectId: projectIdNumber ? projectIdNumber : 0,
-            scheduleId: scheduleId,
-          },
-          {
-            onSuccess: () => {
-              closeDetailModal();
-            },
-            onError: (error) => {
-              console.error('일정 삭제 실패:', error);
-              alert('일정 삭제에 실패했습니다.');
-            },
-          }
-        );
-      }
-    } else {
-      // 일반 일정 삭제
-      deleteScheduleMutate(scheduleId, {
-        onSuccess: () => {
-          closeDetailModal();
-        },
-        onError: (error) => {
-          console.error('일정 삭제 실패:', error);
-          alert('일정 삭제에 실패했습니다.');
-        },
-      });
-    }
-  }, [selectedEventData, webSocketApi, closeDetailModal, projectIdNumber]);
 
   const renderEventContent = useCallback((eventInfo: any) => {
     const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;
@@ -429,7 +318,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           open={openCreateModal}
           onClose={closeCreateModal}
           onCancel={handleCancel}
-          onSave={handleSave}
+          onSave={saveEvent}
           selectedEvent={selectedEvent}
           eventData={eventData}
           onInputChange={handleInputChange}
@@ -442,7 +331,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
           open={openDetailModal}
           onClose={closeDetailModal}
           eventData={selectedEventData}
-          onDelete={handleDelete}
+          onDelete={deleteEvent}
           projectId={projectId}
           takeSchedule={webSocketApi?.takeSchedule as (scheduleId: number) => void}
         />

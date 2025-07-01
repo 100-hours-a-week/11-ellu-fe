@@ -51,8 +51,16 @@ export interface EditScheduleModalProps {
 
 export interface webSocketApi {
   updateSchedule: (eventData: EventData, scheduleId: number) => void;
+  createSchedule: (eventDataList: EventData[], options: { is_project_schedule: boolean }) => void;
+  deleteSchedule: (scheduleId: number) => void;
+  takeSchedule: (scheduleId: number) => void;
 }
 
 export interface UseCalendarEventHandlersProps {
   webSocketApi?: webSocketApi | null;
+  closeCreateModal: () => void;
+  closeDetailModal: () => void;
+  calendarRef: React.RefObject<any>;
+  projectIdNumber?: number;
+  selectedEventData?: EventData | null;
 }

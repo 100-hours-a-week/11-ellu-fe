@@ -1,4 +1,4 @@
-import api from '@/lib/axios';
+import api from '@/lib/config/axios';
 import { KakaoLoginResponse } from '@/types/api/auth';
 import { User } from '@/types/api/user';
 import { ApiResponse } from '@/types/api/common';

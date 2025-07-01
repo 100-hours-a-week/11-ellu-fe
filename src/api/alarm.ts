@@ -1,4 +1,4 @@
-import api from '@/lib/axios';
+import api from '@/lib/config/axios';
 import { Alarm } from '@/types/alarm';
 import { ApiResponse } from '@/types/api/common';
 

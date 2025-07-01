@@ -1,8 +1,8 @@
-import api from '@/lib/axios';
+import api from '@/lib/config/axios';
 import { ApiResponse } from '@/types/api/common';
 import { MessageData } from '@/types/chatbot';
 import { EventData } from '@/types/calendar';
-import { convertToChatbotScheduleData } from '@/utils/scheduleUtils';
+import { convertToChatbotScheduleData } from '@/lib/utils/scheduleUtils';
 import { ScheduleResponse } from '@/types/api/schedule';
 import { ChatMessage, ChatHistoryResponse } from '@/types/api/chatbot';
 

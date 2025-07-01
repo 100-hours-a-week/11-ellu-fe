@@ -1,11 +1,10 @@
-// src/hooks/useWebSocket.ts
 import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { userStore } from '@/stores/userStore';
-import { createWebSocketClient } from '@/lib/websocket';
+import { createWebSocketClient } from '@/lib/config/websocket';
 import { Client } from '@stomp/stompjs';
 import { EventData } from '@/types/calendar';
-import { convertToScheduleData } from '@/utils/scheduleUtils';
+import { convertToScheduleData } from '@/lib/utils/scheduleUtils';
 import { useRouter } from 'next/navigation';
 import { QUERY_KEYS } from '@/constants/queryKeys';
 

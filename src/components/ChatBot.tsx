@@ -8,7 +8,7 @@ import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { useState, useEffect, useRef } from 'react';
 import { Message } from '@/types/chatbot';
 import { usePostMessage } from '@/hooks/api/chatbot/usePostMessage';
-import { useChatSSE } from '@/hooks/useChatSSE';
+import { useChatSSE } from '@/hooks/integration/useChatSSE';
 import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
 import { useChatbotCreateSchedule } from '@/hooks/api/chatbot/useChatbotCreateSchedule';
 import { useGetChatMessage } from '@/hooks/api/chatbot/useGetChatMessage';
