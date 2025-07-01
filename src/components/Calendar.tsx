@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useRef, useCallback, useMemo } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -9,30 +9,19 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import interactionPlugin from '@fullcalendar/interaction';
 import koLocale from '@fullcalendar/core/locales/ko';
-import { format } from 'date-fns';
 import styles from './Calendar.module.css';
 import { useCalendarModals } from '@/hooks/features/calendar/useCalendarModals';
 import { useCalendarEventHandlers } from '@/hooks/features/calendar/useCalendarEvents';
 import { useCalendarView } from '@/hooks/features/calendar/useCalendarView';
 import { useCalendarHandlers } from '@/hooks/features/calendar/useCalendarHandlers';
+import { useCalendarData } from '@/hooks/features/calendar/useCalendarData';
 import { Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Avatar, AvatarGroup, CircularProgress } from '@mui/material';
 import { CALENDAR_VIEWS, HEADER_TOOLBAR } from '@/constants/calendarConfig';
 
-import { useGetProjectDailySchedules } from '@/hooks/api/schedule/project/useGetProjectDailySchedules';
-import { useGetProjectMonthlySchedules } from '@/hooks/api/schedule/project/useGetProjectMonthlySchedules';
-import { useGetProjectYearlySchedules } from '@/hooks/api/schedule/project/useGetProjectYearlySchedules';
-
-import { useGetAllDailySchedules } from '@/hooks/api/schedule/useGetAllDailySchedules';
-import { useGetAllMonthlySchedules } from '@/hooks/api/schedule/useGetAllMonthlySchedules';
-import { useGetAllYearlySchedules } from '@/hooks/api/schedule/useGetAllYearlySchedules';
-
 import CreateScheduleModalSkeleton from './skeleton/CreateScheduleModalSkeleton';
 import ScheduleDetailModalSkeleton from './skeleton/ScheduleDetailModalSkeleton';
-
-import { useScheduleStore } from '@/stores/scheduleStore';
-import { useGetProjectById } from '@/hooks/api/projects/useGetProjectById';
 
 import { useProjectWebSocket } from '@/hooks/integration/useProjectWebSocket';
 
@@ -54,7 +43,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
 
   const webSocketApi = projectIdNumber ? useProjectWebSocket(projectIdNumber) : null;
 
-  const { setCurrentSchedule } = useScheduleStore();
   const { previewEvents } = usePreviewSchedulesStore();
 
   const isPreviewMode = pathname.includes('/chatbot') && previewEvents.length > 0;
@@ -91,117 +79,11 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     calendarRef,
   });
 
-  const formattedDate = format(currentDate, 'yyyy-MM-dd');
-  const formattedMonth = format(currentDate, 'yyyy-MM');
-  const formattedYear = format(currentDate, 'yyyy');
-
-  // tanstack query
-  // 프로젝트 정보 가져오기
-  const { data: projectData } = useGetProjectById(projectIdNumber as number);
-  // 프로젝트
-  // 일별 일정
-  const { data: projectDailyData, isLoading: isLoadingProjectDaily } = useGetProjectDailySchedules(
-    projectIdNumber as number,
-    formattedDate,
-    {
-      enabled: !!projectIdNumber && currentView === 'day',
-    }
-  );
-  // 주간/월간 일정
-  const { data: projectMonthlyData, isLoading: isLoadingProjectMonthly } = useGetProjectMonthlySchedules(
-    projectIdNumber as number,
-    formattedMonth,
-    {
-      enabled: !!projectIdNumber && (currentView === 'week' || currentView === 'month'),
-    }
-  );
-  // 연간 일정
-  const { data: projectYearlyData, isLoading: isLoadingProjectYearly } = useGetProjectYearlySchedules(
-    projectIdNumber as number,
-    formattedYear,
-    {
-      enabled: !!projectIdNumber && currentView === 'year',
-    }
-  );
-
-  // 모든일정
-  // 일별 일정
-  const { data: allDailyData, isLoading: isLoadingAllDaily } = useGetAllDailySchedules(formattedDate, {
-    enabled: !projectIdNumber && currentView === 'day',
-  });
-  // 주간/월간 일정
-  const { data: allMonthlyData, isLoading: isLoadingAllMonthly } = useGetAllMonthlySchedules(formattedMonth, {
-    enabled: !projectIdNumber && (currentView === 'week' || currentView === 'month'),
-  });
-  // 연간 일정
-  const { data: allYearlyData, isLoading: isLoadingAllYearly } = useGetAllYearlySchedules(formattedYear, {
-    enabled: !projectIdNumber && currentView === 'year',
-  });
-
-  const formatEventData = useCallback((data: any[], isProject: boolean) => {
-    return data.map((event) => ({
-      ...event,
-      id: isProject
-        ? `project-${event.id}`
-        : event.extendedProps?.is_project_schedule
-          ? `project-${event.id}`
-          : `schedule-${event.id}`,
-    }));
-  }, []);
-
-  const isCalendarDataLoading = useMemo(() => {
-    if (projectIdNumber) {
-      return isLoadingProjectDaily || isLoadingProjectMonthly || isLoadingProjectYearly;
-    } else {
-      return isLoadingAllDaily || isLoadingAllMonthly || isLoadingAllYearly;
-    }
-  }, [
-    projectIdNumber,
-    isLoadingProjectDaily,
-    isLoadingProjectMonthly,
-    isLoadingProjectYearly,
-    isLoadingAllDaily,
-    isLoadingAllMonthly,
-    isLoadingAllYearly,
-  ]);
-
-  const serverEvents = useMemo(() => {
-    if (isCalendarDataLoading) {
-      return [];
-    }
-    if (projectIdNumber) {
-      if (currentView === 'day' && projectDailyData) {
-        return formatEventData(projectDailyData, true);
-      } else if (['week', 'month'].includes(currentView) && projectMonthlyData) {
-        return formatEventData(projectMonthlyData, true);
-      } else if (currentView === 'year' && projectYearlyData) {
-        return formatEventData(projectYearlyData, true);
-      }
-    } else {
-      if (currentView === 'day' && allDailyData) {
-        return formatEventData(allDailyData, false);
-      } else if (['week', 'month'].includes(currentView) && allMonthlyData) {
-        return formatEventData(allMonthlyData, false);
-      } else if (currentView === 'year' && allYearlyData) {
-        return formatEventData(allYearlyData, false);
-      }
-    }
-    return [];
-  }, [
-    isCalendarDataLoading,
-    projectIdNumber,
+  const { projectData, calendarEvents, isCalendarDataLoading } = useCalendarData({
+    projectId: projectIdNumber,
     currentView,
-    projectDailyData,
-    projectMonthlyData,
-    projectYearlyData,
-    allDailyData,
-    allMonthlyData,
-    allYearlyData,
-  ]);
-
-  const calendarEvents = useMemo(() => {
-    return [...serverEvents, ...previewEvents];
-  }, [serverEvents, previewEvents]);
+    currentDate,
+  });
 
   const renderEventContent = useCallback((eventInfo: any) => {
     const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;

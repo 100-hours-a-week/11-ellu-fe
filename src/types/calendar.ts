@@ -71,3 +71,9 @@ export interface UseCalendarHandlersProps {
   openDetailScheduleModal: (eventData: EventData) => void;
   calendarRef: React.RefObject<any>;
 }
+
+export interface UseCalendarDataProps {
+  projectId?: number;
+  currentView: string;
+  currentDate: Date;
+}
