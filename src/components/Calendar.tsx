@@ -11,10 +11,10 @@ import interactionPlugin from '@fullcalendar/interaction';
 import koLocale from '@fullcalendar/core/locales/ko';
 import { format } from 'date-fns';
 import styles from './Calendar.module.css';
-import { DateSelectArg } from '@fullcalendar/core';
 import { useCalendarModals } from '@/hooks/features/calendar/useCalendarModals';
 import { useCalendarEventHandlers } from '@/hooks/features/calendar/useCalendarEvents';
 import { useCalendarView } from '@/hooks/features/calendar/useCalendarView';
+import { useCalendarHandlers } from '@/hooks/features/calendar/useCalendarHandlers';
 import { Assignee } from '@/types/calendar';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Avatar, AvatarGroup, CircularProgress } from '@mui/material';
@@ -72,6 +72,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     closeDetailModal,
     handleInputChange,
   } = useCalendarModals();
+
   const { saveEvent, updateEvent, deleteEvent } = useCalendarEventHandlers({
     webSocketApi,
     closeCreateModal,
@@ -80,7 +81,15 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     projectIdNumber,
     selectedEventData,
   });
+
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
+
+  const { handleSelect, handleCancel, handleEventClick } = useCalendarHandlers({
+    openCreateScheduleModal,
+    closeCreateModal,
+    openDetailScheduleModal,
+    calendarRef,
+  });
 
   const formattedDate = format(currentDate, 'yyyy-MM-dd');
   const formattedMonth = format(currentDate, 'yyyy-MM');
@@ -193,43 +202,6 @@ export default function Calendar({ projectId }: { projectId?: string }) {
   const calendarEvents = useMemo(() => {
     return [...serverEvents, ...previewEvents];
   }, [serverEvents, previewEvents]);
-
-  // 캘린더에서 시간 선택 시 호출
-  const handleSelect = useCallback(
-    (selectInfo: DateSelectArg) => {
-      openCreateScheduleModal(selectInfo.start, selectInfo.end);
-    },
-    [openCreateScheduleModal]
-  );
-
-  // 모달 취소 처리
-  const handleCancel = useCallback(() => {
-    closeCreateModal();
-    if (calendarRef.current) {
-      const calendarApi = calendarRef.current.getApi();
-      calendarApi.unselect();
-    }
-  }, [closeCreateModal]);
-
-  // 일정 클릭 이벤트 처리
-  const handleEventClick = useCallback(
-    (info: any) => {
-      const eventData = {
-        id: info.event.id,
-        title: info.event.title,
-        start: info.event.start,
-        end: info.event.end,
-        description: info.event.extendedProps.description || '',
-        is_completed: info.event.extendedProps.is_completed || false,
-        is_ai_recommended: info.event.extendedProps.is_ai_recommended || false,
-        is_project_schedule: info.event.extendedProps.is_project_schedule || false,
-        assignees: info.event.extendedProps.assignees || [],
-      };
-      setCurrentSchedule(eventData);
-      openDetailScheduleModal(eventData);
-    },
-    [openDetailScheduleModal, setCurrentSchedule]
-  );
 
   const renderEventContent = useCallback((eventInfo: any) => {
     const isProjectSchedule = eventInfo.event.extendedProps?.is_project_schedule;

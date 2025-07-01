@@ -64,3 +64,10 @@ export interface UseCalendarEventHandlersProps {
   projectIdNumber?: number;
   selectedEventData?: EventData | null;
 }
+
+export interface UseCalendarHandlersProps {
+  openCreateScheduleModal: (start: Date, end: Date) => void;
+  closeCreateModal: () => void;
+  openDetailScheduleModal: (eventData: EventData) => void;
+  calendarRef: React.RefObject<any>;
+}

@@ -47,9 +47,7 @@ export function useCalendarEventHandlers({
               options: { is_project_schedule: true },
             },
             {
-              onSuccess: () => {
-                console.log('프로젝트 일정 생성 성공');
-              },
+              onSuccess: () => {},
               onError: (error) => {
                 console.error('일정 저장 실패:', error);
                 alert('일정 저장에 실패했습니다.');
@@ -65,9 +63,7 @@ export function useCalendarEventHandlers({
             options: { is_project_schedule: false },
           },
           {
-            onSuccess: () => {
-              console.log('일반 일정 생성 성공');
-            },
+            onSuccess: () => {},
             onError: (error) => {
               console.error('일정 저장 실패:', error);
               alert('일정 저장에 실패했습니다.');
@@ -124,9 +120,7 @@ export function useCalendarEventHandlers({
               options: { is_project_schedule: true, is_completed: event.extendedProps.is_completed },
             },
             {
-              onSuccess: () => {
-                console.log('프로젝트 일정 업데이트 성공');
-              },
+              onSuccess: () => {},
               onError: (error) => {
                 console.error('프로젝트 일정 업데이트 실패:', error);
                 alert('일정 업데이트 실패');
@@ -143,9 +137,7 @@ export function useCalendarEventHandlers({
             options: { is_project_schedule: false, is_completed: event.extendedProps.is_completed },
           },
           {
-            onSuccess: () => {
-              console.log('일반 일정 업데이트 성공');
-            },
+            onSuccess: () => {},
             onError: (error) => {
               console.error('일반 일정 업데이트 실패:', error);
               alert('일정 업데이트 실패');

@@ -15,11 +15,7 @@ export function useCalendarView() {
     } else if (type === 'multiMonthYear') {
       setCurrentView('year');
     }
-    console.log('Date range changed:', {
-      start: dateInfo.start,
-      end: dateInfo.end,
-      view: dateInfo.view.type,
-    });
+
     setCurrentDate(dateInfo.start);
   }, []);
 
