@@ -1,4 +1,4 @@
-import api from '@/lib/config/axios';
+import api from '@/config/axios';
 import { User } from '@/types/api/user';
 import { ApiResponse } from '@/types/api/common';
 

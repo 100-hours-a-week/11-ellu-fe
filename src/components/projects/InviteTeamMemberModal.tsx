@@ -8,7 +8,7 @@ import styles from './InviteTeamMemberModal.module.css';
 import { useState, useRef, useEffect } from 'react';
 import { useSearchUser } from '@/hooks/api/user/useSearchUser';
 import { User } from '@/types/api/user';
-import { useDebounce } from '@/hooks/features/projects/useDebounce';
+import { useDebounce } from '@/hooks/common/useDebounce';
 import { InviteTeamMemberModalProps } from '@/types/project';
 import { userStore } from '@/stores/userStore';
 
