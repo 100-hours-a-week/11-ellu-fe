@@ -27,11 +27,11 @@ export default function MypageForm() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNickname(value);
-    validateField(value, 'nickname');
+    validateField('nickname', value, 'nickname');
   };
 
   const handleUpdateNickname = () => {
-    const isValid = validateField(nickname, 'nickname');
+    const isValid = validateField('nickname', nickname, 'nickname');
     if (!isValid || nickname === user?.nickname) return;
 
     updateNickname(nickname, {
@@ -49,7 +49,7 @@ export default function MypageForm() {
       },
       onError: (err) => {
         if (err.response?.status === 409) {
-          setError('이미 사용 중인 닉네임입니다.');
+          setError('nickname', '이미 사용 중인 닉네임입니다.');
         } else {
           alert('닉네임 변경 중 오류가 발생했습니다.');
         }
@@ -91,8 +91,8 @@ export default function MypageForm() {
         <TextField
           value={nickname}
           onChange={handleChange}
-          error={!!errors}
-          helperText={errors ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
+          error={!!errors.nickname}
+          helperText={errors.nickname}
           fullWidth
           sx={{ mb: 3 }}
           disabled={isPending}
@@ -105,7 +105,7 @@ export default function MypageForm() {
         <Button
           variant="contained"
           onClick={handleUpdateNickname}
-          disabled={!!errors || isPending || nickname.length === 0 || nickname === user?.nickname}
+          disabled={!!errors.nickname || isPending || nickname.length === 0 || nickname === user?.nickname}
           fullWidth
           sx={{ height: 50 }}
         >

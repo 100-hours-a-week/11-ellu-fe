@@ -24,25 +24,23 @@ export const validationRules = {
   //     return { isValid: true, message: '' };
   //   },
 
-  //   // 프로젝트 제목 검증 (ProjectInfoForm에서 사용)
-  //   projectTitle: (value: string): ValidationResult => {
-  //     if (!value || value.length < 1 || value.length > 10) {
-  //       return { isValid: false, message: '최소 1자, 최대 10자이내로 입력해주세요' };
-  //     }
-  //     if (!/^[가-힣a-zA-Z0-9\s]+$/.test(value)) {
-  //       return { isValid: false, message: '한글, 영문, 숫자만 입력 가능합니다' };
-  //     }
-  //     return { isValid: true, message: '' };
-  //   },
+  projectTitle: (value: string): ValidationResult => {
+    if (!value || value.length < 1 || value.length > 10) {
+      return { isValid: false, message: '최소 1자, 최대 10자이내로 입력해주세요' };
+    }
+    if (!/^[가-힣a-zA-Z0-9\s]+$/.test(value)) {
+      return { isValid: false, message: '한글, 영문, 숫자만 입력 가능합니다' };
+    }
+    return { isValid: true, message: '' };
+  },
 
-  //   // URL 검증 (ProjectInfoForm의 wiki에서 사용)
-  //   url: (value: string): ValidationResult => {
-  //     const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-  //     if (!urlPattern.test(value)) {
-  //       return { isValid: false, message: '올바른 URL 형식이 아닙니다' };
-  //     }
-  //     return { isValid: true, message: '' };
-  //   },
+  url: (value: string): ValidationResult => {
+    const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+    if (!urlPattern.test(value)) {
+      return { isValid: false, message: '올바른 URL 형식이 아닙니다' };
+    }
+    return { isValid: true, message: '' };
+  },
 
   nickname: (value: string): ValidationResult => {
     if (!value.trim()) {
@@ -69,13 +67,13 @@ export const validationRules = {
   //     return { isValid: true, message: '' };
   //   },
 
-  //   // 필수 필드 검증
-  //   required: (value: string, fieldName: string = '값'): ValidationResult => {
-  //     if (!value || value.trim() === '') {
-  //       return { isValid: false, message: `${fieldName}을(를) 입력해주세요.` };
-  //     }
-  //     return { isValid: true, message: '' };
-  //   },
+  // 필수 필드 검증
+  required: (value: string, fieldName: string = '값'): ValidationResult => {
+    if (!value || value.trim() === '') {
+      return { isValid: false, message: `${fieldName}을(를) 입력해주세요.` };
+    }
+    return { isValid: true, message: '' };
+  },
 
   //   // 길이 검증
   //   length: (value: string, min: number, max: number): ValidationResult => {

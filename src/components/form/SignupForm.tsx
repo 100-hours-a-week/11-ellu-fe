@@ -21,13 +21,13 @@ export default function SignupForm() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNickname(value);
-    validateField(value, 'nickname');
+    validateField('nickname', value, 'nickname');
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const isValid = validateField(nickname, 'nickname');
+    const isValid = validateField('nickname', nickname, 'nickname');
     if (!isValid) return;
 
     signup(nickname, {
@@ -43,7 +43,7 @@ export default function SignupForm() {
       },
       onError: (err) => {
         if (err.response?.status === 409) {
-          setError('이미 사용 중인 닉네임입니다.');
+          setError('nickname', '이미 사용 중인 닉네임입니다.');
         } else {
           alert('회원가입 처리 중 문제가 발생했습니다.');
         }
@@ -62,14 +62,14 @@ export default function SignupForm() {
         label="닉네임"
         value={nickname}
         onChange={handleChange}
-        error={!!errors}
-        helperText={errors ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
+        error={!!errors.nickname}
+        helperText={errors.nickname || '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
         required
       />
       <Button
         type="submit"
         variant="contained"
-        disabled={!!errors || nickname.length === 0 || isPending}
+        disabled={!!errors.nickname || nickname.length === 0 || isPending}
         sx={{ marginTop: 3, height: 50 }}
       >
         회원가입 완료
