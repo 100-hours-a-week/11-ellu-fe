@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { validationRules, ValidationResult } from '@/utils/validateRules';
+import { validationRules } from '@/utils/validateRules';
 export interface ValidationErrors {
   [fieldName: string]: string;
 }
