@@ -12,8 +12,8 @@ import { useRouter } from 'next/navigation';
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { useScheduleStore } from '@/stores/scheduleStore';
-
 import { useProjectWebSocket } from '@/hooks/integration/useProjectWebSocket';
+import { useValidation } from '@/hooks/common/useValidation';
 
 interface EditScheduleFormProps {
   scheduleData: EventData;
@@ -38,27 +38,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   const [endDate, setEndDate] = useState<Date>(new Date(scheduleData.end));
   const [endTime, setEndTime] = useState<Date>(new Date(scheduleData.end));
 
-  // 유효성 검사 상태
-  const [titleError, setTitleError] = useState<string>('');
-  const [descriptionError, setDescriptionError] = useState<string>('');
-
-  // 제목 유효성 검사 함수
-  const validateTitle = (title: string) => {
-    if (title.length < 1) return '제목을 입력해주세요.';
-    if (title.length > 30) return '제목은 30자 이하여야 합니다.';
-    return '';
-  };
-
-  // 할일 유효성 검사 함수
-  const validateDescription = (description: string) => {
-    if (description && description.length > 100) return '상세일정은 100자 이하여야 합니다.';
-    return '';
-  };
-
-  // 초기 유효성 검사 실행
-  useEffect(() => {
-    setTitleError(validateTitle(formData.title));
-  }, []);
+  const { errors, validateField } = useValidation();
 
   // 입력 변경 핸들러
   const handleStartDateChange = (newValue: Date | null) => {
@@ -113,13 +93,13 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setFormData((prev) => ({ ...prev, title: value }));
-    setTitleError(validateTitle(value));
+    validateField('title', value, 'scheduleTitle');
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setFormData((prev) => ({ ...prev, description: value }));
-    setDescriptionError(validateDescription(value));
+    validateField('description', value, 'scheduleDescription');
   };
 
   const isSameDay = (date1: Date, date2: Date) => {
@@ -132,7 +112,7 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
 
   // 저장 버튼 활성화 체크함수
   const isSaveDisabled = () => {
-    if (!formData.title || titleError || descriptionError || isPending) return true;
+    if (!formData.title || errors.title || errors.description || isPending) return true;
 
     const startDateTime = new Date(startDate);
     startDateTime.setHours(startTime.getHours());
@@ -296,8 +276,8 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
         label="제목"
         value={formData.title}
         onChange={handleTitleChange}
-        error={!!titleError}
-        helperText={titleError}
+        error={!!errors.title}
+        helperText={errors.title}
         sx={{
           mb: 5,
           '& .MuiFormHelperText-root': {
@@ -313,8 +293,8 @@ export default function EditScheduleForm({ scheduleData, projectId, onSuccess }:
         label="상세일정"
         value={formData.description || ''}
         onChange={handleDescriptionChange}
-        error={!!descriptionError}
-        helperText={descriptionError}
+        error={!!errors.description}
+        helperText={errors.description}
         multiline
         rows={4}
         sx={{

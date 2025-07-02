@@ -5,24 +5,22 @@ export interface ValidationResult {
 
 // 기본 유효성 검사 규칙들
 export const validationRules = {
-  // 일정 제목 검증 (CreateScheduleModal, EditScheduleForm에서 사용)
-  //   scheduleTitle: (value: string): ValidationResult => {
-  //     if (!value || value.length < 1) {
-  //       return { isValid: false, message: '제목을 입력해주세요.' };
-  //     }
-  //     if (value.length > 30) {
-  //       return { isValid: false, message: '제목은 30자 이하여야 합니다.' };
-  //     }
-  //     return { isValid: true, message: '' };
-  //   },
+  scheduleTitle: (value: string): ValidationResult => {
+    if (!value || value.length < 1) {
+      return { isValid: false, message: '제목을 입력해주세요.' };
+    }
+    if (value.length > 30) {
+      return { isValid: false, message: '제목은 30자 이하여야 합니다.' };
+    }
+    return { isValid: true, message: '' };
+  },
 
-  //   // 일정 설명 검증 (CreateScheduleModal, EditScheduleForm에서 사용)
-  //   scheduleDescription: (value: string): ValidationResult => {
-  //     if (value && value.length > 100) {
-  //       return { isValid: false, message: '할일은 100자 이하여야 합니다.' };
-  //     }
-  //     return { isValid: true, message: '' };
-  //   },
+  scheduleDescription: (value: string): ValidationResult => {
+    if (value && value.length > 100) {
+      return { isValid: false, message: '할일은 100자 이하여야 합니다.' };
+    }
+    return { isValid: true, message: '' };
+  },
 
   projectTitle: (value: string): ValidationResult => {
     if (!value || value.length < 1 || value.length > 10) {
@@ -56,17 +54,6 @@ export const validationRules = {
     return { isValid: true, message: '' };
   },
 
-  //   // 회의록 검증 (CreateMeetnote에서 사용)
-  //   meetingNote: (value: string): ValidationResult => {
-  //     if (value.length < 10) {
-  //       return { isValid: false, message: '최소 10자 이상 입력해주세요.' };
-  //     }
-  //     if (value.length > 1000) {
-  //       return { isValid: false, message: '1000자를 초과할 수 없습니다.' };
-  //     }
-  //     return { isValid: true, message: '' };
-  //   },
-
   // 필수 필드 검증
   required: (value: string, fieldName: string = '값'): ValidationResult => {
     if (!value || value.trim() === '') {
@@ -74,15 +61,4 @@ export const validationRules = {
     }
     return { isValid: true, message: '' };
   },
-
-  //   // 길이 검증
-  //   length: (value: string, min: number, max: number): ValidationResult => {
-  //     if (value.length < min) {
-  //       return { isValid: false, message: `최소 ${min}자 이상 입력해주세요.` };
-  //     }
-  //     if (value.length > max) {
-  //       return { isValid: false, message: `최대 ${max}자까지 입력 가능합니다.` };
-  //     }
-  //     return { isValid: true, message: '' };
-  //   },
 };
