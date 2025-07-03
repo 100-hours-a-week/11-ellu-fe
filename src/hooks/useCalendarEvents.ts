@@ -5,32 +5,10 @@ import { EventResizeDoneArg } from '@fullcalendar/interaction';
 import { useUpdateSchedule } from '@/hooks/api/schedule/useUpdateSchedule';
 import { useUpdateProjectSchedule } from '@/hooks/api/schedule/project/useUpdateProjectSchedule';
 import { UseCalendarEventHandlersProps } from '@/types/calendar';
-import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
 
 export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandlersProps) {
-  const { previewEvents } = usePreviewSchedulesStore();
-  const [events, setEvents] = useState<EventData[]>([]);
-
   const { mutate: updateScheduleMutate } = useUpdateSchedule();
   const { mutate: updateProjectScheduleMutate } = useUpdateProjectSchedule();
-
-  const displayEvents = useMemo(() => {
-    return [...events, ...previewEvents];
-  }, [events, previewEvents]);
-
-  // 일정 생성
-  const createEvent = useCallback((newEvent: EventData) => {
-    const eventWithId = {
-      ...newEvent,
-      id: Date.now().toString(),
-    };
-    setEvents((prevEvents) => {
-      const updatedEvents = [...prevEvents, eventWithId];
-      console.log('새로운 일정 추가:', updatedEvents);
-      return updatedEvents;
-    });
-    return eventWithId;
-  }, []);
 
   // 일정 업데이트 (드래그 앤 드롭, 리사이즈)
   const updateEvent = useCallback(
@@ -60,22 +38,6 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
         is_completed: event.extendedProps.is_completed || false,
         is_ai_recommended: event.extendedProps.is_ai_recommended || false,
       };
-
-      // 로컬 상태 업데이트
-      setEvents((prevEvents) => {
-        const updatedEvents = prevEvents.map((evt) =>
-          evt.id === event.id
-            ? {
-                ...evt,
-                start: event.start!,
-                end: event.end!,
-                title: event.title,
-                description: event.extendedProps.description,
-              }
-            : evt
-        );
-        return updatedEvents;
-      });
 
       // 백엔드 API 호출
       if (updatedEventData.is_project_schedule) {
@@ -126,32 +88,7 @@ export function useCalendarEventHandlers({ webSocketApi }: UseCalendarEventHandl
     [updateScheduleMutate, updateProjectScheduleMutate]
   );
 
-  // 특정 일정 업데이트
-  const updateSpecificEvent = useCallback((updatedEvent: EventData) => {
-    if (!updatedEvent.id) return;
-
-    setEvents((prevEvents) => {
-      const updatedEvents = prevEvents.map((evt) => (evt.id === updatedEvent.id ? updatedEvent : evt));
-      console.log('일정 업데이트:', updatedEvents);
-      return updatedEvents;
-    });
-  }, []);
-
-  // 일정 삭제
-  const deleteEvent = useCallback((eventId: string) => {
-    setEvents((prevEvents) => {
-      const filteredEvents = prevEvents.filter((event) => event.id !== eventId);
-      console.log('일정 삭제 후:', filteredEvents);
-      return filteredEvents;
-    });
-  }, []);
-
   return {
-    events: displayEvents,
-    setEvents,
-    createEvent,
     updateEvent,
-    updateSpecificEvent,
-    deleteEvent,
   };
 }
