@@ -1,5 +1,28 @@
 # 변경 이력
 
+## 1.2.0 (2025-07-03)
+
+* build.yml secrets 수정 ([68c2549](https://github.com/100-hours-a-week/11-ellu-fe/commit/68c2549))
+* build.yml secrets 재수정 ([044bda3](https://github.com/100-hours-a-week/11-ellu-fe/commit/044bda3))
+* Merge branch 'main' into stage ([25e5c65](https://github.com/100-hours-a-week/11-ellu-fe/commit/25e5c65))
+* release v.1.2.0 (#88) ([92bb705](https://github.com/100-hours-a-week/11-ellu-fe/commit/92bb705)), closes [#88](https://github.com/100-hours-a-week/11-ellu-fe/issues/88)
+* chore: release ci 추가 ([18b70a1](https://github.com/100-hours-a-week/11-ellu-fe/commit/18b70a1))
+* refactor: useCallback, useMemo로 최적화 로직 추가 ([12e2471](https://github.com/100-hours-a-week/11-ellu-fe/commit/12e2471))
+* refactor: 불필요한 Import문 제거 ([fdbfa1e](https://github.com/100-hours-a-week/11-ellu-fe/commit/fdbfa1e))
+* refactor: 불필요한 함수 제거 ([1660862](https://github.com/100-hours-a-week/11-ellu-fe/commit/1660862))
+* refactor: 불필요한 함수제거 ([52bac3e](https://github.com/100-hours-a-week/11-ellu-fe/commit/52bac3e))
+* refactor: 상단 헤더 닉네임 cls 성능최적화 ([1ad4881](https://github.com/100-hours-a-week/11-ellu-fe/commit/1ad4881))
+* refactor: 초기 데이터로드 useEffect함수 분리 ([c17f78b](https://github.com/100-hours-a-week/11-ellu-fe/commit/c17f78b))
+* refactor: 캘린더 헤더 리렌더링 수정 ([dd07d60](https://github.com/100-hours-a-week/11-ellu-fe/commit/dd07d60))
+* refactor: 캘린터 컴포넌트 cls 최적화 ([b484b40](https://github.com/100-hours-a-week/11-ellu-fe/commit/b484b40))
+* fix: 로그아웃시 토큰재발급 요청로직 제거 ([6401bd9](https://github.com/100-hours-a-week/11-ellu-fe/commit/6401bd9))
+* fix: 캘린더 handler useCallback 적용 ([a0313e3](https://github.com/100-hours-a-week/11-ellu-fe/commit/a0313e3))
+* feat: 채팅 답변 로딩UI 추가 ([1888ca1](https://github.com/100-hours-a-week/11-ellu-fe/commit/1888ca1))
+* ci: gcp stage 서버에 ci(배포)과정 포함 ([058858f](https://github.com/100-hours-a-week/11-ellu-fe/commit/058858f))
+* ci: gcp stage 서버에 ci(배포)과정 포함 (#82) ([3a04233](https://github.com/100-hours-a-week/11-ellu-fe/commit/3a04233)), closes [#82](https://github.com/100-hours-a-week/11-ellu-fe/issues/82) [#82](https://github.com/100-hours-a-week/11-ellu-fe/issues/82)
+* ci: script에 nginx 재시작 포함 ([5213e4e](https://github.com/100-hours-a-week/11-ellu-fe/commit/5213e4e))
+* ci: script에 nginx 재시작 포함 (#83) ([6ce3c27](https://github.com/100-hours-a-week/11-ellu-fe/commit/6ce3c27)), closes [#83](https://github.com/100-hours-a-week/11-ellu-fe/issues/83) [#83](https://github.com/100-hours-a-week/11-ellu-fe/issues/83)
+
 ## 1.1.0 (2025-06-20)
 
 * feature 프로젝트 생성 시 팀원 초대기능 개발(#54)  ([8e67b9c](https://github.com/100-hours-a-week/11-ellu-fe/commit/8e67b9c)), closes [#54](https://github.com/100-hours-a-week/11-ellu-fe/issues/54)
