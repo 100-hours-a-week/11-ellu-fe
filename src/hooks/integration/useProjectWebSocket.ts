@@ -76,6 +76,7 @@ export const useProjectWebSocket = (projectId: number) => {
           destination: `/app/${projectId}/create`,
           body: JSON.stringify({
             project_schedules: scheduleData,
+            is_ai_recommended: false,
           }),
         });
       } catch (error) {

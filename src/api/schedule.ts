@@ -101,6 +101,7 @@ export const createProjectSchedules = async (
   const scheduleDataList = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
   await api.post<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules`, {
     project_schedules: scheduleDataList,
+    is_ai_recommended: true,
   });
 };
 
