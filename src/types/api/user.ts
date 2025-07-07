@@ -3,3 +3,10 @@ export interface User {
   nickname: string;
   imageUrl: string;
 }
+
+export interface UserProgressItem {
+  date: string;
+  created_schedules: number;
+}
+
+export type UserProgress = UserProgressItem[];

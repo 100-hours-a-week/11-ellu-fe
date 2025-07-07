@@ -1,5 +1,5 @@
 import api from '@/config/axios';
-import { User } from '@/types/api/user';
+import { User, UserProgress } from '@/types/api/user';
 import { ApiResponse } from '@/types/api/common';
 
 // 닉네임 등록
@@ -22,4 +22,13 @@ export const editMyInfo = async (nickname: string): Promise<void> => {
 export const searchUsersByNickname = async (query: string): Promise<User[]> => {
   const res = await api.get<ApiResponse<User[]>>(`/users?query=${query}`);
   return res.data.data;
+};
+
+// 유저 달성 현황 조회
+export const getUserProgress = async (): Promise<UserProgress> => {
+  const res = await api.get<ApiResponse<UserProgress>>('/achievements/daily');
+  return res.data.data.map((item) => ({
+    date: item.date.split('T')[0],
+    created_schedules: item.created_schedules,
+  }));
 };

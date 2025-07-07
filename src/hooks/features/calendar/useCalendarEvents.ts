@@ -9,6 +9,7 @@ import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreat
 import { UseCalendarEventHandlersProps } from '@/types/calendar';
 import { useDeleteSchedule } from '@/hooks/api/schedule/useDeleteSchedule';
 import { useDeleteProjectSchedule } from '@/hooks/api/schedule/project/useDeleteProjectSchedule';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useCalendarEventHandlers({
   webSocketApi,
@@ -18,6 +19,7 @@ export function useCalendarEventHandlers({
   projectIdNumber,
   selectedEventData,
 }: UseCalendarEventHandlersProps) {
+  const queryClient = useQueryClient();
   const { mutate: updateScheduleMutate } = useUpdateSchedule();
   const { mutate: updateProjectScheduleMutate } = useUpdateProjectSchedule();
   const { mutate: createScheduleMutate } = useCreateSchedule();
@@ -47,7 +49,9 @@ export function useCalendarEventHandlers({
               options: { is_project_schedule: true },
             },
             {
-              onSuccess: () => {},
+              onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ['user-progress'] });
+              },
               onError: (error) => {
                 console.error('일정 저장 실패:', error);
                 alert('일정 저장에 실패했습니다.');
@@ -63,7 +67,9 @@ export function useCalendarEventHandlers({
             options: { is_project_schedule: false },
           },
           {
-            onSuccess: () => {},
+            onSuccess: () => {
+              queryClient.invalidateQueries({ queryKey: ['user-progress'] });
+            },
             onError: (error) => {
               console.error('일정 저장 실패:', error);
               alert('일정 저장에 실패했습니다.');
