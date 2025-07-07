@@ -5,16 +5,18 @@ import { Box, TextField, Button, Avatar, Typography, Skeleton, Alert, Link } fro
 import style from './MypageForm.module.css';
 import { userStore } from '@/stores/userStore';
 import { useEditMyInfo } from '@/hooks/api/user/useEditMyInfo';
+import { useValidation } from '@/hooks/common/useValidation';
 
 export default function MypageForm() {
   const user = userStore((state) => state.user);
   const setUser = userStore((state) => state.setUser);
 
   const [nickname, setNickname] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   const { mutate: updateNickname, isPending } = useEditMyInfo();
+
+  const { errors, validateField, setError } = useValidation();
 
   useEffect(() => {
     if (user?.nickname) {
@@ -22,40 +24,15 @@ export default function MypageForm() {
     }
   }, [user]);
 
-  // 닉네임 유효성 검사 규칙
-  const nicknameRegex = /^[a-zA-Z0-9가-힣._]{1,10}$/;
-
-  const validateNickname = (value: string): string | null => {
-    if (!value.trim()) {
-      return '닉네임을 입력해주세요.';
-    }
-    if (value.length > 10) {
-      return '닉네임은 최대 10자까지 가능합니다.';
-    }
-    if (!nicknameRegex.test(value)) {
-      return '닉네임은 . , _ 를 포함한 한글, 영문 또는 숫자만 사용할 수 있습니다.';
-    }
-    return null;
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNickname(value);
-    setError(validateNickname(value));
+    validateField('nickname', value, 'nickname');
   };
 
   const handleUpdateNickname = () => {
-    const validationError = validateNickname(nickname);
-
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    if (nickname === user?.nickname) {
-      setError('현재 닉네임과 동일합니다.');
-      return;
-    }
+    const isValid = validateField('nickname', nickname, 'nickname');
+    if (!isValid || nickname === user?.nickname) return;
 
     updateNickname(nickname, {
       onSuccess: () => {
@@ -66,14 +43,13 @@ export default function MypageForm() {
           });
         }
         setIsSuccess(true);
-        setError(null);
         setTimeout(() => {
           setIsSuccess(false);
         }, 3000);
       },
       onError: (err) => {
         if (err.response?.status === 409) {
-          setError('이미 사용 중인 닉네임입니다.');
+          setError('nickname', '이미 사용 중인 닉네임입니다.');
         } else {
           alert('닉네임 변경 중 오류가 발생했습니다.');
         }
@@ -115,8 +91,8 @@ export default function MypageForm() {
         <TextField
           value={nickname}
           onChange={handleChange}
-          error={!!error}
-          helperText={error ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
+          error={!!errors.nickname}
+          helperText={errors.nickname}
           fullWidth
           sx={{ mb: 3 }}
           disabled={isPending}
@@ -129,7 +105,7 @@ export default function MypageForm() {
         <Button
           variant="contained"
           onClick={handleUpdateNickname}
-          disabled={!!error || isPending || nickname.length === 0 || nickname === user?.nickname}
+          disabled={!!errors.nickname || isPending || nickname.length === 0 || nickname === user?.nickname}
           fullWidth
           sx={{ height: 50 }}
         >

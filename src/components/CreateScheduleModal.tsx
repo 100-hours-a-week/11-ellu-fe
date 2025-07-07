@@ -8,6 +8,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import React, { useState, useEffect } from 'react';
 import { ko } from 'date-fns/locale/ko';
 import { EventData, SelectedTime, CalendarModalProps } from '../types/calendar';
+import { useValidation } from '@/hooks/common/useValidation';
 
 export default function CreateScheduleModal({
   open,
@@ -22,8 +23,8 @@ export default function CreateScheduleModal({
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
-  const [titleError, setTitleError] = useState<string>('');
-  const [descriptionError, setDescriptionError] = useState<string>('');
+
+  const { errors, validateField } = useValidation();
 
   useEffect(() => {
     if (selectedEvent) {
@@ -67,29 +68,16 @@ export default function CreateScheduleModal({
     setEndTime(newValue);
   };
 
-  // 제목 유효성 검사 함수
-  const validateTitle = (title: string) => {
-    if (title.length < 1) return '제목을 입력해주세요.';
-    if (title.length > 30) return '제목은 30자 이하여야 합니다.';
-    return '';
-  };
-
-  // 할일 유효성 검사 함수
-  const validateDescription = (description: string) => {
-    if (description.length > 100) return '할일은 100자 이하여야 합니다.';
-    return '';
-  };
-
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     onInputChange(e);
-    setTitleError(validateTitle(value));
+    validateField('title', value, 'scheduleTitle');
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     onInputChange(e);
-    setDescriptionError(validateDescription(value));
+    validateField('description', value, 'scheduleDescription');
   };
 
   const handleSave = () => {
@@ -125,7 +113,7 @@ export default function CreateScheduleModal({
 
   // 저장 버튼 활성화 체크함수
   const isSaveDisabled = () => {
-    if (!eventData.title || titleError || descriptionError) return true;
+    if (!eventData.title || errors.title || errors.description) return true;
     if (!startDate || !startTime || !endDate || !endTime) return true;
 
     const startDateTime = new Date(startDate);
@@ -220,8 +208,8 @@ export default function CreateScheduleModal({
           onChange={handleTitleChange}
           sx={{ mb: 2 }}
           required
-          error={!!titleError}
-          helperText={titleError}
+          error={!!errors.title}
+          helperText={errors.title}
         />
 
         <TextField
@@ -233,8 +221,8 @@ export default function CreateScheduleModal({
           multiline
           rows={3}
           sx={{ mb: 2 }}
-          error={!!descriptionError}
-          helperText={descriptionError}
+          error={!!errors.description}
+          helperText={errors.description}
         />
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>

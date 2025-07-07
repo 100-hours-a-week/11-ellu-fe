@@ -1,4 +1,4 @@
-import api from '@/lib/axios';
+import api from '@/config/axios';
 import { AiApiResponse, ApiResponse } from '@/types/api/common';
 import { ProjectFormData, Project, ProjectDetail, RecommendedSchedules } from '@/types/api/project';
 

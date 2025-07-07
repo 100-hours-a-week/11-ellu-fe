@@ -1,4 +1,4 @@
-import api from '@/lib/axios';
+import api from '@/config/axios';
 import { ApiResponse } from '@/types/api/common';
 import { MessageData } from '@/types/chatbot';
 import { EventData } from '@/types/calendar';

@@ -1,4 +1,4 @@
-import api from '@/lib/axios';
+import api from '@/config/axios';
 import { ScheduleResponse } from '@/types/api/schedule';
 import { EventData } from '@/types/calendar';
 import { ApiResponse } from '@/types/api/common';

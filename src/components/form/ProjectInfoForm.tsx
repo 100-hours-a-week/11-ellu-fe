@@ -30,6 +30,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CachedIcon from '@mui/icons-material/Cached';
 import InviteTeamMemberModal from '../projects/InviteTeamMemberModal';
 import styles from './ProjectInfoForm.module.css';
+import { useValidation } from '@/hooks/common/useValidation';
 
 const positions = [
   { value: 'FE', label: 'FE 개발자' },
@@ -64,12 +65,9 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     color: 'FEC178',
     added_members: [],
   });
-  const [errors, setErrors] = useState({
-    title: '',
-    wiki: '',
-    position: '',
-    color: '',
-  });
+
+  const { errors, validateField, hasErrors } = useValidation();
+
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [openRemoveModal, setOpenRemoveModal] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
@@ -78,7 +76,6 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   // 기존 프로젝트 데이터 불러오기
   useEffect(() => {
     if (isEditMode && projectData) {
-      console.log(projectData);
       setFormData({
         title: projectData.title,
         wiki: projectData.wiki || '',
@@ -89,36 +86,12 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
     }
   }, [isEditMode, projectData]);
 
-  // url 형식 정규식
-  const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6}).*\/wiki\/?$/;
-
-  // 유효성 검사 함수
-  const validateTitle = (value: string) => {
-    if (value.length < 1 || value.length > 10) return '최소 1자, 최대 10자이내로 입력해주세요';
-    if (!/^[가-힣a-zA-Z0-9\s]+$/.test(value)) return '한글, 영문, 숫자만 입력 가능합니다';
-    return '';
-  };
-  const validateWiki = (value: string) => {
-    if (!urlPattern.test(value)) return '올바른 URL 형식이 아닙니다';
-    return '';
-  };
-  const validatePosition = (value: string) => {
-    if (!value) return '포지션을 선택해주세요';
-    return '';
-  };
-  const validateColor = (value: string) => {
-    if (!value) return '색상을 선택해주세요';
-    return '';
-  };
-
   // 폼 유효성 검사
   const isFormValid = () => {
     return (
-      !errors.title &&
-      !errors.wiki &&
-      !errors.position &&
+      !hasErrors() &&
       formData.title.length >= 1 &&
-      urlPattern.test(formData.wiki) &&
+      formData.wiki !== '' &&
       formData.position !== '' &&
       formData.color !== ''
     );
@@ -132,25 +105,13 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       [name]: value,
     }));
     if (name === 'title') {
-      setErrors((prev) => ({
-        ...prev,
-        title: validateTitle(value),
-      }));
+      validateField('title', value, 'projectTitle');
     } else if (name === 'wiki') {
-      setErrors((prev) => ({
-        ...prev,
-        wiki: validateWiki(value),
-      }));
+      validateField('wiki', value, 'url');
     } else if (name === 'position') {
-      setErrors((prev) => ({
-        ...prev,
-        position: validatePosition(value),
-      }));
+      validateField('position', value, 'required');
     } else if (name === 'color') {
-      setErrors((prev) => ({
-        ...prev,
-        color: validateColor(value),
-      }));
+      validateField('color', value, 'required');
     }
   };
 
@@ -198,7 +159,6 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
   };
 
   const handleSaveInvitedMembers = (invitedMembers: User[]) => {
-    console.log(formData.added_members, invitedMembers);
     if (formData.added_members.length + invitedMembers.length > 7) {
       alert('프로젝트 멤버는 최대 7명까지만 추가할 수 있습니다.');
       return;
@@ -217,7 +177,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       id: member.id,
       nickname: member.nickname,
       profileImageUrl: member.imageUrl,
-      position: 'FE', // 모든 멤버의 포지션을 FE로 설정
+      position: 'FE',
     }));
 
     setFormData((prev) => ({
@@ -263,9 +223,6 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
 
   // 프로젝트 개요 URL 동기화
   const handleSyncClick = () => {
-    if (!urlPattern.test(formData.wiki)) {
-      return;
-    }
     setIsRotating(true);
     editProject(
       {
@@ -278,9 +235,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
             setIsRotating(false);
           }, 3000);
         },
-        onError: (error) => {
-          console.log('동기화에 실패했습니다');
-        },
+        onError: (error) => {},
       }
     );
   };

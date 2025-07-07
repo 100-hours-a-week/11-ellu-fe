@@ -4,8 +4,8 @@ import LeftNavigationBar from '@/components/LeftNavigationBar';
 import AfterLoginHeader from '@/components/AfterLoginHeader';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import AuthProvider from '@/components/provider/AuthProvider';
-import SSEProvider from '@/components/provider/SSEProvider';
+import AuthProvider from '@/providers/AuthProvider';
+import SSEProvider from '@/providers/SSEProvider';
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const cookieStore = await cookies();
