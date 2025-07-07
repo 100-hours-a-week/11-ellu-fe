@@ -207,7 +207,7 @@ export function useCalendarEventHandlers({
         },
       });
     }
-  }, [webSocketApi, projectIdNumber, deleteProjectScheduleMutate, deleteScheduleMutate]);
+  }, [selectedEventData, webSocketApi, projectIdNumber, deleteProjectScheduleMutate, deleteScheduleMutate]);
 
   return {
     saveEvent,
