@@ -65,7 +65,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.semantic-release.outputs.new-release-version || 'latest' }}
+            ${{ needs.semantic-release.outputs.new-release-version && format('{0}/{1}:{2}', env.REGISTRY, env.IMAGE_NAME, needs.semantic-release.outputs.new-release-version) || '' }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
             NEXT_PUBLIC_KAKAO_REST_KEY=${{ secrets.KAKAO_REST_KEY }}
