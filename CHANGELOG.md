@@ -1,5 +1,10 @@
 # 변경 이력
 
+## <small>1.3.1 (2025-07-08)</small>
+
+* fix: semantic-release 결과와 관계없이 docker-build 작업 실행되도록 수정 ([0dac746](https://github.com/100-hours-a-week/11-ellu-fe/commit/0dac746))
+* fix: semantic-release 결과와 관계없이 docker-build 작업 실행되도록 수정 (#92) ([582daa2](https://github.com/100-hours-a-week/11-ellu-fe/commit/582daa2)), closes [#92](https://github.com/100-hours-a-week/11-ellu-fe/issues/92)
+
 ## 1.3.0 (2025-07-08)
 
 * build.yml secrets 수정 ([7b19e2a](https://github.com/100-hours-a-week/11-ellu-fe/commit/7b19e2a))
