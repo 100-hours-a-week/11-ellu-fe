@@ -36,7 +36,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           HUSKY: 0
-        run: npx semantic-release
+        run: |
+          npx semantic-release
+          echo "new-release-published=true" >> $GITHUB_OUTPUT
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "new-release-version=${LATEST_TAG#v}" >> $GITHUB_OUTPUT
 
   docker-build:
     name: Build and Publish Docker Image
@@ -50,7 +54,8 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.semantic-release.outputs.new-release-version && format('v{0}', needs.semantic-release.outputs.new-release-version) || 'main' }}
+          ref: v${{ needs.semantic-release.outputs.new-release-version }}
+          token: ${{ secrets.GH_PAT }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Log into container registry
@@ -65,7 +70,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ needs.semantic-release.outputs.new-release-version && format('{0}/{1}:{2}', env.REGISTRY, env.IMAGE_NAME, needs.semantic-release.outputs.new-release-version) || '' }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.semantic-release.outputs.new-release-version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
             NEXT_PUBLIC_KAKAO_REST_KEY=${{ secrets.KAKAO_REST_KEY }}
@@ -74,6 +79,6 @@ jobs:
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.url=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.version=${{ needs.semantic-release.outputs.new-release-version || 'latest' }}
+            org.opencontainers.image.version=${{ needs.semantic-release.outputs.new-release-version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
