@@ -1,5 +1,10 @@
 # 변경 이력
 
+## <small>1.3.2 (2025-07-08)</small>
+
+* fix: git checkout 참조 오류 수정 ([8674427](https://github.com/100-hours-a-week/11-ellu-fe/commit/8674427))
+* fix: git checkout 참조 오류 수정 (#93) ([47d41ff](https://github.com/100-hours-a-week/11-ellu-fe/commit/47d41ff)), closes [#93](https://github.com/100-hours-a-week/11-ellu-fe/issues/93)
+
 ## <small>1.3.1 (2025-07-08)</small>
 
 * fix: semantic-release 결과와 관계없이 docker-build 작업 실행되도록 수정 ([0dac746](https://github.com/100-hours-a-week/11-ellu-fe/commit/0dac746))
