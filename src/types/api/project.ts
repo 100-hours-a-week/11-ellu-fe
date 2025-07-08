@@ -39,6 +39,7 @@ export interface EditProjectParams {
 
 // 회의록 기반 AI 추천일정 타입
 export interface RecommendedSchedule {
+  position: string;
   task: string;
   subtasks: string[];
 }

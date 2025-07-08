@@ -69,7 +69,12 @@ export const useProjectWebSocket = (projectId: number) => {
         return;
       }
 
-      const scheduleData = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
+      const scheduleData = eventDataList.map((eventData) => {
+        return {
+          ...convertToScheduleData(eventData, options),
+          position: null,
+        };
+      });
 
       try {
         clientRef.current.publish({
