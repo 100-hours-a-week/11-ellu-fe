@@ -12,10 +12,15 @@ export const postMessage = async (messageData: MessageData): Promise<void> => {
 };
 
 // 챗봇추천 일정 생성
-export const chatbotCreateSchedule = async (planTitle: string, eventDataList: EventData[]): Promise<void> => {
+export const chatbotCreateSchedule = async (
+  planTitle: string,
+  category: string,
+  eventDataList: EventData[]
+): Promise<void> => {
   const scheduleDataList = eventDataList.map((eventData) => convertToChatbotScheduleData(eventData));
   await api.post<ApiResponse<ScheduleResponse>>('/user/schedules/plan', {
     plan_title: planTitle,
+    category: category,
     chatbot_schedules: scheduleDataList,
   });
 };

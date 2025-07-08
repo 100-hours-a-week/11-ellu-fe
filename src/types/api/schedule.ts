@@ -52,6 +52,7 @@ export type DeleteProjectScheduleParams = {
 // 챗봇 일정 타입
 export type ChatbotCreateScheduleParams = {
   planTitle: string;
+  category: string;
   eventDataList: EventData[];
   options?: ScheduleOptions;
 };
