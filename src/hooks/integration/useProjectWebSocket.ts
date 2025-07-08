@@ -1,8 +1,7 @@
-// src/hooks/useWebSocket.ts
 import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { userStore } from '@/stores/userStore';
-import { createWebSocketClient } from '@/lib/websocket';
+import { createWebSocketClient } from '@/config/websocket';
 import { Client } from '@stomp/stompjs';
 import { EventData } from '@/types/calendar';
 import { convertToScheduleData } from '@/utils/scheduleUtils';
@@ -70,13 +69,19 @@ export const useProjectWebSocket = (projectId: number) => {
         return;
       }
 
-      const scheduleData = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
+      const scheduleData = eventDataList.map((eventData) => {
+        return {
+          ...convertToScheduleData(eventData, options),
+          position: null,
+        };
+      });
 
       try {
         clientRef.current.publish({
           destination: `/app/${projectId}/create`,
           body: JSON.stringify({
             project_schedules: scheduleData,
+            is_ai_recommended: false,
           }),
         });
       } catch (error) {

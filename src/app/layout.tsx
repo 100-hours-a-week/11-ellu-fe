@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import QueryProvider from '@/hooks/QueryProvider';
+import QueryProvider from '@/providers/QueryProvider';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { PublicEnvScript } from 'next-runtime-env'; // 런타임 변수 주입
 

@@ -7,8 +7,8 @@ export const useChatbotCreateSchedule = () => {
   const queryClient = useQueryClient();
 
   return useMutation<void, AxiosError<{ message: string }>, ChatbotCreateScheduleParams>({
-    mutationFn: ({ planTitle, eventDataList }) => {
-      return chatbotCreateSchedule(planTitle, eventDataList);
+    mutationFn: ({ planTitle, category, eventDataList }) => {
+      return chatbotCreateSchedule(planTitle, category, eventDataList);
     },
     retry: 1,
     onSuccess: () => {

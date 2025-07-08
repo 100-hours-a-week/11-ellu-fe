@@ -1,4 +1,4 @@
-import api from '@/lib/axios';
+import api from '@/config/axios';
 import { ScheduleResponse } from '@/types/api/schedule';
 import { EventData } from '@/types/calendar';
 import { ApiResponse } from '@/types/api/common';
@@ -98,9 +98,13 @@ export const createProjectSchedules = async (
     is_completed?: boolean;
   } = {}
 ): Promise<void> => {
-  const scheduleDataList = eventDataList.map((eventData) => convertToScheduleData(eventData, options));
+  const scheduleDataList = eventDataList.map((eventData) => ({
+    ...convertToScheduleData(eventData, options),
+    position: null,
+  }));
   await api.post<ApiResponse<ScheduleResponse[]>>(`/projects/${projectId}/schedules`, {
     project_schedules: scheduleDataList,
+    is_ai_recommended: true,
   });
 };
 

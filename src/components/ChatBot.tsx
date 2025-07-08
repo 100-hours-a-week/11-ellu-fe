@@ -8,7 +8,7 @@ import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
 import { useState, useEffect, useRef } from 'react';
 import { Message } from '@/types/chatbot';
 import { usePostMessage } from '@/hooks/api/chatbot/usePostMessage';
-import { useChatSSE } from '@/hooks/useChatSSE';
+import { useChatSSE } from '@/hooks/integration/useChatSSE';
 import { usePreviewSchedulesStore } from '@/stores/previewSchedulesStore';
 import { useChatbotCreateSchedule } from '@/hooks/api/chatbot/useChatbotCreateSchedule';
 import { useGetChatMessage } from '@/hooks/api/chatbot/useGetChatMessage';
@@ -22,6 +22,7 @@ export default function ChatBot() {
   const [streamingMessage, setStreamingMessage] = useState('');
   const [finalMessage, setFinalMessage] = useState('');
   const [planTitle, setPlanTitle] = useState('');
+  const [category, setCategory] = useState('');
   const { mutate: postMessage, isPending: isPosting } = usePostMessage();
   const messageBoxRef = useRef<HTMLDivElement>(null);
   const [showScheduleButtons, setShowScheduleButtons] = useState(false);
@@ -70,6 +71,7 @@ export default function ChatBot() {
   const handleSSESchedule = (data: any) => {
     setShowScheduleButtons(true);
     setPlanTitle(data.task_title);
+    setCategory(data.category);
     const previewEvent = {
       id: `schedule-${Date.now()}`,
       title: `🤖 ${data.schedule_preview[0].title}`,
@@ -126,6 +128,7 @@ export default function ChatBot() {
     chatbotCreateSchedule(
       {
         planTitle: planTitle,
+        category: category,
         eventDataList: previewEvents,
       },
       {

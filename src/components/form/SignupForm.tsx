@@ -6,46 +6,29 @@ import { TextField, Button, Box } from '@mui/material';
 import { userStore } from '@/stores/userStore';
 import { useSignup } from '@/hooks/api/auth/useSignup';
 import { getMyInfo } from '@/api/user';
+import { useValidation } from '@/hooks/common/useValidation';
 
 export default function SignupForm() {
   const router = useRouter();
   const [nickname, setNickname] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+
+  const { errors, validateField, setError } = useValidation();
 
   const setUser = userStore((s) => s.setUser);
 
   const { mutate: signup, isPending } = useSignup();
 
-  const nicknameRegex = /^[a-zA-Z0-9가-힣._]{1,10}$/;
-
-  const validateNickname = (value: string): string | null => {
-    if (!value.trim()) {
-      return '닉네임을 입력해주세요.';
-    }
-    if (value.length > 10) {
-      return '닉네임은 최대 10자까지 가능합니다.';
-    }
-    if (!nicknameRegex.test(value)) {
-      return '닉네임은 . , _ 를 포함한 한글, 영문 또는 숫자만 사용할 수 있습니다.';
-    }
-    return null;
-  };
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setNickname(value);
-    setError(validateNickname(value));
+    validateField('nickname', value, 'nickname');
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const validationMessage = validateNickname(nickname);
-
-    if (validationMessage) {
-      setError(validationMessage);
-      return;
-    }
+    const isValid = validateField('nickname', nickname, 'nickname');
+    if (!isValid) return;
 
     signup(nickname, {
       onSuccess: async () => {
@@ -60,7 +43,7 @@ export default function SignupForm() {
       },
       onError: (err) => {
         if (err.response?.status === 409) {
-          setError('이미 사용 중인 닉네임입니다.');
+          setError('nickname', '이미 사용 중인 닉네임입니다.');
         } else {
           alert('회원가입 처리 중 문제가 발생했습니다.');
         }
@@ -79,14 +62,14 @@ export default function SignupForm() {
         label="닉네임"
         value={nickname}
         onChange={handleChange}
-        error={!!error}
-        helperText={error ?? '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
+        error={!!errors.nickname}
+        helperText={errors.nickname || '한글, 영문, 숫자만 입력해주세요 (1~10자)'}
         required
       />
       <Button
         type="submit"
         variant="contained"
-        disabled={!!error || nickname.length === 0 || isPending}
+        disabled={!!errors.nickname || nickname.length === 0 || isPending}
         sx={{ marginTop: 3, height: 50 }}
       >
         회원가입 완료
