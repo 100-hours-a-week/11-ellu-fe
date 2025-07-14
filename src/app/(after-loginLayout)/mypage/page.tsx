@@ -9,6 +9,7 @@ export default function Page() {
         <MypageForm />
       </div>
       <div className={style.chartContainer}>
+        <div className={style.chartTitle}>나의 일정 생성 히스토리</div>
         <UserProgressChart />
       </div>
     </div>
