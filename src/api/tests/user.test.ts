@@ -11,7 +11,7 @@ describe('User API', () => {
   });
 
   describe('signup', () => {
-    test('POST /auth/users/nickname 엔드포인트 테스트', async () => {
+    test('POST /auth/users/nickname 테스트', async () => {
       // API 응답 모킹
       mockedApi.post.mockResolvedValueOnce({ data: { data: null } });
 
@@ -38,10 +38,11 @@ describe('User API', () => {
       });
     });
 
-    test('빈 문자열로 호출 시 예외처리', async () => {
-      mockedApi.post.mockResolvedValueOnce({ data: { data: null } });
+    test('형식에 맞지않는 닉네임으로 호출 시 예외처리', async () => {
+      const errorResponse = new Error('400 Conflict');
+      mockedApi.post.mockRejectedValueOnce(errorResponse);
 
-      await signup('');
+      await expect(signup('')).rejects.toThrow('400 Conflict');
 
       expect(mockedApi.post).toHaveBeenCalledWith('/auth/users/nickname', {
         nickname: '',
@@ -50,7 +51,7 @@ describe('User API', () => {
   });
 
   describe('getMyInfo', () => {
-    test('GET /users/me 엔드포인트 테스트', async () => {
+    test('GET /users/me 테스트', async () => {
       const mockUser: User = {
         id: 1,
         nickname: '테스트사용자',
@@ -75,7 +76,7 @@ describe('User API', () => {
   });
 
   describe('editMyInfo', () => {
-    test('PATCH /users/me 엔드포인트 테스트', async () => {
+    test('PATCH /users/me 테스트', async () => {
       mockedApi.patch.mockResolvedValueOnce({ data: { data: null } });
 
       await editMyInfo('새로운닉네임');
@@ -92,14 +93,14 @@ describe('User API', () => {
     });
 
     test('권한없을 시 예외처리', async () => {
-      mockedApi.get.mockRejectedValueOnce(new Error('401 Unauthorized'));
+      mockedApi.patch.mockRejectedValueOnce(new Error('401 Unauthorized'));
 
       await expect(editMyInfo('닉네임')).rejects.toThrow('401 Unauthorized');
     });
   });
 
   describe('searchUsersByNickname', () => {
-    test('GET /users?query= 엔드포인트 테스트', async () => {
+    test('GET /users?query= 테스트', async () => {
       const mockUsers: User[] = [
         { id: 1, nickname: '테스트1', imageUrl: 'url1' },
         { id: 2, nickname: '테스트2', imageUrl: 'url2' },
@@ -130,6 +131,11 @@ describe('User API', () => {
       await searchUsersByNickname('test@#$');
 
       expect(mockedApi.get).toHaveBeenCalledWith('/users?query=test@#$');
+    });
+
+    test('권한없을 시 예외처리', async () => {
+      mockedApi.get.mockRejectedValueOnce(new Error('401 Unauthorized'));
+      await expect(searchUsersByNickname('닉네임')).rejects.toThrow('401 Unauthorized');
     });
   });
 });
