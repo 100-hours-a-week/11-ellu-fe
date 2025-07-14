@@ -163,7 +163,7 @@ describe('validationRules 테스트', () => {
     });
 
     test('11자 초과 실패', () => {
-      const result = validationRules.nickname('abcdefghijk'); // 11자
+      const result = validationRules.nickname('abcdefghijk');
       expect(result.isValid).toBe(false);
       expect(result.message).toBe('닉네임은 최대 10자까지 가능합니다.');
     });

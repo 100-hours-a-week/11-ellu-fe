@@ -12,6 +12,9 @@ const config: Config = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1', // Jest 관련 import 경로 매칭
+  },
 };
 
 // next/jest가 Next.js 구성을 로드할 수 있도록 createJestConfig가 이 방식으로 내보내집니다.
