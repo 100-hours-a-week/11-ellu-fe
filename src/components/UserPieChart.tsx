@@ -1,13 +1,24 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Chart from 'react-apexcharts';
+import { useGetAchievements } from '@/hooks/api/user/useGetAchievements';
 
 export default function UserPieChart() {
+  const [uncompletedSchedules, setUncompletedSchedules] = useState(0);
+  const { data: userAchievements } = useGetAchievements();
+
+  useEffect(() => {
+    if (userAchievements) {
+      setUncompletedSchedules(userAchievements?.total_schedules - userAchievements?.completed_schedules);
+    }
+  }, [userAchievements]);
+
   const chartOptions = {
     chart: {
       height: 350,
     },
-    labels: ['나의 스케줄 달성률', '남은 스케줄'],
+    labels: ['나의 일정 달성률', '남은 일정'],
     responsive: [
       {
         breakpoint: 480,
@@ -27,7 +38,7 @@ export default function UserPieChart() {
     colors: ['#1a73e8', '#9ecbff'],
   };
 
-  const series = [134, 40];
+  const series = [userAchievements?.completed_schedules as number, uncompletedSchedules];
 
   return (
     <div>

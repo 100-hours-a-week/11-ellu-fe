@@ -9,4 +9,10 @@ export interface UserProgressItem {
   created_schedules: number;
 }
 
+export interface UserAchievements {
+  total_schedules: number;
+  completed_schedules: number;
+  achievement_rate: number;
+}
+
 export type UserProgress = UserProgressItem[];
