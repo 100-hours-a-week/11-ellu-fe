@@ -6,7 +6,7 @@ import { useGetAchievements } from '@/hooks/api/user/useGetAchievements';
 
 export default function UserPieChart() {
   const [uncompletedSchedules, setUncompletedSchedules] = useState(0);
-  const { data: userAchievements } = useGetAchievements();
+  const { data: userAchievements, isLoading } = useGetAchievements();
 
   useEffect(() => {
     if (userAchievements) {
@@ -39,6 +39,10 @@ export default function UserPieChart() {
   };
 
   const series = [userAchievements?.completed_schedules as number, uncompletedSchedules];
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <div>
