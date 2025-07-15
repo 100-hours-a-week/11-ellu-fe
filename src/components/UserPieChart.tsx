@@ -18,7 +18,7 @@ export default function UserPieChart() {
     chart: {
       height: 350,
     },
-    labels: ['나의 일정 달성률', '남은 일정'],
+    labels: ['달성한 일정', '남은 일정'],
     responsive: [
       {
         breakpoint: 480,
