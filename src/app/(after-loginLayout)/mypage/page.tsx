@@ -1,6 +1,7 @@
 import style from './page.module.css';
 import MypageForm from '@/components/form/MypageForm';
 import UserProgressChart from '@/components/UserProgressChart';
+import UserPieChart from '@/components/UserPieChart';
 
 export default function Page() {
   return (
@@ -9,8 +10,13 @@ export default function Page() {
         <MypageForm />
       </div>
       <div className={style.chartContainer}>
-        <div className={style.chartTitle}>나의 일정 생성 히스토리</div>
-        <UserProgressChart />
+        <div className={style.chartTitle}>My Looper History</div>
+        <div>
+          <UserProgressChart />
+        </div>
+        <div className={style.piechart}>
+          <UserPieChart />
+        </div>
       </div>
     </div>
   );
