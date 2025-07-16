@@ -1,7 +1,15 @@
+'use client';
+
 import style from './page.module.css';
 import MypageForm from '@/components/form/MypageForm';
 import UserProgressChart from '@/components/UserProgressChart';
-import UserPieChart from '@/components/UserPieChart';
+import UserPieChartSkeleton from '@/components/skeleton/UserPieChartSkeleton';
+import dynamic from 'next/dynamic';
+
+const UserPieChart = dynamic(() => import('@/components/UserPieChart'), {
+  ssr: false,
+  loading: () => <UserPieChartSkeleton />,
+});
 
 export default function Page() {
   return (
