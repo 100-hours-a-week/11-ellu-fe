@@ -20,15 +20,13 @@ import {
 } from '@mui/material';
 import { CalendarMonth as CalendarIcon, ExpandMore as ExpandMoreIcon, Check as CheckIcon } from '@mui/icons-material';
 import { useParams } from 'next/navigation';
-import Image from 'next/image';
 import { addDays, setHours, setMinutes, format } from 'date-fns';
 import { useQueryClient } from '@tanstack/react-query';
 import { TaskGroup } from '@/types/schedule';
-
-import { useGetRecommendedSchedule } from '@/hooks/api/projects/useGetRecommendedSchedule';
 import { useCreateProjectSchedules } from '@/hooks/api/schedule/project/useCreateProjectSchedules';
+import { RecommendedSchedules } from '@/types/api/project';
 
-export default function RecommendSchedule() {
+export default function RecommendSchedule({ recommendedTasksData }: { recommendedTasksData: RecommendedSchedules }) {
   const params = useParams();
   const projectIdNumber = Number(params.id);
   const [recommendedTasks, setRecommendedTasks] = useState<TaskGroup[]>([]);
@@ -37,12 +35,11 @@ export default function RecommendSchedule() {
 
   const queryClient = useQueryClient();
 
-  const { data: scheduleData, isLoading, isError, error } = useGetRecommendedSchedule(projectIdNumber);
   const { mutate: createProjectSchedules, isPending } = useCreateProjectSchedules();
 
   useEffect(() => {
-    if (scheduleData) {
-      const formattedTasks = scheduleData.map((schedule, groupIndex) => ({
+    if (recommendedTasksData) {
+      const formattedTasks = recommendedTasksData.map((schedule, groupIndex) => ({
         keyword: schedule.task,
         subtasks: schedule.subtasks.map((name, subtaskIndex) => ({
           id: `${groupIndex + 1}-${subtaskIndex + 1}`,
@@ -53,7 +50,7 @@ export default function RecommendSchedule() {
 
       setRecommendedTasks(formattedTasks);
     }
-  }, [scheduleData]);
+  }, [recommendedTasksData]);
 
   // 단일 서브태스크 체크박스 변경 핸들러
   const handleSubtaskChange = (groupIndex: number, subtaskId: string) => {
@@ -185,29 +182,6 @@ export default function RecommendSchedule() {
   const handleAccordionChange = (groupId: string) => {
     setExpanded(expanded === groupId ? null : groupId);
   };
-
-  if (isLoading) {
-    return (
-      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" mt={8}>
-        <Image src={'/images/addmeeting2.svg'} width={200} height={200} alt={'로고'} />
-        <CircularProgress size={30} sx={{ mt: 5 }} />
-        <Typography variant="h6" sx={{ mt: 2, fontSize: '1rem' }}>
-          Looper가 프로젝트에 맞는 태스크를 분석하는 중입니다...
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          AI 분석에는 약 30초~1분 정도 소요될 수 있습니다.
-        </Typography>
-      </Box>
-    );
-  }
-
-  if (isError) {
-    return (
-      <Alert severity="error" sx={{ mt: 2 }}>
-        태스크 정보를 불러오는 중 오류가 발생했습니다: {error?.message || '알 수 없는 오류'}
-      </Alert>
-    );
-  }
 
   if (recommendedTasks.length === 0) {
     return (
