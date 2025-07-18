@@ -3,15 +3,19 @@
   flex-direction: column;
   flex: wrap;
   width: 100vw;
+  height: 100vh;
   background-color: var(--color-background);
+  overflow: hidden;
 }
 
 .box {
   display: flex;
+  height: calc(100vh - 80px);
+  flex: 1;
 }
 
 .mainbox {
-  width: calc(100% - 150px);
+  width: calc(100% - 170px);
   max-height: calc(100vh - 180px);
   border-top-left-radius: 25px;
   background-color: white;

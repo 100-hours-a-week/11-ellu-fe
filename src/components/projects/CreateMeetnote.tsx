@@ -1,16 +1,17 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import style from './CreateMeetnote.module.css';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { TextField, Button } from '@mui/material';
+import { TextField, Button, Box, CircularProgress, Typography } from '@mui/material';
 import { useCreateMeetingNote } from '@/hooks/api/projects/useCreateMeetingNote';
 import RecommendSchedule from './RecommendSchedule';
+import { RecommendedSchedules } from '@/types/api/project';
 
 export default function CreateMeetnote({ projectId }: { projectId: string }) {
-  // 회의록 추가 훅
-  const { mutate: createMeetingNote, isPending, isError, error } = useCreateMeetingNote();
+  const { mutate: createMeetingNote, isPending } = useCreateMeetingNote();
+  const [recommendedTasks, setRecommendedTasks] = useState<RecommendedSchedules>([]);
 
   const [step, setStep] = useState(0);
 
@@ -21,7 +22,7 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
       case 1:
         return <SecondState />;
       case 2:
-        return <RecommendSchedule />;
+        return <RecommendSchedule recommendedTasksData={recommendedTasks} />;
       default:
         return <div>알 수 없는 상태</div>;
     }
@@ -48,13 +49,16 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+      if (isPending) return;
+
       createMeetingNote(
         {
           projectId: parseInt(projectId),
           meetingNote: meetingNote,
         },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
+            setRecommendedTasks(data);
             setStep(2);
           },
           onError: (err) => {
@@ -63,8 +67,22 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
           },
         }
       );
-      setStep(2);
     };
+
+    if (isPending) {
+      return (
+        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" mt={8}>
+          <Image src={'/images/addmeeting2.svg'} width={200} height={200} alt={'로고'} />
+          <CircularProgress size={30} sx={{ mt: 5 }} />
+          <Typography variant="h6" sx={{ mt: 2, fontSize: '1rem' }}>
+            Looper가 프로젝트에 맞는 태스크를 분석하는 중입니다...
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+            AI 분석에는 약 30초~1분 정도 소요될 수 있습니다.
+          </Typography>
+        </Box>
+      );
+    }
 
     return (
       <div className={style.secondState}>

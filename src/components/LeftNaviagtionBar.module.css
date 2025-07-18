@@ -1,7 +1,9 @@
 .container {
   width: 170px;
   min-width: 170px;
-  height: calc(100vh - 80px);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .container ul {

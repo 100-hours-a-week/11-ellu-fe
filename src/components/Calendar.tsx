@@ -70,6 +70,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
     selectedEventData,
   });
 
+
   const { currentView, currentDate, handleDatesSet } = useCalendarView();
 
   const { handleSelect, handleCancel, handleEventClick } = useCalendarHandlers({
@@ -94,6 +95,7 @@ export default function Calendar({ projectId }: { projectId?: string }) {
         : '#4285F4'
       : `#${eventInfo.event.extendedProps?.color}`;
     const assignees = eventInfo.event.extendedProps?.assignees;
+
 
     return (
       <div
