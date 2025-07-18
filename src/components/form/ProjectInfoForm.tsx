@@ -329,7 +329,7 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
       </TextField>
 
       <Typography variant="subtitle1" sx={{ fontSize: '1rem', fontWeight: 600, mb: 0 }}>
-        프로젝트 개요가 적혀진 깃허브 wiki URL을 입력해주세요
+        프로젝트에 대한 정보가 담긴 URL을 입력해주세요
       </Typography>
       <Typography variant="subtitle2" sx={{ fontSize: '0.8rem', color: 'text.secondary', mb: 3 }}>
         <List
@@ -353,10 +353,10 @@ export default function ProjectInfoForm({ id }: { id?: string }) {
           }}
         >
           <ListItem>
-            <ListItemText primary="(ex. https://github.com/조직명/레포명/wiki)" />
+            <ListItemText primary="(ex. https://github.com/repo/wiki)" />
           </ListItem>
           <ListItem>
-            <ListItemText primary="위키 내용에 대한 학습이 완료되면 알림으로 알려드릴게요." />
+            <ListItemText primary="프로젝트에 대한 학습이 완료되면 알림으로 알려드릴게요." />
           </ListItem>
           <ListItem>
             <ListItemText primary="프로젝트에 대한 자세한 설명이 있을수록 Looper가 더욱 꼼꼼한 일정을 짜드릴 수 있어요!" />
