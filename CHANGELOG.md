@@ -1,5 +1,21 @@
 # 변경 이력
 
+## 1.4.0 (2025-07-18)
+
+* release V1.3.2 (#94) ([c40909c](https://github.com/100-hours-a-week/11-ellu-fe/commit/c40909c)), closes [#94](https://github.com/100-hours-a-week/11-ellu-fe/issues/94)
+* Release v1.4.0 (#96) ([f0087c6](https://github.com/100-hours-a-week/11-ellu-fe/commit/f0087c6)), closes [#96](https://github.com/100-hours-a-week/11-ellu-fe/issues/96)
+* 버전 태그가 없을 때 중복 latest 태그 생성 방지 ([ba5c3eb](https://github.com/100-hours-a-week/11-ellu-fe/commit/ba5c3eb))
+* 최신 태그 사용하도록 수정 ([06760e2](https://github.com/100-hours-a-week/11-ellu-fe/commit/06760e2))
+* docs: 프로젝트 입력란 설명문구 수정 ([ed1492e](https://github.com/100-hours-a-week/11-ellu-fe/commit/ed1492e))
+* style: 달성률 섹션 색상 추가 ([f455893](https://github.com/100-hours-a-week/11-ellu-fe/commit/f455893))
+* style: 왼쪽 네비게이션바 스타일 수정 ([6d9855e](https://github.com/100-hours-a-week/11-ellu-fe/commit/6d9855e))
+* fix: apexChart ssr문제 수정 ([5a460a3](https://github.com/100-hours-a-week/11-ellu-fe/commit/5a460a3))
+* fix: 마이페이지 일정 달성률 로딩상태 처리 추가 ([2d2f81d](https://github.com/100-hours-a-week/11-ellu-fe/commit/2d2f81d))
+* chore: 문구수정 ([c97a136](https://github.com/100-hours-a-week/11-ellu-fe/commit/c97a136))
+* feat: 마이페이지 일정 달성률 UI 추가 ([938040f](https://github.com/100-hours-a-week/11-ellu-fe/commit/938040f))
+* feat: 마이페이지 일정 달성률 데이터 패치로직 추가 ([6762ec8](https://github.com/100-hours-a-week/11-ellu-fe/commit/6762ec8))
+* stlye: 마이페이지 히스토리 문구추가 ([539ee15](https://github.com/100-hours-a-week/11-ellu-fe/commit/539ee15))
+
 ## <small>1.3.2 (2025-07-08)</small>
 
 * fix: git checkout 참조 오류 수정 ([8674427](https://github.com/100-hours-a-week/11-ellu-fe/commit/8674427))
