@@ -6,5 +6,7 @@ export interface ApiResponse<T> {
 // 백엔드 AI API 응답 형식
 export interface AiApiResponse<T> {
   message: string;
-  detail: T;
+  data: {
+    detail: T;
+  };
 }

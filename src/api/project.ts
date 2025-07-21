@@ -30,14 +30,12 @@ export const deleteProject = async (id: number): Promise<void> => {
 };
 
 // 회의록 추가
-export const createProjectMeetingNote = async (projectId: number, meetingNote: string): Promise<void> => {
-  await api.post<ApiResponse<void>>(`/projects/${projectId}/notes`, {
+export const createProjectMeetingNote = async (
+  projectId: number,
+  meetingNote: string
+): Promise<RecommendedSchedules> => {
+  const res = await api.post<AiApiResponse<RecommendedSchedules>>(`/projects/${projectId}/notes`, {
     content: meetingNote,
   });
-};
-
-// 회의록 기반 AI 추천일정 받아오기
-export const getRecommendedSchedule = async (projectId: number): Promise<RecommendedSchedules> => {
-  const res = await api.get<AiApiResponse<RecommendedSchedules>>(`/projects/${projectId}/tasks/preview`);
-  return res.data.detail;
+  return res.data.data.detail;
 };
