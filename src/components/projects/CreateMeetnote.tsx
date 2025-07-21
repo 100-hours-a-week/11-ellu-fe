@@ -10,9 +10,11 @@ import RecommendSchedule from './RecommendSchedule';
 import { RecommendedSchedules } from '@/types/api/project';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useCreateMeetingAudioNote } from '@/hooks/api/projects/useCreateMeetingAudioNote';
 
 export default function CreateMeetnote({ projectId }: { projectId: string }) {
   const { mutate: createMeetingNote, isPending } = useCreateMeetingNote();
+  const { mutate: createMeetingAudioNote, isPending: isAudioPending } = useCreateMeetingAudioNote();
   const [recommendedTasks, setRecommendedTasks] = useState<RecommendedSchedules>([]);
 
   const [step, setStep] = useState(0);
@@ -80,27 +82,53 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (isPending) return;
-
-      createMeetingNote(
-        {
-          projectId: parseInt(projectId),
-          meetingNote: meetingNote,
-        },
-        {
-          onSuccess: (data) => {
-            setRecommendedTasks(data);
-            setStep(2);
+      if (isPending || isAudioPending) return;
+      if (meetingNote.length >= 10) {
+        createMeetingNote(
+          {
+            projectId: parseInt(projectId),
+            meetingNote: meetingNote,
           },
-          onError: (err) => {
-            console.error('회의록 저장 실패:', err);
-            alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+          {
+            onSuccess: (data) => {
+              setRecommendedTasks(data);
+              setStep(2);
+            },
+            onError: (err) => {
+              console.error('회의록 저장 실패:', err);
+              alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+            },
+          }
+        );
+      } else if (audioFile !== null) {
+        createMeetingAudioNote(
+          {
+            projectId: parseInt(projectId),
+            audioNote: audioFile,
           },
-        }
-      );
+          {
+            onSuccess: (data) => {
+              setRecommendedTasks(data);
+              setStep(2);
+            },
+            onError: (err) => {
+              console.error('회의록 저장 실패:', err);
+              alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+            },
+          }
+        );
+      }
     };
 
-    if (isPending) {
+    const handleDisabled = () => {
+      const hasValidNote = meetingNote.length >= 10 && meetingNote.length <= 1000;
+      const hasAudioFile = audioFile !== null;
+
+      // 둘 다 없거나, 둘 다 있으면 비활성화
+      return (!hasValidNote && !hasAudioFile) || (hasValidNote && hasAudioFile);
+    };
+
+    if (isPending || isAudioPending) {
       return (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" mt={8}>
           <Image src={'/images/addmeeting2.svg'} width={200} height={200} alt={'로고'} />
@@ -130,7 +158,6 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
               variant="outlined"
               multiline
               placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
-              required
               helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
               error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
               sx={{
@@ -213,7 +240,7 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
               variant="contained"
               type="submit"
               color="primary"
-              disabled={meetingNote.length < 10 || meetingNote.length > 1000}
+              disabled={handleDisabled()}
               sx={{ width: '80px' }}
             >
               저장

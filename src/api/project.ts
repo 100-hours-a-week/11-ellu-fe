@@ -39,3 +39,18 @@ export const createProjectMeetingNote = async (
   });
   return res.data.detail;
 };
+
+// 회의록 추가(음성)
+export const createProjectMeetingAudioNote = async (
+  projectId: number,
+  audioNote: File
+): Promise<RecommendedSchedules> => {
+  const formData = new FormData();
+  formData.append('file', audioNote);
+  const res = await api.post<AiApiResponse<RecommendedSchedules>>(`/projects/${projectId}/audio`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data.detail;
+};
