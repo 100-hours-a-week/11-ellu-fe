@@ -1,5 +1,10 @@
 # 변경 이력
 
+## <small>1.4.1 (2025-07-21)</small>
+
+* fix: 회의록 추천 일정 응답형식변경 ([862247a](https://github.com/100-hours-a-week/11-ellu-fe/commit/862247a))
+* fix: 회의록 추천 일정 응답형식변경 (#97) ([8b5c120](https://github.com/100-hours-a-week/11-ellu-fe/commit/8b5c120)), closes [#97](https://github.com/100-hours-a-week/11-ellu-fe/issues/97)
+
 ## 1.4.0 (2025-07-18)
 
 * release V1.3.2 (#94) ([c40909c](https://github.com/100-hours-a-week/11-ellu-fe/commit/c40909c)), closes [#94](https://github.com/100-hours-a-week/11-ellu-fe/issues/94)
