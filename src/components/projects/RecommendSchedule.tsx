@@ -192,7 +192,7 @@ export default function RecommendSchedule({ recommendedTasksData }: { recommende
   }
 
   return (
-    <Box sx={{ mt: 3 }}>
+    <Box>
       <Typography variant="h5" gutterBottom fontWeight="bold" sx={{ color: '#528ad3' }}>
         Looper가 추천하는 태스크
       </Typography>

@@ -37,5 +37,5 @@ export const createProjectMeetingNote = async (
   const res = await api.post<AiApiResponse<RecommendedSchedules>>(`/projects/${projectId}/notes`, {
     content: meetingNote,
   });
-  return res.data.data.detail;
+  return res.data.detail;
 };
