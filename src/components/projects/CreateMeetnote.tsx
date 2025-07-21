@@ -1,16 +1,20 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import style from './CreateMeetnote.module.css';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { TextField, Button, Box, CircularProgress, Typography } from '@mui/material';
+import { TextField, Button, Box, CircularProgress, Typography, IconButton } from '@mui/material';
 import { useCreateMeetingNote } from '@/hooks/api/projects/useCreateMeetingNote';
 import RecommendSchedule from './RecommendSchedule';
 import { RecommendedSchedules } from '@/types/api/project';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useCreateMeetingAudioNote } from '@/hooks/api/projects/useCreateMeetingAudioNote';
 
 export default function CreateMeetnote({ projectId }: { projectId: string }) {
   const { mutate: createMeetingNote, isPending } = useCreateMeetingNote();
+  const { mutate: createMeetingAudioNote, isPending: isAudioPending } = useCreateMeetingAudioNote();
   const [recommendedTasks, setRecommendedTasks] = useState<RecommendedSchedules>([]);
 
   const [step, setStep] = useState(0);
@@ -42,34 +46,89 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
 
   function SecondState() {
     const [meetingNote, setMeetingNote] = useState('');
+    const [audioFile, setAudioFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (audioFile) return alert('회의록과 음성파일을 동시에 업로드할 수 없습니다!');
       setMeetingNote(e.target.value);
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+
+      if (file) {
+        const isValidFile = /\.(mp3|mp4|wav)$/i.test(file.name);
+
+        if (isValidFile) {
+          setAudioFile(file);
+        } else {
+          alert('mp3, mp4, wav 파일만 업로드 가능합니다.');
+        }
+      }
+    };
+
+    const handleFileUpload = () => {
+      if (meetingNote !== '') return alert('회의록과 음성파일을 동시에 업로드할 수 없습니다!');
+      fileInputRef.current?.click();
+    };
+
+    const handleRemoveFile = () => {
+      setAudioFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (isPending) return;
-
-      createMeetingNote(
-        {
-          projectId: parseInt(projectId),
-          meetingNote: meetingNote,
-        },
-        {
-          onSuccess: (data) => {
-            setRecommendedTasks(data);
-            setStep(2);
+      if (isPending || isAudioPending) return;
+      if (meetingNote.length >= 10) {
+        createMeetingNote(
+          {
+            projectId: parseInt(projectId),
+            meetingNote: meetingNote,
           },
-          onError: (err) => {
-            console.error('회의록 저장 실패:', err);
-            alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+          {
+            onSuccess: (data) => {
+              setRecommendedTasks(data);
+              setStep(2);
+            },
+            onError: (err) => {
+              console.error('회의록 저장 실패:', err);
+              alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+            },
+          }
+        );
+      } else if (audioFile !== null) {
+        createMeetingAudioNote(
+          {
+            projectId: parseInt(projectId),
+            audioNote: audioFile,
           },
-        }
-      );
+          {
+            onSuccess: (data) => {
+              setRecommendedTasks(data);
+              setStep(2);
+            },
+            onError: (err) => {
+              console.error('회의록 저장 실패:', err);
+              alert('회의록 저장에 실패했습니다. 다시 시도해주세요.');
+            },
+          }
+        );
+      }
     };
 
-    if (isPending) {
+    const handleDisabled = () => {
+      const hasValidNote = meetingNote.length >= 10 && meetingNote.length <= 1000;
+      const hasAudioFile = audioFile !== null;
+
+      // 둘 다 없거나, 둘 다 있으면 비활성화
+      return (!hasValidNote && !hasAudioFile) || (hasValidNote && hasAudioFile);
+    };
+
+    if (isPending || isAudioPending) {
       return (
         <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="300px" mt={8}>
           <Image src={'/images/addmeeting2.svg'} width={200} height={200} alt={'로고'} />
@@ -99,7 +158,6 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
               variant="outlined"
               multiline
               placeholder="오늘의 스크럼 회의에서 논의된 내용을 입력하세요..."
-              required
               helperText={`${meetingNote.length}/1000자 (최소 10자, 최대 1000자)`}
               error={(meetingNote.length > 0 && meetingNote.length < 10) || meetingNote.length > 1000}
               sx={{
@@ -129,12 +187,60 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
             />
           </div>
 
+          <div className={style.audioUploadSection}>
+            <div className={style.audioUploadHeader}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
+                음성 파일 추가 (선택사항)
+              </Typography>
+            </div>
+
+            {!audioFile ? (
+              <div className={style.audioUploadButton}>
+                <IconButton
+                  onClick={handleFileUpload}
+                  sx={{
+                    border: '2px dashed #ccc',
+                    borderRadius: '8px',
+                    width: '100%',
+                    height: '60px',
+                    '&:hover': {
+                      border: '2px dashed #528ad3',
+                      backgroundColor: '#f5f5f5',
+                    },
+                  }}
+                >
+                  <AttachFileIcon sx={{ fontSize: 24, color: '#666' }} />
+                  <Typography variant="body2" sx={{ ml: 1, mt: 2, color: '#666' }}>
+                    음성 파일 선택
+                  </Typography>
+                </IconButton>
+              </div>
+            ) : (
+              <div className={style.audioFileDisplay}>
+                <Typography variant="body2" sx={{ color: '#528ad3', fontWeight: 500, paddingTop: '15px' }}>
+                  ✓ {audioFile.name}
+                </Typography>
+                <IconButton onClick={handleRemoveFile} size="small" sx={{ color: '#ff4444' }}>
+                  <DeleteIcon />
+                </IconButton>
+              </div>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="audio/*"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+            />
+          </div>
+
           <div className={style.secondbutton}>
             <Button
               variant="contained"
               type="submit"
               color="primary"
-              disabled={meetingNote.length < 10 || meetingNote.length > 1000}
+              disabled={handleDisabled()}
               sx={{ width: '80px' }}
             >
               저장
