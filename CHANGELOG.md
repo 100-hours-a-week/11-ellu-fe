@@ -1,5 +1,10 @@
 # 변경 이력
 
+## <small>1.5.1 (2025-07-21)</small>
+
+* style: 회의록 추천일정 UI 스크롤문제 해결 ([82d18df](https://github.com/100-hours-a-week/11-ellu-fe/commit/82d18df))
+* style: 회의록 추천일정 UI 스크롤문제 해결 (#99) ([4986d59](https://github.com/100-hours-a-week/11-ellu-fe/commit/4986d59)), closes [#99](https://github.com/100-hours-a-week/11-ellu-fe/issues/99)
+
 ## 1.5.0 (2025-07-21)
 
 * feat: 음성파일 업로드 UI추가 ([c5fb515](https://github.com/100-hours-a-week/11-ellu-fe/commit/c5fb515))
