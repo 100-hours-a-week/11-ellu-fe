@@ -1,5 +1,12 @@
 # 변경 이력
 
+## 1.5.0 (2025-07-21)
+
+* feat: 음성파일 업로드 UI추가 ([c5fb515](https://github.com/100-hours-a-week/11-ellu-fe/commit/c5fb515))
+* feat: 음성파일 업로드 패치로직 추가 ([4cbcfd6](https://github.com/100-hours-a-week/11-ellu-fe/commit/4cbcfd6))
+* feat: 음성파일 업로드기능 추가 (#98) ([8af4cc6](https://github.com/100-hours-a-week/11-ellu-fe/commit/8af4cc6)), closes [#98](https://github.com/100-hours-a-week/11-ellu-fe/issues/98)
+* fix: 회의록 추천일정 api형식수정 ([33299e4](https://github.com/100-hours-a-week/11-ellu-fe/commit/33299e4))
+
 ## <small>1.4.1 (2025-07-21)</small>
 
 * fix: 회의록 추천 일정 응답형식변경 ([862247a](https://github.com/100-hours-a-week/11-ellu-fe/commit/862247a))
