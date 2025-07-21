@@ -1,13 +1,15 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import style from './CreateMeetnote.module.css';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { TextField, Button, Box, CircularProgress, Typography } from '@mui/material';
+import { TextField, Button, Box, CircularProgress, Typography, IconButton } from '@mui/material';
 import { useCreateMeetingNote } from '@/hooks/api/projects/useCreateMeetingNote';
 import RecommendSchedule from './RecommendSchedule';
 import { RecommendedSchedules } from '@/types/api/project';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function CreateMeetnote({ projectId }: { projectId: string }) {
   const { mutate: createMeetingNote, isPending } = useCreateMeetingNote();
@@ -42,9 +44,38 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
 
   function SecondState() {
     const [meetingNote, setMeetingNote] = useState('');
+    const [audioFile, setAudioFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (audioFile) return alert('회의록과 음성파일을 동시에 업로드할 수 없습니다!');
       setMeetingNote(e.target.value);
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+
+      if (file) {
+        const isValidFile = /\.(mp3|mp4|wav)$/i.test(file.name);
+
+        if (isValidFile) {
+          setAudioFile(file);
+        } else {
+          alert('mp3, mp4, wav 파일만 업로드 가능합니다.');
+        }
+      }
+    };
+
+    const handleFileUpload = () => {
+      if (meetingNote !== '') return alert('회의록과 음성파일을 동시에 업로드할 수 없습니다!');
+      fileInputRef.current?.click();
+    };
+
+    const handleRemoveFile = () => {
+      setAudioFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -126,6 +157,54 @@ export default function CreateMeetnote({ projectId }: { projectId: string }) {
                 border: 'none',
                 borderRadius: '10px',
               }}
+            />
+          </div>
+
+          <div className={style.audioUploadSection}>
+            <div className={style.audioUploadHeader}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 500 }}>
+                음성 파일 추가 (선택사항)
+              </Typography>
+            </div>
+
+            {!audioFile ? (
+              <div className={style.audioUploadButton}>
+                <IconButton
+                  onClick={handleFileUpload}
+                  sx={{
+                    border: '2px dashed #ccc',
+                    borderRadius: '8px',
+                    width: '100%',
+                    height: '60px',
+                    '&:hover': {
+                      border: '2px dashed #528ad3',
+                      backgroundColor: '#f5f5f5',
+                    },
+                  }}
+                >
+                  <AttachFileIcon sx={{ fontSize: 24, color: '#666' }} />
+                  <Typography variant="body2" sx={{ ml: 1, mt: 2, color: '#666' }}>
+                    음성 파일 선택
+                  </Typography>
+                </IconButton>
+              </div>
+            ) : (
+              <div className={style.audioFileDisplay}>
+                <Typography variant="body2" sx={{ color: '#528ad3', fontWeight: 500, paddingTop: '15px' }}>
+                  ✓ {audioFile.name}
+                </Typography>
+                <IconButton onClick={handleRemoveFile} size="small" sx={{ color: '#ff4444' }}>
+                  <DeleteIcon />
+                </IconButton>
+              </div>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="audio/*"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
             />
           </div>
 

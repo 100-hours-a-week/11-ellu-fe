@@ -65,6 +65,29 @@
   min-height: 0;
 }
 
+.audioUploadSection {
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.audioUploadHeader {
+  margin-bottom: 10px;
+}
+
+.audioUploadButton {
+  width: 100%;
+}
+
+.audioFileDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
 .secondbutton {
   display: flex;
   justify-content: flex-end;
