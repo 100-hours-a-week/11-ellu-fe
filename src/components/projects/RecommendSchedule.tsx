@@ -192,7 +192,13 @@ export default function RecommendSchedule({ recommendedTasksData }: { recommende
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
       <Typography variant="h5" gutterBottom fontWeight="bold" sx={{ color: '#528ad3' }}>
         Looper가 추천하는 태스크
       </Typography>
@@ -232,7 +238,8 @@ export default function RecommendSchedule({ recommendedTasksData }: { recommende
           overflow: 'hidden',
           maxHeight: '500px',
           position: 'relative',
-          mb: 3,
+          overflowY: 'auto',
+          flex: 1,
         }}
       >
         <Box
@@ -364,7 +371,7 @@ export default function RecommendSchedule({ recommendedTasksData }: { recommende
           onClick={handleAddToCalendar}
           disabled={getSelectedSubtaskCount() === 0 || isSubmitted}
           sx={{
-            mt: 8,
+            mt: 'auto',
             width: '100%',
             px: 4,
             py: 1.5,
