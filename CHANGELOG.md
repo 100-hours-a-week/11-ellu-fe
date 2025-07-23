@@ -1,5 +1,90 @@
 # 변경 이력
 
+## <small>1.5.2 (2025-07-23)</small>
+
+* fix: 액티비티 캘린더 UI 라이트모드로 고정 ([d121476](https://github.com/100-hours-a-week/11-ellu-fe/commit/d121476))
+
+## <small>1.5.1 (2025-07-21)</small>
+
+* style: 회의록 추천일정 UI 스크롤문제 해결 ([82d18df](https://github.com/100-hours-a-week/11-ellu-fe/commit/82d18df))
+* style: 회의록 추천일정 UI 스크롤문제 해결 (#99) ([4986d59](https://github.com/100-hours-a-week/11-ellu-fe/commit/4986d59)), closes [#99](https://github.com/100-hours-a-week/11-ellu-fe/issues/99)
+
+## 1.5.0 (2025-07-21)
+
+* feat: 음성파일 업로드 UI추가 ([c5fb515](https://github.com/100-hours-a-week/11-ellu-fe/commit/c5fb515))
+* feat: 음성파일 업로드 패치로직 추가 ([4cbcfd6](https://github.com/100-hours-a-week/11-ellu-fe/commit/4cbcfd6))
+* feat: 음성파일 업로드기능 추가 (#98) ([8af4cc6](https://github.com/100-hours-a-week/11-ellu-fe/commit/8af4cc6)), closes [#98](https://github.com/100-hours-a-week/11-ellu-fe/issues/98)
+* fix: 회의록 추천일정 api형식수정 ([33299e4](https://github.com/100-hours-a-week/11-ellu-fe/commit/33299e4))
+
+## <small>1.4.1 (2025-07-21)</small>
+
+* fix: 회의록 추천 일정 응답형식변경 ([862247a](https://github.com/100-hours-a-week/11-ellu-fe/commit/862247a))
+* fix: 회의록 추천 일정 응답형식변경 (#97) ([8b5c120](https://github.com/100-hours-a-week/11-ellu-fe/commit/8b5c120)), closes [#97](https://github.com/100-hours-a-week/11-ellu-fe/issues/97)
+
+## 1.4.0 (2025-07-18)
+
+* release V1.3.2 (#94) ([c40909c](https://github.com/100-hours-a-week/11-ellu-fe/commit/c40909c)), closes [#94](https://github.com/100-hours-a-week/11-ellu-fe/issues/94)
+* Release v1.4.0 (#96) ([f0087c6](https://github.com/100-hours-a-week/11-ellu-fe/commit/f0087c6)), closes [#96](https://github.com/100-hours-a-week/11-ellu-fe/issues/96)
+* 버전 태그가 없을 때 중복 latest 태그 생성 방지 ([ba5c3eb](https://github.com/100-hours-a-week/11-ellu-fe/commit/ba5c3eb))
+* 최신 태그 사용하도록 수정 ([06760e2](https://github.com/100-hours-a-week/11-ellu-fe/commit/06760e2))
+* docs: 프로젝트 입력란 설명문구 수정 ([ed1492e](https://github.com/100-hours-a-week/11-ellu-fe/commit/ed1492e))
+* style: 달성률 섹션 색상 추가 ([f455893](https://github.com/100-hours-a-week/11-ellu-fe/commit/f455893))
+* style: 왼쪽 네비게이션바 스타일 수정 ([6d9855e](https://github.com/100-hours-a-week/11-ellu-fe/commit/6d9855e))
+* fix: apexChart ssr문제 수정 ([5a460a3](https://github.com/100-hours-a-week/11-ellu-fe/commit/5a460a3))
+* fix: 마이페이지 일정 달성률 로딩상태 처리 추가 ([2d2f81d](https://github.com/100-hours-a-week/11-ellu-fe/commit/2d2f81d))
+* chore: 문구수정 ([c97a136](https://github.com/100-hours-a-week/11-ellu-fe/commit/c97a136))
+* feat: 마이페이지 일정 달성률 UI 추가 ([938040f](https://github.com/100-hours-a-week/11-ellu-fe/commit/938040f))
+* feat: 마이페이지 일정 달성률 데이터 패치로직 추가 ([6762ec8](https://github.com/100-hours-a-week/11-ellu-fe/commit/6762ec8))
+* stlye: 마이페이지 히스토리 문구추가 ([539ee15](https://github.com/100-hours-a-week/11-ellu-fe/commit/539ee15))
+
+## <small>1.3.2 (2025-07-08)</small>
+
+* fix: git checkout 참조 오류 수정 ([8674427](https://github.com/100-hours-a-week/11-ellu-fe/commit/8674427))
+* fix: git checkout 참조 오류 수정 (#93) ([47d41ff](https://github.com/100-hours-a-week/11-ellu-fe/commit/47d41ff)), closes [#93](https://github.com/100-hours-a-week/11-ellu-fe/issues/93)
+
+## <small>1.3.1 (2025-07-08)</small>
+
+* fix: semantic-release 결과와 관계없이 docker-build 작업 실행되도록 수정 ([0dac746](https://github.com/100-hours-a-week/11-ellu-fe/commit/0dac746))
+* fix: semantic-release 결과와 관계없이 docker-build 작업 실행되도록 수정 (#92) ([582daa2](https://github.com/100-hours-a-week/11-ellu-fe/commit/582daa2)), closes [#92](https://github.com/100-hours-a-week/11-ellu-fe/issues/92)
+
+## 1.3.0 (2025-07-08)
+
+* build.yml secrets 수정 ([7b19e2a](https://github.com/100-hours-a-week/11-ellu-fe/commit/7b19e2a))
+* build.yml secrets 재수정 ([2cf7ea1](https://github.com/100-hours-a-week/11-ellu-fe/commit/2cf7ea1))
+* Merge branch 'develop' into 77-refactor-디자인패턴custom-hooks-분리-패턴-적용 ([d715890](https://github.com/100-hours-a-week/11-ellu-fe/commit/d715890))
+* Release V 1.3.0 (#91) ([c1a1a40](https://github.com/100-hours-a-week/11-ellu-fe/commit/c1a1a40)), closes [#91](https://github.com/100-hours-a-week/11-ellu-fe/issues/91)
+* resolve merge conflicts between develop and main ([c161d3d](https://github.com/100-hours-a-week/11-ellu-fe/commit/c161d3d))
+* Update release.yml ([7b1e578](https://github.com/100-hours-a-week/11-ellu-fe/commit/7b1e578))
+* Update release.yml (secrets) ([fabc7df](https://github.com/100-hours-a-week/11-ellu-fe/commit/fabc7df))
+* fix: 로그아웃시 토큰재발급 요청로직 제거 ([a32dd1e](https://github.com/100-hours-a-week/11-ellu-fe/commit/a32dd1e))
+* fix: 챗봇일정생성 api형식변경 ([e2b09b1](https://github.com/100-hours-a-week/11-ellu-fe/commit/e2b09b1))
+* fix: 캘린더 handler useCallback 적용 ([c29784b](https://github.com/100-hours-a-week/11-ellu-fe/commit/c29784b))
+* fix: 프로젝트 일정생성 api 형식변경 ([38e9f0e](https://github.com/100-hours-a-week/11-ellu-fe/commit/38e9f0e))
+* fix: 프로젝트 일정생성 요청형식 변경 ([6a30993](https://github.com/100-hours-a-week/11-ellu-fe/commit/6a30993))
+* style: 마이페이지 스타일수정 ([c486413](https://github.com/100-hours-a-week/11-ellu-fe/commit/c486413))
+* hofix: 일정삭제 오류 수정 ([28e9119](https://github.com/100-hours-a-week/11-ellu-fe/commit/28e9119))
+* feat: 개인 진척도 UI 추가 ([43e79ea](https://github.com/100-hours-a-week/11-ellu-fe/commit/43e79ea))
+* feat: 개인진척도 UI 데이터연동완료 ([21e37ae](https://github.com/100-hours-a-week/11-ellu-fe/commit/21e37ae))
+* feat: 채팅 답변 로딩UI 추가 ([fb82051](https://github.com/100-hours-a-week/11-ellu-fe/commit/fb82051))
+* refactor: calendar 컴포넌트 cls 성능 리팩토링 (#86) ([88ff73e](https://github.com/100-hours-a-week/11-ellu-fe/commit/88ff73e)), closes [#86](https://github.com/100-hours-a-week/11-ellu-fe/issues/86)
+* refactor: useCalendarData 기능분리 ([d5cec72](https://github.com/100-hours-a-week/11-ellu-fe/commit/d5cec72))
+* refactor: useCalendarEvents 기능 분리 ([700b79e](https://github.com/100-hours-a-week/11-ellu-fe/commit/700b79e))
+* refactor: useCallback, useMemo로 최적화 로직 추가 ([f7b2d85](https://github.com/100-hours-a-week/11-ellu-fe/commit/f7b2d85))
+* refactor: 닉네임 유효성검사로직 커스텀 훅함수로 분리 ([3511fcf](https://github.com/100-hours-a-week/11-ellu-fe/commit/3511fcf))
+* refactor: 다수 입력폼 형태로 변경 ([e381642](https://github.com/100-hours-a-week/11-ellu-fe/commit/e381642))
+* refactor: 디자인패턴custom hooks 분리 패턴 적용 (#90) ([5df8ec0](https://github.com/100-hours-a-week/11-ellu-fe/commit/5df8ec0)), closes [#90](https://github.com/100-hours-a-week/11-ellu-fe/issues/90)
+* refactor: 모든폼 커스텀 훅으로 분리 ([7c6b409](https://github.com/100-hours-a-week/11-ellu-fe/commit/7c6b409))
+* refactor: 불필요한 Import문 제거 ([5079ce4](https://github.com/100-hours-a-week/11-ellu-fe/commit/5079ce4))
+* refactor: 불필요한 함수 제거 ([ec66295](https://github.com/100-hours-a-week/11-ellu-fe/commit/ec66295))
+* refactor: 불필요한 함수제거 ([084cd68](https://github.com/100-hours-a-week/11-ellu-fe/commit/084cd68))
+* refactor: 상단 헤더 닉네임 cls 성능최적화 ([0f3aa31](https://github.com/100-hours-a-week/11-ellu-fe/commit/0f3aa31))
+* refactor: 전체폴더구조 리팩토링 및useCalendarEvents 기능 상세분리 ([d2fbcbe](https://github.com/100-hours-a-week/11-ellu-fe/commit/d2fbcbe))
+* refactor: 초기 데이터로드 useEffect함수 분리 ([914f410](https://github.com/100-hours-a-week/11-ellu-fe/commit/914f410))
+* refactor: 캘린더 헤더 리렌더링 수정 ([558385c](https://github.com/100-hours-a-week/11-ellu-fe/commit/558385c))
+* refactor: 캘린터 컴포넌트 cls 최적화 ([f60ff3f](https://github.com/100-hours-a-week/11-ellu-fe/commit/f60ff3f))
+* refactor: 프로젝트 정보 입력폼 커스텀 훅함수로 분리 ([da0d77c](https://github.com/100-hours-a-week/11-ellu-fe/commit/da0d77c))
+* chore: release ci 추가 ([3f599de](https://github.com/100-hours-a-week/11-ellu-fe/commit/3f599de))
+
 ## 1.2.0 (2025-07-03)
 
 * build.yml secrets 수정 ([68c2549](https://github.com/100-hours-a-week/11-ellu-fe/commit/68c2549))
