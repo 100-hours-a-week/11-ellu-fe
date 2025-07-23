@@ -1,5 +1,12 @@
 # 변경 이력
 
+## <small>1.5.3 (2025-07-23)</small>
+
+* Merge branch 'main' into develop ([762ac68](https://github.com/100-hours-a-week/11-ellu-fe/commit/762ac68))
+* release v1.5.3 (#101) ([1ea497e](https://github.com/100-hours-a-week/11-ellu-fe/commit/1ea497e)), closes [#101](https://github.com/100-hours-a-week/11-ellu-fe/issues/101)
+* fix: 액티비티 캘린더 UI 라이트모드로 고정 ([4aeae7c](https://github.com/100-hours-a-week/11-ellu-fe/commit/4aeae7c))
+* fix: 액티비티 캘린더 UI 색상 ([73cab0c](https://github.com/100-hours-a-week/11-ellu-fe/commit/73cab0c))
+
 ## <small>1.5.2 (2025-07-23)</small>
 
 * fix: 액티비티 캘린더 UI 라이트모드로 고정 ([d121476](https://github.com/100-hours-a-week/11-ellu-fe/commit/d121476))
