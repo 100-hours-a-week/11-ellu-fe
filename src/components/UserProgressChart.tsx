@@ -50,8 +50,7 @@ export default function UserProgressChart() {
     <ActivityCalendar
       data={processData}
       theme={{
-        light: ['#ebedf0', '#9ecbff', '#4285f4', '#1a73e8', '#1557b0'],
-        dark: ['#161b22', '#1e293b', '#3b82f6', '#2563eb', '#1d4ed8'],
+        light: ['#ebedf0', '#9ecbff', '#4285f4', '#1a73e8', '#1557b0']
       }}
     />
   );
