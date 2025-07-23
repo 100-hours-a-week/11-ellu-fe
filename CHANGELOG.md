@@ -1,5 +1,9 @@
 # 변경 이력
 
+## <small>1.5.2 (2025-07-23)</small>
+
+* fix: 액티비티 캘린더 UI 라이트모드로 고정 ([d121476](https://github.com/100-hours-a-week/11-ellu-fe/commit/d121476))
+
 ## <small>1.5.1 (2025-07-21)</small>
 
 * style: 회의록 추천일정 UI 스크롤문제 해결 ([82d18df](https://github.com/100-hours-a-week/11-ellu-fe/commit/82d18df))
