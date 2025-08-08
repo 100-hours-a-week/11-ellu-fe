@@ -1,6 +1,6 @@
 # <img width="25" height="25" alt="image" src="https://github.com/user-attachments/assets/a8fef7e6-abfa-4a60-81c9-b5a96ce47fc9" /> Looper
 
-> 2025.04 ~ 2025.07
+> 2025.04 ~ 2025.07 (Kakaotech Bootcamp)
 
 **Looper는 혁신적인 AI 기반 루틴 관리 서비스로, 반복적인 일상에 효율을 추구하는 모든 사람들을 위해 개발되었습니다.**    
 
